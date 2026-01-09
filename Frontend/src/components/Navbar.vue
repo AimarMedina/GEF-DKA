@@ -47,10 +47,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import axios from 'axios';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 const router = useRouter();
 const userStore = useUserStore()
 let message = ref()
