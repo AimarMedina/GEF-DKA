@@ -19,9 +19,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'nombre',
         'email',
-        'password',
+        'contrasenna',
     ];
 
     /**
@@ -30,7 +30,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password',
+        'contrasenna',
         'remember_token',
     ];
 
@@ -45,5 +45,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted(){
+        static::creating(function ($user){
+            $start = match ($user->tipo){
+                'admin' => 10000,
+                'alumno' => 20000,
+                'tutor' => 30000,
+                'instructor' => 40000
+            };
+
+            $lastNumber = self::where('tipo', $user->tipo)->max('id');
+
+            $user->id = $lastNumber ? $lastNumber +1 : $start +1;
+        });
     }
 }

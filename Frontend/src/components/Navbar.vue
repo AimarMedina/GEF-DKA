@@ -9,17 +9,12 @@
 
             <!-- Bienvenida (desktop, derecha) -->
             <span class="d-none d-lg-block ms-lg-auto me-3 fw-semibold">
-                ¡Bienvenido, {{ usuario }}!
+                ¡Bienvenid@, {{ usuario }}!
             </span>
 
             <!-- Hamburguesa -->
-            <button
-                class="navbar-toggler"
-                type="button"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasNavbar"
-                aria-controls="offcanvasNavbar"
-            >
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -29,12 +24,7 @@
                     <h5 class="offcanvas-title">
                         ¡Bienvenido, {{ usuario }}!
                     </h5>
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="offcanvas"
-                        aria-label="Close"
-                    ></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
 
                 <div class="offcanvas-body">
@@ -71,33 +61,36 @@
 
 
 <script setup>
-import { useUserStore } from '@/stores/userStore';
-import axios from 'axios';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-const router = useRouter();
-const userStore = useUserStore()
-let message = ref()
-let usuario = userStore.user.name
-async function logout() {
-    const token = localStorage.getItem('token')
-    try {
-        const response = await axios.post('http://localhost:8000/api/logout', {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
+    import { useUserStore } from '@/stores/userStore';
+    import axios from 'axios';
+    import { ref } from 'vue';
+    import { useRouter } from 'vue-router';
+
+    const router = useRouter();
+    const userStore = useUserStore()
+
+    let message = ref()
+    let usuario = userStore.user.name
+    
+    async function logout() {
+        const token = localStorage.getItem('token')
+        try {
+            const response = await axios.post('http://localhost:8000/api/logout', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data.status === 'success') {
+                localStorage.removeItem('token');
+                delete axios.defaults.headers.common['Authorization'];
+                userStore.user.value = null
+                router.push('/');
             }
-        });
-        if (response.data.status === 'success') {
-            localStorage.removeItem('token');
-            delete axios.defaults.headers.common['Authorization'];
-            userStore.user.value = null
-            router.push('/');
+        } catch (error) {
+            console.error(error);
+            message.value = 'Error cerrando sesión';
         }
-    } catch (error) {
-        console.error(error);
-        message.value = 'Error cerrando sesión';
     }
-}
 </script>
 
 <style lang="scss" scoped></style>
