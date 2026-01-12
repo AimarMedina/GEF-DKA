@@ -70,8 +70,8 @@
     const userStore = useUserStore()
 
     let message = ref()
-    let usuario = userStore.user.name
-    
+    let usuario = userStore.user.nombre + " " + userStore.user.apellidos
+
     async function logout() {
         const token = localStorage.getItem('token')
         try {

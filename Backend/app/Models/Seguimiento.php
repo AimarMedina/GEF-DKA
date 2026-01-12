@@ -6,5 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Seguimiento extends Model
 {
-    
+    protected $fillable = [
+        'ID_Estancia',
+        'Fecha',
+        'Hora',
+        'Accion_Seguimiento',
+        'Seguimiento_Actividad'
+    ];
+
+    public function estancia(){
+        return $this->belongsTo(EstanciaAlumno::class);
+    }
 }

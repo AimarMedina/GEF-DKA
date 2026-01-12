@@ -11,9 +11,9 @@ class UserSeeder extends Seeder
     {
         // ADMIN
         User::create([
-            'nombre' => 'Ainhoa',
-            'apellidos' => 'Admin Etxeberria',
-            'email' => 'admin@centro.local',
+            'nombre' => 'Admin',
+            'apellidos' => 'admin',
+            'email' => 'admin@test.com',
             'n_tel' => 600111222,
             'password' => bcrypt('admin'),
             'tipo' => 'admin',

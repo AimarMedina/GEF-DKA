@@ -20,7 +20,6 @@ class User extends Authenticatable
      */
     public $incrementing = false;
     protected $fillable = [
-        'id',
         'nombre',
         'apellidos',
         'email',
@@ -65,6 +64,24 @@ class User extends Authenticatable
 
             $user->id = $lastNumber ? $lastNumber +1 : $start +1;
         });
+        static::created(function ($user) {
+            match ($user->tipo) {
+                'alumno'     => Alumno::create(['ID_Usuario' => $user->id]),
+                'instructor' => Instructor::create(['ID_Usuario' => $user->id]),
+                'tutor'      => Tutor::create(['ID_Usuario' => $user->id]),
+                default      => null,
+            };
+        });
+
     }
 
+    public function alumno(){
+        return $this->hasOne(Alumno::class,'ID_Usuario');
+    }
+    public function tutor(){
+        return $this->hasOne(Tutor::class,'ID_Usuario');
+    }
+    public function instructor(){
+        return $this->hasOne(Instructor::class,'ID_Usuario');
+    }
 }
