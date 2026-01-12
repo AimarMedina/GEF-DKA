@@ -19,4 +19,5 @@ class Tutor extends Model
     protected function instructores(){
         return $this->belongsToMany(Instructor::class,"tutor_instructor","ID_Tutor","ID_Instructor");
     }
+    
 }
