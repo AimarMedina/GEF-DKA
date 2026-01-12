@@ -6,5 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class AlumnoEntrega extends Model
 {
-    
+    protected $table = 'alumno_entrega';
+
+    protected $fillable = [
+        'URL_Cuaderno',
+        'Fecha_Entrega',
+        'ID_Alumno',
+        'ID_Entrega'
+    ];
+
+    public function alumno()
+    {
+        return $this->belongsTo(Alumno::class,'ID_Alumno','ID_Usuario');
+    }
+
+
+    public function entrega()
+    {
+        return $this->belongsTo(EntregaCuaderno::class,'ID_Entrega','ID');
+    }
 }
