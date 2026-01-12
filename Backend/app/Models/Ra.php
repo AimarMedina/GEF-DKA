@@ -13,10 +13,8 @@ class Ra extends Model
         "Descripcion"
     ];
 
-    public function competencias(){
-        return $this->belongsToMany(Competencia::class,"comp_ra","ID_Ra","ID_Comp");
+    public function compRa(){
+        return $this->hasOne(compRa::class,"comp_ra","ID","ID_Ra");
     }
-    public function asignaturas(){
-        return $this->belongsToMany(Asignatura::class,"comp_ra","ID_Ra","ID_Asignatura");
-    }
+
 }
