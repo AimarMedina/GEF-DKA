@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Dom\Notation;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 
@@ -23,6 +24,6 @@ class Asignatura extends Model
     }
 
     public function notaEgibide(){
-        return $this -> hasOne('ID_Asignatura');
+        return $this -> hasOne(NotaEgibide::class, 'ID_Asignatura');
     }
 }

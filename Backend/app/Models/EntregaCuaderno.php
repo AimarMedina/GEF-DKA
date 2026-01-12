@@ -6,5 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class EntregaCuaderno extends Model
 {
+    protected $table = 'entrega_cuaderno';
     
+    protected $fillable = [
+        'Fecha_creacion',
+        'Fecha_Limite',
+        'ID_Grado '
+    ];
+
+    public function alumnoEntrega(){
+        return $this->hasOne(AlumnoEntrega::class, 'ID_Entrega');
+    }
+
+    public function grado (){
+        return $this->belongsTo(Grado::class, 'ID_Grado');
+    }
 }

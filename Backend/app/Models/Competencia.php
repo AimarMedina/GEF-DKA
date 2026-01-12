@@ -12,8 +12,8 @@ class Competencia extends Model
         "Descripcion"
     ];
 
-    public function ras(){
-        return $this->belongsToMany(Ra::class,"comp_ra","ID_Comp","ID_Ra");
+    public function compRa(){
+        return $this->hasOne(compRa::class,"comp_ra","ID","ID_Comp");
     }
     public function notasCompentencias(){
         return $this->hasMany(NotaCompetencia::class,"ID_Compentencia","ID");
