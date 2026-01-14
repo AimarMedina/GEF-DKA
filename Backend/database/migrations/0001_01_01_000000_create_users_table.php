@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('apellidos');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->integer('n_tel');
+            $table->string('n_tel');
             $table->string('password');
             $table->enum('tipo', ['admin', 'alumno', 'tutor', 'instructor']);
             $table->rememberToken();

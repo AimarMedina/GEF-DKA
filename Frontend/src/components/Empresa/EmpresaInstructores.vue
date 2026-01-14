@@ -9,7 +9,7 @@ const instructores = ref([])
 const cache = ref({})
 const loading = ref(false)
 const showModal = ref(false)
-const errorMessage = ref(false)
+const errorMessage = ref(null)
 
 async function cargarInstructores(cif) {
     if (cache.value[cif]) {
@@ -46,6 +46,7 @@ async function crearInstructor(instructorData) {
         instructores.value.push(response.data.instructor)
         cache.value[props.empresa.CIF] = instructores.value
         showModal.value = false
+        errorMessage.value = {}
     } catch (error) {
         errorMessage.value = error.response.data.errors
     }
@@ -99,6 +100,5 @@ async function crearInstructor(instructorData) {
             </table>
         </div>
     </div>
-
-    <ModalInstructor :show="showModal" :errorMessage="errorMessage" @close="showModal=false, errorMessage = false" @crear="crearInstructor" />
+    <ModalInstructor :show="showModal" :errorMessage="errorMessage" @close="showModal=false, errorMessage = null" @crear="crearInstructor" />
 </template>

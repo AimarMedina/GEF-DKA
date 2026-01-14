@@ -3,7 +3,7 @@ import { ref, defineProps, defineEmits, watch } from 'vue'
 
 const props = defineProps({
     show: Boolean,
-    errorMessage: String
+    errorMessage: Object
 })
 
 const emit = defineEmits(['close', 'crear'])

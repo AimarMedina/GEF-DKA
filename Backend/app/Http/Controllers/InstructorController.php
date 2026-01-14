@@ -19,7 +19,7 @@ class InstructorController extends Controller
             'nombre' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
             'email' => ['required','email','max:255','unique:users,email'],
-            'n_tel' => ['nullable','string','max:9','unique:users,n_tel'],
+            'n_tel' => ['nullable','string','regex:/^[0-9]{9}$/','unique:users,n_tel'],
             'password' => 'required|string|min:6',
             'CIF_Empresa' => 'required|string|exists:empresa,CIF',
         ], [
@@ -29,7 +29,7 @@ class InstructorController extends Controller
             'email.required' => 'El email es obligatorio.',
             'email.email' => 'Debes introducir un email válido.',
             'email.unique' => 'Este email ya está registrado.',
-            'n_tel.max' => 'El número de teléfono no puede superar los 9 caracteres.',
+            'n_tel.regex' => 'El número de teléfono debe tener exactamente 9 dígitos.',
             'n_tel.unique' => 'Este número de teléfono ya está registrado.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
@@ -52,9 +52,13 @@ class InstructorController extends Controller
         $user->load('instructor');
 
         // Asignamos la empresa al instructor recién creado
-        $user->instructor()->update([
-            'CIF_Empresa' => $data['CIF_Empresa']
-        ]);
+        $instructor = $user->instructor;
+
+        if ($instructor) {
+            $instructor->CIF_Empresa = $data['CIF_Empresa'];
+            $instructor->save();
+        }
+
 
         return response()->json([
             'message' => 'Instructor creado correctamente',

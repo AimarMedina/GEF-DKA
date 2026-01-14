@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Admin',
             'apellidos' => 'admin',
             'email' => 'admin@test.com',
-            'n_tel' => 600111222,
+            'n_tel' => '600111222',
             'password' => bcrypt('admin'),
             'tipo' => 'admin',
         ]);
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Maite',
             'apellidos' => 'García Lasa',
             'email' => 'maite.tutor@centro.local',
-            'n_tel' => 600222333,
+            'n_tel' => '600222333',
             'password' => bcrypt('tutor'),
             'tipo' => 'tutor',
         ]);
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Iñigo',
             'apellidos' => 'Sáez Arriola',
             'email' => 'inigo.tutor@centro.local',
-            'n_tel' => 600333444,
+            'n_tel' => '600333444',
             'password' => bcrypt('tutor'),
             'tipo' => 'tutor',
         ]);
@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Nerea',
             'apellidos' => 'López Mendieta',
             'email' => 'nerea.instructor@empresa.local',
-            'n_tel' => 610111222,
+            'n_tel' => '610111222',
             'password' => bcrypt('instructor'),
             'tipo' => 'instructor',
         ]);
@@ -52,7 +52,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Jon',
             'apellidos' => 'Martín Urrutia',
             'email' => 'jon.instructor@empresa.local',
-            'n_tel' => 610222333,
+            'n_tel' => '610222333',
             'password' => bcrypt('instructor'),
             'tipo' => 'instructor',
         ]);
@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Ane',
             'apellidos' => 'Zubizarreta Ochoa',
             'email' => 'ane.alumno@centro.local',
-            'n_tel' => 620111222,
+            'n_tel' => '620111222',
             'password' => bcrypt('alumno'),
             'tipo' => 'alumno',
         ]);
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Unai',
             'apellidos' => 'Alonso Ibarrola',
             'email' => 'unai.alumno@centro.local',
-            'n_tel' => 620222333,
+            'n_tel' => '620222333',
             'password' => bcrypt('alumno'),
             'tipo' => 'alumno',
         ]);
@@ -80,7 +80,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Irati',
             'apellidos' => 'Serrano Garmendia',
             'email' => 'irati.alumno@centro.local',
-            'n_tel' => 620333444,
+            'n_tel' => '620333444',
             'password' => bcrypt('alumno'),
             'tipo' => 'alumno',
         ]);
@@ -89,7 +89,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Mikel',
             'apellidos' => 'Ruiz Echevarría',
             'email' => 'mikel.alumno@centro.local',
-            'n_tel' => 620444555,
+            'n_tel' => '620444555',
             'password' => bcrypt('alumno'),
             'tipo' => 'alumno',
         ]);
@@ -98,7 +98,7 @@ class UserSeeder extends Seeder
             'nombre' => 'Leire',
             'apellidos' => 'Navarro Etxaniz',
             'email' => 'leire.alumno@centro.local',
-            'n_tel' => 620555666,
+            'n_tel' => '620555666',
             'password' => bcrypt('alumno'),
             'tipo' => 'alumno',
         ]);
