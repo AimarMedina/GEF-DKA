@@ -1,7 +1,13 @@
 
 <?php
 
+<<<<<<< Updated upstream
 use App\Http\Controllers\EstanciaController;
+=======
+use App\Http\Controller\EstanciaAlumno;
+use App\Http\Controller\EstanciaController;
+use App\Http\Controllers\Empresa;
+>>>>>>> Stashed changes
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AlumnoController;
@@ -19,6 +25,6 @@ Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getComp
 Route::post('/empresa/instructor/create',[InstructorController::class,'crearInstructor']);
 Route::get('/tutores/{id}/alumnos', [AlumnoController::class, 'alumnosDeTutor']);
 Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']);
-Route::get('/alumno/{id}/estancia',[EstanciaController::class,'getEstanciaAlumno']);
+Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaAlumno']);
 Route::get('/estancias',[EstanciaController::class,'getEstancias']);
 Route::get('/empresa/{cif}/alumnos',[EstanciaController::class,'getCompanyAlumnos']);

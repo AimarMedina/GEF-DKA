@@ -118,6 +118,14 @@
                 Alumnos
               </RouterLink>
             </li>
+            <li class="nav-item" v-if="usuario.tipo ==='alumno'">
+              <RouterLink
+                class="nav-link"
+                :to="`/alumno/${usuario.id}/estancia`"
+              >
+              Estancias
+              </RouterLink>
+            </li>
 
             <li class="nav-item">
               <a class="nav-link text-danger" role="button" @click="logout">

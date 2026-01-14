@@ -41,6 +41,7 @@ class Alumno extends Model
         return $this->hasMany(NotaTransversal::class, 'ID_Alumno','ID_Usuario');
     }
 
+    
     public function estanciaAlumno(){
         return $this-> hasOne(EstanciaAlumno::class, 'ID_Alumno', 'ID_Usuario');
     }

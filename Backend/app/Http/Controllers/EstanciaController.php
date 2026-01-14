@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\EstanciaAlumno;
-use Illuminate\Http\Request;
 
 class EstanciaController extends Controller
 {
@@ -11,9 +10,18 @@ class EstanciaController extends Controller
         $estancias = EstanciaAlumno::all();
         return response()->json($estancias);
     }
+    
+    // Obtener la estancia del alumno
+    public function getEstanciaAlumno($idAlumno)
+    {
+        $estancia = EstanciaAlumno::with([
+            'empresa',
+            'horario',
+            'alumno.tutor.usuario',
+            'alumno.instructor.usuario'
+        ])->where('ID_Alumno', $idAlumno)
+            ->get(); 
 
-    public function getEstanciaAlumno($id){
-        $estancia=EstanciaAlumno::find($id);
         return response()->json($estancia);
     }
     public function getCompanyAlumnos($CIF){
@@ -23,3 +31,4 @@ class EstanciaController extends Controller
 
 
 }
+
