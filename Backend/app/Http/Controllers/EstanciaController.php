@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\EstanciaAlumno;
+use App\Models\Alumno;
+
 
 class EstanciaController extends Controller
 {
@@ -11,28 +13,32 @@ class EstanciaController extends Controller
         return response()->json($estancias);
     }
 
-    // Obtener la estancia del alumno
-    public function getEstanciaAlumno($idAlumno)
-        {
-            $estancia = EstanciaAlumno::with([
-                'empresa',
-                'horario',
-                'alumno.usuario',
-                'alumno.tutor.user',
-                'alumno.instructor.user'
-            ])->where('ID_Alumno', $idAlumno)
-            ->first();
+    // Tutor: historial completo de estancias de un alumno
+    public function historialEstanciasAlumno($idAlumno)
+    {
+        $estancias = EstanciaAlumno::with([
+            'empresa',
+            'horario',
+            'alumno.tutor.user',
+            'alumno.instructor.user',
+            'alumno.grado'
+        ])->where('ID_Alumno', $idAlumno)
+          ->orderBy('Fecha_inicio', 'desc')
+          ->get();
 
-            if (!$estancia) {
-                return response()->json(['message' => 'Estancia no encontrada'], 404);
-            }
+        return response()->json($estancias);
+    }
 
-            return response()->json($estancia);
-        }
+    // Alumno: solo su estancia actual
+    public function getEstanciaActual($idAlumno)
+    {
+        $alumno = Alumno::with('estanciaActual.empresa',
+                               'estanciaActual.horario',
+                               'estanciaActual.alumno.tutor.user',
+                               'estanciaActual.alumno.instructor.user')
+                        ->findOrFail($idAlumno);
 
-    public function getCompanyAlumnos($CIF){
-        $estanciasEmpresa = EstanciaAlumno::with(['alumno.usuario','alumno.instructor.user'])->where('CIF_Empresa', $CIF)->get();
-        return response()->json($estanciasEmpresa);
+        return response()->json($alumno->estanciaActual);
     }
 
 
