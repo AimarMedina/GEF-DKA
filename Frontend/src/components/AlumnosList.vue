@@ -1,14 +1,24 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import UserTable from "@/components/UserTable.vue";
 import Navbar from "../components/Navbar.vue";
-
+import { useRoute } from "vue-router";
 const props = defineProps({
   endpoint: { type: String, required: true }, // URL completa
   title: { type: String, default: "Alumnos" },
   actions: {},
 });
+
+const route = useRoute();
+//Cogemos de la URL si los datos son de un tutor o de un instructor
+const isTutorView = computed(() => route.name === "alumnosTutor");
+const isInstructorView = computed(() => route.name === "alumnosInstructor");
+
+function verNotas(alumno) {}
+function verEntregas(alumno) {}
+function verSeguimiento(alumno) {}
+function crearSeguimiento(alumno) {}
 
 const alumnos = ref([]); // por defecto array vacío de alumnos
 const currentPage = ref(1); //por defecto se carga la primera pagina
@@ -66,9 +76,49 @@ onMounted(() => fetchAlumnos(1));
           <td>{{ a.Email }}</td>
           <td>{{ a.Grado }}</td>
           <td>
-            <slot name="actions" :alumno="a">
+            <span v-if="isTutorView">
+              <!-- Hay que coger de la bd si un alumno tiene estancia
+     SI TIENE ESTANCIA: Ver seguimiento/ borrar estancia
+     SI NO TIENE ESTANCIA: Asignar Estancia-->
+              <button v-if=" a.Tiene_estancia"
+                class="btn btn-sm btn-primary me-2"
+                @click="verSeguimiento(a)" 
+              >
+                Ver Segumiento
+              </button>
+               <button v-if="! a.Tiene_estancia"
+                class="btn btn-sm btn-primary me-2"
+                @click="verSeguimiento(a)" 
+              >
+                Asignar Empresa
+              </button>
+
+              <button class="btn btn-sm btn-secondary" @click="verEntregas(a)">
+                Entregas
+              </button>
+            </span>
+
+            <span v-else-if="isInstructorView">
+              <button v-if=" a.Tiene_estancia"
+                class="btn btn-sm btn-primary me-2"
+                @click="verSeguimiento(a)" 
+              >
+                Ver Notas
+              </button>
+               <button v-if="! a.Tiene_estancia"
+               disabled=""
+                class="btn btn-sm btn-primary me-2"
+                @click="verSeguimiento(a)" 
+              >
+                Ver Notas
+              </button>
+
+              
+            </span>
+
+            <span v-else>
               <span class="text-muted">-</span>
-            </slot>
+            </span>
           </td>
         </tr>
 

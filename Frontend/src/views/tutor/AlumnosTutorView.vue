@@ -9,11 +9,11 @@ const tutorId = route.params.id;
      <AlumnosList
     :endpoint="`http://127.0.0.1:8000/api/tutores/${tutorId}/alumnos`"
     title="Tus Alumnos"
-  >
-     <template #actions="{ alumno }">
+  />
+     <!-- <template #actions="{ alumno }">
     <button class="btn btn-sm btn-primary me-2" @click="verDetalle(alumno)">
       Ver
     </button>
   </template>
-  </AlumnosList>
+  </AlumnosList> -->
 </template>
