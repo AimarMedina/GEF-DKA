@@ -7,6 +7,7 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\EstanciaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\NotasEmpresaController;
 
 Route::get('/auth', [UserController::class, 'auth'])->middleware('auth:sanctum');
 
@@ -21,3 +22,5 @@ Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeIns
 Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaAlumno']);
 Route::get('/estancias', [EstanciaController::class, 'getEstancias']);
 Route::get('/empresa/{cif}/alumnos', [EstanciaController::class, 'getCompanyAlumnos']);
+ Route::get('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'show'])->middleware('auth:sanctum');
+ Route::post('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'store'])->middleware('auth:sanctum');

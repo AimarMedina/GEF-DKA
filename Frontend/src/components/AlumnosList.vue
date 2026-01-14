@@ -80,15 +80,17 @@ onMounted(() => fetchAlumnos(1));
               <!-- Hay que coger de la bd si un alumno tiene estancia
      SI TIENE ESTANCIA: Ver seguimiento/ borrar estancia
      SI NO TIENE ESTANCIA: Asignar Estancia-->
-              <button v-if=" a.Tiene_estancia"
+              <button
+                v-if="a.Tiene_estancia"
                 class="btn btn-sm btn-primary me-2"
-                @click="verSeguimiento(a)" 
+                @click="verSeguimiento(a)"
               >
                 Ver Segumiento
               </button>
-               <button v-if="! a.Tiene_estancia"
+              <button
+                v-if="!a.Tiene_estancia"
                 class="btn btn-sm btn-primary me-2"
-                @click="verSeguimiento(a)" 
+                @click="verSeguimiento(a)"
               >
                 Asignar Empresa
               </button>
@@ -99,21 +101,19 @@ onMounted(() => fetchAlumnos(1));
             </span>
 
             <span v-else-if="isInstructorView">
-              <button v-if=" a.Tiene_estancia"
+              <!-- TIENE ESTANCIA -->
+              <RouterLink
+                v-if="a.Tiene_estancia"
+                :to="`/instructor/alumnos/${a.ID_Usuario}/notas`"
                 class="btn btn-sm btn-primary me-2"
-                @click="verSeguimiento(a)" 
               >
                 Ver Notas
-              </button>
-               <button v-if="! a.Tiene_estancia"
-               disabled=""
-                class="btn btn-sm btn-primary me-2"
-                @click="verSeguimiento(a)" 
-              >
-                Ver Notas
-              </button>
+              </RouterLink>
 
-              
+              <!-- NO TIENE ESTANCIA -->
+              <button v-else class="btn btn-sm btn-primary me-2" disabled>
+                Ver Notas
+              </button>
             </span>
 
             <span v-else>
