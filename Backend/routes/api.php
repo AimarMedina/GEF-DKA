@@ -1,7 +1,7 @@
 
 <?php
 
-use App\Http\Controllers\Empresa;
+use App\Http\Controllers\EstanciaController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AlumnoController;
@@ -21,3 +21,4 @@ Route::get('/tutores/{id}/alumnos', [AlumnoController::class, 'alumnosDeTutor'])
 Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']);
 Route::get('/alumno/{id}/estancia',[EstanciaController::class,'getEstanciaAlumno']);
 Route::get('/estancias',[EstanciaController::class,'getEstancias']);
+Route::get('/empresa/{cif}/alumnos',[EstanciaController::class,'getCompanyAlumnos']);

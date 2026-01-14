@@ -16,4 +16,10 @@ class EstanciaController extends Controller
         $estancia=EstanciaAlumno::find($id);
         return response()->json($estancia);
     }
+    public function getCompanyAlumnos($CIF){
+        $estanciasEmpresa = EstanciaAlumno::with(['alumno.usuario','alumno.instructor.user'])->where('CIF_Empresa', $CIF)->get();
+        return response()->json($estanciasEmpresa);
+    }
+
+
 }

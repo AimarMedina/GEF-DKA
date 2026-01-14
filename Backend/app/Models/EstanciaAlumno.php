@@ -24,6 +24,6 @@ class EstanciaAlumno extends Model
         return $this->belongsTo(Empresa::class,'CIF');
     }
     public function alumno(){
-        return $this->belongsTo(Alumno::class,'ID_Usuario');
+        return $this->belongsTo(Alumno::class,'ID_Alumno','ID_Usuario');
     }
 }

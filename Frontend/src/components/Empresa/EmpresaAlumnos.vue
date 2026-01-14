@@ -21,6 +21,7 @@ async function cargarAlumnos(cif) {
         const response = await axios.get(`http://localhost:8000/api/empresa/${cif}/alumnos`)
         cache.value[cif] = response.data
         alumnos.value = response.data
+        console.log(alumnos.value);
     } catch (e) {
         alumnos.value = []
     } finally {
@@ -71,12 +72,13 @@ watch(
                         </td>
                     </tr>
 
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                       <tr v-for="estancia in alumnos" :key="estancia">
+                            <td>{{ estancia.alumno.usuario.nombre }} {{ estancia.alumno.usuario.apellidos }}</td>
+                            <td>{{ estancia.alumno.usuario.email }}</td>
+                            <td>{{ estancia.alumno.usuario.n_tel }}</td>
+                            <td>{{ estancia.alumno.instructor?.user?.nombre || '—' }}</td>
+                        </tr>
+
 
                     <tr v-if="!loading && !alumnos.length">
                         <td colspan="3" class="text-center text-muted">No hay alumnos</td>
@@ -85,5 +87,4 @@ watch(
             </table>
         </div>
     </div>
-    <ModalInstructor :show="showModal" :errorMessage="errorMessage" @close="showModal=false, errorMessage = null" @crear="crearInstructor" />
 </template>

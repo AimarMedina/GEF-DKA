@@ -49,10 +49,10 @@ class Alumno extends Model
         return $this->belongsToMany(
             EntregaCuaderno::class,
             'Alumno_Entrega',
-            'ID_Alumno',   
-            'ID_Entrega',  
-            'ID_Usuario',  
-            'ID'           
+            'ID_Alumno',
+            'ID_Entrega',
+            'ID_Usuario',
+            'ID'
         )->withPivot(['URL_Cuaderno', 'Fecha_Entrega', 'ID']);
     }
 
