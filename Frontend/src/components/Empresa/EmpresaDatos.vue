@@ -11,7 +11,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="col-8">
+    <div class="col-md-9">
         <EmpresaInfo v-if="empresa" :empresa="empresa" />
         <EmpresaInstructores v-if="empresa" :empresa="empresa" />
         <EmpresaAlumnos v-if="empresa" :empresa="empresa"></EmpresaAlumnos>

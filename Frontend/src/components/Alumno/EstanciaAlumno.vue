@@ -24,11 +24,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="estancia">
-    <EstanciaDatos :estancia="estancia" />
-    <EstanciaHorario :horario="estancia.horario" />
-  </div>
-  <div v-else>
-    No hay estancia registrada.
+  <div class="container-fluid">
+    <div v-if="estancia" class="row">
+      <EstanciaDatos :estancia="estancia" />
+      <EstanciaHorario :horario="estancia.horario" />
+    </div>
+    <div v-else class="row">
+      No hay estancia registrada.
+    </div>
   </div>
 </template>
