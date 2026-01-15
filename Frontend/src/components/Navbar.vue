@@ -101,6 +101,12 @@
                     Entregas de cuadernos
                   </RouterLink>
                 </li>
+                
+                 <li>
+                  <RouterLink class="dropdown-item" to="/cuadernos-tutor">
+                    Cuadernos
+                  </RouterLink>
+                </li>
 
                 <li>
                   <RouterLink class="dropdown-item" to="/notas-alumnos">
@@ -123,8 +129,12 @@
                 class="nav-link"
                 :to="`/alumno/${usuario.id}/estancia`"
               >
-              Estancias
+              Estancia
               </RouterLink>
+            </li>
+            
+             <li class="nav-item" v-if="usuario.tipo === 'alumno'">
+              <RouterLink class="nav-link" to="/cuadernos-alumno">Mis Cuadernos</RouterLink>
             </li>
 
             <li class="nav-item">

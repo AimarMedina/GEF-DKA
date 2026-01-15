@@ -15,7 +15,7 @@ class EntregaCuaderno extends Model
     ];
 
     public function alumnoEntrega(){
-        return $this->hasOne(AlumnoEntrega::class, 'ID_Entrega');
+        return $this->hasMany(AlumnoEntrega::class, 'ID_Entrega','id');
     }
 
     public function grado (){
