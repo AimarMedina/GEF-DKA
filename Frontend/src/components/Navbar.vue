@@ -96,23 +96,11 @@
                   </RouterLink>
                 </li>
 
-                <li>
-                  <RouterLink class="dropdown-item" to="/entregas-cuaderno">
-                    Entregas de cuadernos
-                  </RouterLink>
-                </li>
-                
                  <li>
-                  <RouterLink class="dropdown-item" to="/cuadernos-tutor">
-                    Cuadernos
-                  </RouterLink>
-                </li>
-
-                <li>
-                  <RouterLink class="dropdown-item" to="/notas-alumnos">
-                    Notas de alumnos
-                  </RouterLink>
-                </li>
+                    <RouterLink class="dropdown-item" to="/cuadernos-tutor">
+                      Cuadernos
+                    </RouterLink>
+                  </li>
               </ul>
             </li>
 

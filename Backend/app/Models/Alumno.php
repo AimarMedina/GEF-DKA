@@ -50,7 +50,7 @@ class Alumno extends Model
                 ->whereNull('Fecha_fin');
     }
 
-     public function entregasCuadernos(){
+     public function entregas(){
         return $this->belongsToMany(
             EntregaCuaderno::class,
             'Alumno_Entrega',

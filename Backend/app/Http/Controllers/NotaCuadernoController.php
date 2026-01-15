@@ -7,16 +7,23 @@ use Illuminate\Http\Request;
 
 class NotaCuadernoController extends Controller
 {
+     // POST /api/nota-cuaderno
     public function notaCuaderno(Request $request)
     {
-        return NotaCuaderno::updateOrCreate(
+        $request->validate([
+            'ID_Cuaderno' => 'required',
+            'Nota' => 'required|numeric|min:0|max:10'
+        ]);
+
+        NotaCuaderno::updateOrCreate(
             ['ID_Cuaderno' => $request->ID_Cuaderno],
             [
-                'ID_Tutor' => auth()->id(),
-                'Fecha' => now(),
-                'Nota' => $request->Nota
+                'Nota' => $request->Nota,
+                'Fecha' => now()
             ]
         );
+
+        return response()->json(['message' => 'Nota guardada']);
     }
       
 }

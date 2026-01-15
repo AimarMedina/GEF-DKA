@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import axios from "axios";
 import UserTable from "@/components/UserTable.vue";
 import Navbar from "../components/Navbar.vue";
+import Buscador from "./Buscador.vue";
 import { useRoute } from "vue-router";
 const props = defineProps({
   endpoint: { type: String, required: true }, // URL completa
@@ -25,6 +26,21 @@ const currentPage = ref(1); //por defecto se carga la primera pagina
 const totalPages = ref(1); // por defecto una pagina en total
 const perPage = ref(5); //por defecto 5 alumnos por página
 
+const q = ref("");
+let searchTimeout = null;
+function onSearch(texto) {
+  q.value = (texto || "").trim();
+  fetchAlumnos(1); // al buscar, volvemos a página 1
+}
+watch(q, () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  searchTimeout = setTimeout(() => {
+    fetchAlumnos(1); // se muestra la primera página
+  }, 400);
+});
 //Asignamos la primera primera página al fetch
 async function fetchAlumnos(page = 1) {
   //si nos meten una página menor que uno redirigimos a la primera
@@ -35,7 +51,7 @@ async function fetchAlumnos(page = 1) {
 
   //Cogemos la URL, la página en la que estamos y la cantidad de alumnos que va a haber en cada página. Guardamos en res
   const res = await axios.get(props.endpoint, {
-    params: { page: currentPage.value, per_page: perPage.value },
+    params: { page: currentPage.value, per_page: perPage.value, q: q.value },
   });
 
   //guardamos el json que devuelve laravel en paginator
@@ -56,79 +72,85 @@ onMounted(() => fetchAlumnos(1));
   <div>
     <h4 class="mb-3">{{ title }}</h4>
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Apellidos</th>
-          <th>Email</th>
-          <th>Grado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
+    <Buscador :tipo="'Buscar Alumnos'" @search="onSearch" />
+    <!-- </span> -->
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <!-- <th>ID</th> -->
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th>Grado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr v-for="a in alumnos" :key="a.ID_Usuario">
-          <td>{{ a.ID_Usuario }}</td>
-          <td>{{ a.Nombre }}</td>
-          <td>{{ a.Apellidos }}</td>
-          <td>{{ a.Email }}</td>
-          <td>{{ a.Grado }}</td>
-          <td>
-            <span v-if="isTutorView">
-              <!-- Hay que coger de la bd si un alumno tiene estancia
+        <tbody>
+          <tr v-for="a in alumnos" :key="a.ID_Usuario">
+            <!-- <td>{{ a.ID_Usuario }}</td> -->
+            <td>{{ a.Nombre }}</td>
+            <td>{{ a.Apellidos }}</td>
+            <td>{{ a.Email }}</td>
+            <td>{{ a.Grado }}</td>
+            <td>
+              <span v-if="isTutorView">
+                <!-- Hay que coger de la bd si un alumno tiene estancia
      SI TIENE ESTANCIA: Ver seguimiento/ borrar estancia
      SI NO TIENE ESTANCIA: Asignar Estancia-->
-              <button
-                v-if="a.Tiene_estancia"
-                class="btn btn-sm btn-primary me-2"
-                @click="verSeguimiento(a)"
-              >
-                Ver Segumiento
-              </button>
-              <button
-                v-if="!a.Tiene_estancia"
-                class="btn btn-sm btn-primary me-2"
-                @click="verSeguimiento(a)"
-              >
-                Asignar Empresa
-              </button>
+                <button
+                  v-if="a.Tiene_estancia"
+                  class="btn btn-sm btn-primary me-2"
+                  @click="verSeguimiento(a)"
+                >
+                  Ver Segumiento
+                </button>
+                <button
+                  v-if="!a.Tiene_estancia"
+                  class="btn btn-sm btn-primary me-2"
+                  @click="verSeguimiento(a)"
+                >
+                  Asignar Empresa
+                </button>
 
-              <button class="btn btn-sm btn-secondary" @click="verEntregas(a)">
-                Entregas
-              </button>
-            </span>
+                <button
+                  class="btn btn-sm btn-secondary"
+                  @click="verEntregas(a)"
+                >
+                  Entregas
+                </button>
+              </span>
 
-            <span v-else-if="isInstructorView">
-              <!-- TIENE ESTANCIA -->
-              <RouterLink
-                v-if="a.Tiene_estancia"
-                :to="`/instructor/alumnos/${a.ID_Usuario}/notas`"
-                class="btn btn-sm btn-primary me-2"
-              >
-                Ver Notas
-              </RouterLink>
+              <span v-else-if="isInstructorView">
+                <!-- TIENE ESTANCIA -->
+                <RouterLink
+                  v-if="a.Tiene_estancia"
+                  :to="`/instructor/alumnos/${a.ID_Usuario}/notas`"
+                  class="btn btn-sm btn-primary me-2"
+                >
+                  Ver Notas
+                </RouterLink>
 
-              <!-- NO TIENE ESTANCIA -->
-              <button v-else class="btn btn-sm btn-primary me-2" disabled>
-                Ver Notas
-              </button>
-            </span>
+                <!-- NO TIENE ESTANCIA -->
+                <button v-else class="btn btn-sm btn-primary me-2" disabled>
+                  Ver Notas
+                </button>
+              </span>
 
-            <span v-else>
-              <span class="text-muted">-</span>
-            </span>
-          </td>
-        </tr>
+              <span v-else>
+                <span class="text-muted">-</span>
+              </span>
+            </td>
+          </tr>
 
-        <tr v-if="alumnos.length === 0">
-          <td colspan="6" class="text-center py-3">No hay alumnos</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <nav>
+          <tr v-if="alumnos.length === 0">
+            <td colspan="6" class="text-center py-3">No hay alumnos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <nav v-if="totalPages > 1">
       <ul class="pagination justify-content-center">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
           <button

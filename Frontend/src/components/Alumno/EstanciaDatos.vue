@@ -12,6 +12,7 @@ const props = defineProps({
       <thead>
         <tr>
           <th>Empresa</th>
+          <th>Dirección</th>
           <th>Instructor</th>
           <th>Tutor</th>
           <th>Fecha inicio</th>
@@ -21,6 +22,7 @@ const props = defineProps({
       <tbody>
         <tr>
           <td>{{ estancia.empresa?.Nombre }}</td>
+          <td>{{ estancia.empresa?.Direccion }}</td>
           <td>
             {{ estancia.alumno?.instructor?.user?.nombre }}
             {{ estancia.alumno?.instructor?.user?.apellidos }}

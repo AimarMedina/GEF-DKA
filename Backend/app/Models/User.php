@@ -64,19 +64,19 @@ class User extends Authenticatable
 
             $user->id = $lastNumber ? $lastNumber +1 : $start +1;
         });
-        static::created(function ($user) {
-            match ($user->tipo) {
-                'alumno'     => Alumno::create(['ID_Usuario' => $user->id]),
-                'instructor' => Instructor::create(['ID_Usuario' => $user->id]),
-                'tutor'      => Tutor::create(['ID_Usuario' => $user->id]),
-                default      => null,
-            };
-        });
+        //  static::created(function ($user) {
+        //      match ($user->tipo) {
+        //          'alumno'     => Alumno::create(['ID_Usuario' => $user->id]),
+        //          'instructor' => Instructor::create(['ID_Usuario' => $user->id]),
+        //          'tutor'      => Tutor::create(['ID_Usuario' => $user->id]),
+        //          default      => null,
+        //      };
+        //  });
 
     }
 
     public function alumno(){
-        return $this->hasOne(Alumno::class,'ID_Usuario');
+        return $this->hasOne(Alumno::class,'ID_Usuario','id');
     }
     public function tutor(){
         return $this->hasOne(Tutor::class,'ID_Usuario');

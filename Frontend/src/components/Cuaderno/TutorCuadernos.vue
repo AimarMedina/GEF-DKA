@@ -8,22 +8,33 @@ const tutorId = userStore.user?.id;
 
 const entregas = ref([]);
 const mensaje = ref('');
+
 async function fetchEntregas() {
   if (!tutorId) return;
 
   try {
     // Obtener los grados que tutorea
-    const grados  = await axios.get(`http://localhost:8000/api/tutor/${tutorId}/grados`);
+    const gradosResponse = await axios.get(`http://localhost:8000/api/tutor/${tutorId}/grados`);
+    const grados = gradosResponse.data;
+
     entregas.value = [];
 
-    console.log(grados);
     // Obtener entregas de cada grado
     for (const grado of grados) {
-      const { data: res } = await axios.get(`http://localhost:8000/api/grado/${grado.id}/entregas`);
-      // Añadir info del alumno para mostrar en la tabla
-      res.forEach(e => {
-        e.alumnoEntrega = e.alumnoEntrega || [];
+      const resResponse = await axios.get(`http://localhost:8000/api/grado/${grado.id}/entregas`);
+      const res = resResponse.data;
+
+      // Mapear alumno_entrega a alumnoEntrega
+      res.forEach(function(e) {
+        e.alumnoEntrega = e.alumno_entrega || [];
+        // Asegurar que cada entrega tenga una nota
+        e.alumnoEntrega.forEach(a => {
+          if (!a.nota) {
+            a.nota = { Nota: 0 };
+          }
+        });
       });
+
       entregas.value.push(...res);
     }
 
@@ -63,19 +74,27 @@ onMounted(fetchEntregas);
         </tr>
       </thead>
       <tbody>
-        <tr v-for="entrega in entregas" :key="entrega.ID">
-          <td>{{ entrega.alumnoEntrega[0]?.alumno?.usuario?.nombre ?? '—' }}</td>
+        <!-- Para cada entrega -->
+        <tr v-for="entrega in entregas" :key="entrega.id">
           <td>
-            <a v-if="entrega.alumnoEntrega[0]?.URL_Cuaderno"
-               :href="entrega.alumnoEntrega[0].URL_Cuaderno"
-               target="_blank">
-              Ver PDF
-            </a>
-            <span v-else>No entregado</span>
+            <!-- Mostrar cada alumno de la entrega -->
+            <span v-for="alumnoEntrega in entrega.alumnoEntrega" :key="alumnoEntrega.id">
+              {{ alumnoEntrega.alumno?.usuario?.nombre ?? '—' }}
+            </span>
           </td>
           <td>
-            <input v-model="entrega.alumnoEntrega[0].nota.Nota" type="number" min="0" max="10" />
-            <button @click="guardarNota(entrega.alumnoEntrega[0])" class="btn btn-success btn-sm">Guardar</button>
+            <span v-for="alumnoEntrega in entrega.alumnoEntrega" :key="alumnoEntrega.id">
+              <a v-if="alumnoEntrega.URL_Cuaderno" :href="alumnoEntrega.URL_Cuaderno" target="_blank">
+                Ver PDF
+              </a>
+              <span v-else>No entregado</span>
+            </span>
+          </td>
+          <td>
+            <span v-for="alumnoEntrega in entrega.alumnoEntrega" :key="alumnoEntrega.id">
+              <input v-model="alumnoEntrega.nota.Nota" type="number" min="0" max="10" />
+              <button @click="guardarNota(alumnoEntrega)" class="btn btn-success btn-sm">Guardar</button>
+            </span>
           </td>
         </tr>
       </tbody>

@@ -102,5 +102,55 @@ class UserSeeder extends Seeder
             'password' => bcrypt('alumno'),
             'tipo' => 'alumno',
         ]);
+        // MÁS ALUMNOS
+        User::create([
+            'id' => 20006,
+            'nombre' => 'Aitor',
+            'apellidos' => 'Etxeberria Salinas',
+            'email' => 'aitor.alumno@centro.local',
+            'n_tel' => '620666777',
+            'password' => bcrypt('alumno'),
+            'tipo' => 'alumno',
+        ]);
+
+        User::create([
+            'id' => 20007,
+            'nombre' => 'June',
+            'apellidos' => 'Larrinaga Múgica',
+            'email' => 'june.alumno@centro.local',
+            'n_tel' => '620777888',
+            'password' => bcrypt('alumno'),
+            'tipo' => 'alumno',
+        ]);
+
+        User::create([
+            'id' => 20008,
+            'nombre' => 'Iker',
+            'apellidos' => 'Goikoetxea Aramburu',
+            'email' => 'iker.alumno@centro.local',
+            'n_tel' => '620888999',
+            'password' => bcrypt('alumno'),
+            'tipo' => 'alumno',
+        ]);
+
+        User::create([
+            'id' => 20009,
+            'nombre' => 'Nahia',
+            'apellidos' => 'Uribe Lete',
+            'email' => 'nahia.alumno@centro.local',
+            'n_tel' => '620999000',
+            'password' => bcrypt('alumno'),
+            'tipo' => 'alumno',
+        ]);
+
+        User::create([
+            'id' => 20010,
+            'nombre' => 'Asier',
+            'apellidos' => 'Mendia Otaola',
+            'email' => 'asier.alumno@centro.local',
+            'n_tel' => '621000111',
+            'password' => bcrypt('alumno'),
+            'tipo' => 'alumno',
+        ]);
     }
 }

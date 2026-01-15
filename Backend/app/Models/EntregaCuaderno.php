@@ -11,7 +11,7 @@ class EntregaCuaderno extends Model
     protected $fillable = [
         'Fecha_creacion',
         'Fecha_Limite',
-        'ID_Grado '
+        'ID_Grado'
     ];
 
     public function alumnoEntrega(){

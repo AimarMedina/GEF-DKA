@@ -1,8 +1,8 @@
-
 <?php
 
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\GradoController;
+use App\Http\Controllers\TutorController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\AlumnoEntregaController;
@@ -30,13 +30,16 @@ Route::get('/empresa/{cif}/alumnos', [EstanciaController::class, 'getCompanyAlum
 
 
 //Cuaderno
+Route::get('/alumno/{id}', [AlumnoController::class, 'getGrado']);
+Route::middleware('auth:sanctum')->get('/alumno/entregas', [EntregaCuadernoController::class, 'entregasAlumno']);
 Route::post('/entregas', [EntregaCuadernoController::class, 'crearEntregaCuaderno']); // tutor
 Route::get('/grado/{id}/entregas', [EntregaCuadernoController::class, 'porGrado']);
-Route::post('/alumno/entrega', [AlumnoEntregaController::class, 'entregarCuaderno']);
+Route::post('/alumno/entregas', [AlumnoEntregaController::class, 'entregarCuaderno']);
 Route::post('/nota-cuaderno', [NotaCuadernoController::class, 'notaCuaderno']);
+
 
 
 Route::get('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'show'])->middleware('auth:sanctum');
 Route::post('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'store'])->middleware('auth:sanctum');
-Route::get('/grados',[GradoController::class,'getGrados']);
+Route::get('/tutor/{id}/grados', [TutorController::class, 'grados']);
 

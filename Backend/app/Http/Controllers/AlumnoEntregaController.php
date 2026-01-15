@@ -12,11 +12,11 @@ class AlumnoEntregaController extends Controller
         // Si recibes archivo PDF desde un form-data
         $urlCuaderno = $request->URL_Cuaderno;
 
-        // Para subir archivo real:
-        // if($request->hasFile('PDF')){
-        //     $path = $request->file('PDF')->store('cuadernos', 'public');
-        //     $urlCuaderno = asset('storage/'.$path);
-        // }
+        //Para subir archivo real:
+        if($request->hasFile('cuaderno')){
+            $path = $request->file('cuaderno')->store('cuadernos', 'public');
+            $urlCuaderno = asset('storage/'.$path);
+        }
 
         return AlumnoEntrega::updateOrCreate(
             [
