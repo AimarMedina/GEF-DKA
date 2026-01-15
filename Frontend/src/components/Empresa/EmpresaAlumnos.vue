@@ -21,7 +21,6 @@ async function cargarAlumnos(cif) {
         const response = await axios.get(`http://localhost:8000/api/empresa/${cif}/alumnos`)
         cache.value[cif] = response.data
         alumnos.value = response.data
-        console.log(alumnos.value);
     } catch (e) {
         alumnos.value = []
     } finally {

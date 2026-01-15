@@ -4,22 +4,22 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
 
 const userStore = useUserStore();
-const tutorId = userStore.user?.ID;
+const tutorId = userStore.user?.id;
 
 const entregas = ref([]);
 const mensaje = ref('');
-
 async function fetchEntregas() {
   if (!tutorId) return;
 
   try {
     // Obtener los grados que tutorea
-    const { data: grados } = await axios.get(`http://localhost:8000/api/tutor/${tutorId}/grados`);
+    const grados  = await axios.get(`http://localhost:8000/api/tutor/${tutorId}/grados`);
     entregas.value = [];
 
+    console.log(grados);
     // Obtener entregas de cada grado
     for (const grado of grados) {
-      const { data: res } = await axios.get(`http://localhost:8000/api/grado/${grado.ID}/entregas`);
+      const { data: res } = await axios.get(`http://localhost:8000/api/grado/${grado.id}/entregas`);
       // Añadir info del alumno para mostrar en la tabla
       res.forEach(e => {
         e.alumnoEntrega = e.alumnoEntrega || [];
