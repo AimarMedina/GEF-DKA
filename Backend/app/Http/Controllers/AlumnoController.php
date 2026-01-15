@@ -7,14 +7,21 @@ use Illuminate\Http\Request;
 
 class AlumnoController extends Controller
 {
-    public function alumnosDeTutor(Request $request, int $id)
-    {
-        $usuario= $request->user();
-        //  if($usuario->tipo =='tutor'){
-        $perPage = (int) $request->query('per_page', 10);
+   public function alumnosDeTutor(Request $request, int $id)
+{
+    $perPage = (int) $request->query('per_page', 10);
+    $q = trim((string) $request->query('q', ''));
 
-        $alumnos = Alumno::query()
-            ->where('id_tutor', $id)
+    $query = Alumno::query()->where('id_tutor', $id);
+
+    if ($q !== '') {
+        $query->whereHas('usuario', function ($u) use ($q) {
+            $u->where('nombre', 'like', "%{$q}%")
+              ->orWhere('apellidos', 'like', "%{$q}%")
+              ->orWhere('email', 'like', "%{$q}%");
+        });
+    }
+        $alumnos = $query
             ->with([
                 'usuario:id,nombre,apellidos,email,tipo',
                 'grado:id,nombre',
@@ -31,8 +38,8 @@ class AlumnoController extends Controller
                 'Email'      => $a->usuario?->email,
                 'Tipo'      =>  $a->usuario?->tipo,
                 'Grado'      => $a->grado?->nombre,
-                'Tiene_estancia'=> $a->estanciaAlumno !==null,
-                'estancia_id'   =>$a->estanciaAlumno?->id
+                'Tiene_estancia'=> $a->estanciaActual !==null,
+                'estancia_id'   =>$a->estanciaActual?->id
             ];
         });
 
@@ -48,9 +55,19 @@ class AlumnoController extends Controller
     {
         $perPage = (int) $request->query('per_page', 10);
 
-        $alumnos = Alumno::query()
-            ->where('id_instructor', $id)
-            //Nombre de las funciones de las relaciones en el modelo de alumno
+        $q = trim((string) $request->query('q', ''));
+
+         $query = Alumno::query()->where('id_instructor', $id);
+
+        if ($q !== '') {
+            $query->whereHas('usuario', function ($u) use ($q) {
+                $u->where('nombre', 'like', "%{$q}%")
+                ->orWhere('apellidos', 'like', "%{$q}%")
+                ->orWhere('email', 'like', "%{$q}%");
+            });
+      }
+
+        $alumnos = $query
             ->with([
                 'usuario:id,nombre,apellidos,email,tipo',
                 'grado:id,nombre',
@@ -65,8 +82,8 @@ class AlumnoController extends Controller
                 'Apellidos'  => $a->usuario?->apellidos,
                 'Email'      => $a->usuario?->email,
                 'Grado'      => $a->grado?->nombre,
-                'Tiene_estancia'=> $a->estanciaAlumno !==null,
-                'estancia_id'   =>$a->estanciaAlumno?->id
+                'Tiene_estancia'=> $a->estanciaActual !==null,
+                'estancia_id'   =>$a->estanciaActual?->id
             ];
         });
 
