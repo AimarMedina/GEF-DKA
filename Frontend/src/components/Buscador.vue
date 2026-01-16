@@ -15,7 +15,7 @@ watch(texto, (nuevoValor) => {
 </script>
 
 <template>
-  <nav class="navbar bg-body-tertiary mb-3">
+  <nav class="navbar mb-3">
     <div class="">
       <input
         class="form-control"

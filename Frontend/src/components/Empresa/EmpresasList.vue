@@ -3,7 +3,7 @@
         <button class="btn btn-secondary mb-2" @click="mostrarModal = true">
             <i class="bi bi-building-fill-add"></i> Añadir
         </button>
-
+        <Buscador :tipo="'Buscar Empresa'" @search="onSearch"></Buscador>
         <EmpresaForm :show="mostrarModal" :errorMessage="errores" @close="mostrarModal = false" @crear="crearEmpresa" />
 
         <ul v-if="empresas.length" class="list-group">
@@ -18,7 +18,7 @@
             </button>
         </ul>
 
-        <p v-else>
+        <p v-if="cargando">
             Cargando empresas
         <ul class="carga">
             <li></li>
@@ -34,8 +34,9 @@
 
 <script setup>
 import axios from 'axios'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import EmpresaForm from './EmpresaForm.vue'
+import Buscador from "../Buscador.vue";
 
 const empresas = ref([])
 const mostrarModal = ref(false)
@@ -43,28 +44,59 @@ const errores = ref(null)
 
 const emit = defineEmits(['seleccionarEmpresa'])
 
-const cargarEmpresas = async () => {
-  const response = await axios.get('http://localhost:8000/api/empresas')
-  empresas.value = response.data
+async function cargarEmpresas() {
+            cargando.value = true
+
+    const response = await axios.get(
+        'http://localhost:8000/api/empresas',
+        {
+            params: {
+                q: q.value
+            }
+        }
+    )
+
+    empresas.value = response.data
+    cargando.value = false
 }
 
-onMounted(cargarEmpresas)
+
 
 const crearEmpresa = async (empresa) => {
-  try {
-    const response = await axios.post('http://localhost:8000/api/empresa/create', {
-        ...empresa
-    })
-    console.log(response.data);
-    
-    mostrarModal.value = false
-    errores.value = null
-    cargarEmpresas()
-  } catch (e) {
-    if (e.response?.status === 422) {
-      errores.value = e.response.data.errors
-    }
-  }
-}
-</script>
+    try {
+        const response = await axios.post('http://localhost:8000/api/empresa/create', {
+            ...empresa
+        })
+        console.log(response.data);
 
+        mostrarModal.value = false
+        errores.value = null
+        q.value = response.data.Nombre
+    } catch (e) {
+        if (e.response?.status === 422) {
+            errores.value = e.response.data.errors
+        }
+    }
+}
+const cargando = ref(false)
+const q = ref("");
+let searchTimeout = null;
+function onSearch(texto) {
+    q.value = (texto || "").trim();
+}
+watch(q, () => {
+    if (searchTimeout) {
+        cargando.value = false
+        clearTimeout(searchTimeout)
+    }
+    searchTimeout = setTimeout(() => {
+        if (q.value.length < 2) {
+            cargando.value =false
+            empresas.value = []
+            return
+        }
+        cargarEmpresas()
+    }, 400)
+})
+
+</script>

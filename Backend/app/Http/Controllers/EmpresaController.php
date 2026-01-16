@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
 {
-    public function getCompanys()
+    public function getCompanys(Request $req)
     {
-        $empresas = Empresa::all();
+        $q = trim((string) $req->query('q', ''));
+        $query = Empresa::query();
+
+        if ($q !== '') {
+            $query->where(function ($u) use ($q) {
+                $u->where('CIF', 'like', "%{$q}%")
+                    ->orWhere('Nombre', 'like', "%{$q}%")
+                    ->orWhere('Direccion', 'like', "%{$q}%")
+                    ->orWhere('Email', 'like', "%{$q}%")
+                    ->orWhere('N_Tel', 'like', "%{$q}%");
+            });
+        }
+        $empresas = $query->get();
         return response()->json($empresas);
     }
     public function create(Request $req)
@@ -43,7 +55,5 @@ class EmpresaController extends Controller
         ]);
 
         return response()->json($data, 201);
-
-
     }
 }

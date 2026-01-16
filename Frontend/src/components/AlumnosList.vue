@@ -40,7 +40,7 @@ watch(q, () => {
     fetchAlumnos(1); // se muestra la primera página
   }, 400);
 });
-//Asignamos la primera primera página al fetch
+
 async function fetchAlumnos(page = 1) {
   //si nos meten una página menor que uno redirigimos a la primera
   if (page < 1) page = 1;
@@ -61,7 +61,7 @@ async function fetchAlumnos(page = 1) {
   totalPages.value = paginator.last_page || 1;
 }
 
-//Cuando el componente se cargue se va a la primera pagina
+
 onMounted(() => fetchAlumnos(1));
 </script>
 
@@ -97,7 +97,7 @@ onMounted(() => fetchAlumnos(1));
 
             <!-- ==== VISTA DE TUTORES ==== -->
               <span v-if="isTutorView">
-                
+
                 <button
                   v-if="a.Tiene_estancia"
                   class="btn btn-sm btn-primary me-2"
