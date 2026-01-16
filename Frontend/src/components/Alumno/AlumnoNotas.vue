@@ -3,9 +3,9 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '@/stores/userStore'
 
-import CuadernosTable from '@/components/notas/CuadernosTable.vue'
-import CompetenciasTable from '@/components/notas/CompetenciasTable.vue'
-import TransversalesTable from '@/components/notas/TransversalesTable.vue'
+import CuardernosTable from '../Notas/CuardernosTable.vue'
+import CompetenciasTable from '../Notas/CompetenciasTable.vue'
+import TransversalesTable from '../Notas/TransversalesTable.vue'
 import EgibideTable from '@/components/notas/EgibideTable.vue'
 
 const notas = ref(null)
@@ -41,7 +41,7 @@ onMounted(cargarNotas)
         <p class="mb-0"><strong>Grado:</strong> {{ notas.grado.nombre }}</p>
       </div>
 
-      <CuadernosTable :entregas="notas.entregas" :alumno-id="id" />
+      <CuardernosTable :entregas="notas.entregas" :alumno-id="id" />
       <CompetenciasTable :competencias="notas.notas_competencias" />
       <TransversalesTable :transversales="notas.notas_transversales" />
       <EgibideTable :egibide="notas.notas_egibide" />
