@@ -88,7 +88,8 @@ const router = createRouter({
       path: '/alumno/mis-notas',
       name: "alumno-notas",
       component: AlumnoNotasView ,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true }
+    },
     {
       path: "/grados",
       name: "grados",
