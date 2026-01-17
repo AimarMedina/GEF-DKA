@@ -39,12 +39,15 @@ const router = createRouter({
     {
       path: '/tutores/:id/alumnos',
       name: 'alumnosTutor',
-      component: AlumnosTutorView 
+      component: AlumnosTutorView ,
+      meta: { requiresAuth: true }
     },
     {
       path: '/instructores/:id/alumnos',
       name: 'alumnosInstructor',
       component:AlumnosInstructorView,
+      meta: { requiresAuth: true }
+
     },
     {
       path: '/alumnosTutor/seguimiento',
