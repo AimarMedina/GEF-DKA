@@ -123,9 +123,9 @@
                 Mis Cuadernos
               </RouterLink>
             </li>
-            <li>
+            <li v-if="usuario.tipo ==='alumno'">
               <RouterLink class="nav-link" to="/alumno/mis-notas">
-                Mis notas
+                Mis Notas
               </RouterLink>
             </li>
             <li class="nav-item">
@@ -185,4 +185,4 @@ async function logout() {
 
 </script>
 
-<style lang="scss" scoped></style>
+

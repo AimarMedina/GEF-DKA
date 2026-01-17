@@ -4,7 +4,7 @@ import axios from "axios";
 import UserTable from "@/components/UserTable.vue";
 import Navbar from "../components/Navbar.vue";
 import Buscador from "./Buscador.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 const props = defineProps({
   endpoint: { type: String, required: true }, // URL completa
   title: { type: String, default: "Alumnos" },
@@ -12,6 +12,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
+const redireccionador= useRouter();
 //Cogemos de la URL si los datos son de un tutor o de un instructor
 const isTutorView = computed(() => route.name === "alumnosTutor");
 const isInstructorView = computed(() => route.name === "alumnosInstructor");
@@ -48,8 +49,11 @@ async function fetchAlumnos(page = 1) {
   //actualizamos la página en la que estamos
   currentPage.value = page;
 
+  const token = localStorage.getItem('token');
+  try{
   //Cogemos la URL, la página en la que estamos y la cantidad de alumnos que va a haber en cada página. Guardamos en res
   const res = await axios.get(props.endpoint, {
+    headers:  { Authorization: `Bearer ${token}` },
     params: { page: currentPage.value, per_page: perPage.value, q: q.value },
   });
 
@@ -59,6 +63,12 @@ async function fetchAlumnos(page = 1) {
   alumnos.value = paginator.data || [];
   //asignamos el total de páginas con el número de la última, mínimo 1
   totalPages.value = paginator.last_page || 1;
+} catch(error){
+  if(error.response && error.response.status === 403){
+    redireccionador.push('/home');
+    alert(error.response.data.message);
+  }
+}
 }
 
 

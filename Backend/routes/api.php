@@ -45,8 +45,8 @@ Route::post('/empresa/instructor/create', [InstructorController::class, 'crearIn
 | Tutores y Alumnos
 |--------------------------------------------------------------------------
 */
-Route::get('/tutores/{id}/alumnos', [AlumnoController::class, 'alumnosDeTutor']);
-Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']);
+Route::get('/tutores/{id}/alumnos', [AlumnoController::class, 'alumnosDeTutor'])-> middleware('auth:sanctum');
+Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']) ->middleware('auth:sanctum');
 
 Route::get('/tutor/alumno/{id}/estancias', [EstanciaController::class, 'historialEstanciasAlumno']);// Tutor
 Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaActual']);// Alumno
