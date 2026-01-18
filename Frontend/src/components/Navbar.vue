@@ -10,9 +10,7 @@
         />
       </RouterLink>
       <!-- Bienvenida (desktop, derecha) -->
-      <span class="d-none d-lg-block ms-lg-auto me-3 fw-semibold">
-        ¡Bienvenid@, {{ usuario.nombre }}!
-      </span>
+      
 
       <!-- Hamburguesa -->
       <button
@@ -28,7 +26,6 @@
       <!-- Offcanvas -->
       <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar">
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title">¡Bienvenid@, {{ usuario.nombre }}!</h5>
           <button
             type="button"
             class="btn-close"
