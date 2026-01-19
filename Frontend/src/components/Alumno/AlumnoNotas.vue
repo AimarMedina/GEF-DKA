@@ -31,7 +31,7 @@ async function cargarNotas() {
 onMounted(cargarNotas)
 </script>
 
-<<template>
+<template>
   <div class="container mt-4">
     <h3 class="mb-4 text-center text-md-start">Mis Notas</h3>
 

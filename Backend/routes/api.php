@@ -12,6 +12,8 @@ use App\Http\Controllers\MatrizController;
 use App\Http\Controllers\NotaCuadernoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotasEmpresaController;
+use App\Http\Controllers\SeguimientoController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +54,7 @@ Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeIns
 Route::get('/tutor/alumno/{id}/estancias', [EstanciaController::class, 'historialEstanciasAlumno']);// Tutor
 Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaActual']);// Alumno
 Route::get('/empresa/{cif}/alumnos', [EstanciaController::class, 'getCompanyAlumnos']);
+Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaActual']);
 
 
 //Cuaderno
@@ -123,4 +126,16 @@ Route::get('/grados/{id}/competencias', [GradoController::class, 'getCompetencia
 Route::get('/tutor/{id}/notas-cuaderno', [NotaCuadernoController::class, 'notasPorTutor']);
 
 
+/*
+|--------------------------------------------------------------------------
+| Seguimiento
+|--------------------------------------------------------------------------
+*/
+Route::get('/estancia/{id}/seguimientos', [SeguimientoController::class, 'index']);
+Route::post('/seguimiento', [SeguimientoController::class,'crearSeguimiento']);
+Route::put('/seguimiento/{id}', [SeguimientoController::class,'ModificarSeguimiento']);
+Route::delete('/seguimiento/{id}', [SeguimientoController::class,'eliminarSeguimiento']);
+
+
 Route::get('/grado/{id}/matriz-competencias/', [MatrizController::class, 'getCompRa']);
+

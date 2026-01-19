@@ -49,16 +49,17 @@ const router = createRouter({
 
     },
     {
-      path: '/alumnosTutor/seguimiento',
+      path: '/tutor/alumno/:id/seguimiento',
       name: 'seguimientoAlumno',
       component: SeguimientoView
     },
 
     {
-      path: '/alumnosTutor/asignarEmpresa',
-      name: 'asignarEmpresa',
-      component: AsignarEmpresaView
-    },
+      path: '/tutor/seguimiento/:estanciaId',
+      name: 'seguimiento',
+      component: SeguimientoView,
+      props: true
+    },  
 
     {
       path: '/empresa',

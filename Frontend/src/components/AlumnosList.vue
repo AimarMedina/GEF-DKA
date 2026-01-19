@@ -5,6 +5,7 @@ import UserTable from "@/components/UserTable.vue";
 import Navbar from "../components/Navbar.vue";
 import Buscador from "./Buscador.vue";
 import { useRoute, useRouter } from "vue-router";
+import NotasAlumnoModal from "@/components/Tutor/NotasAlumnoModal.vue";
 const props = defineProps({
   endpoint: { type: String, required: true }, // URL completa
   title: { type: String, default: "Alumnos" },
@@ -16,11 +17,40 @@ const redireccionador= useRouter();
 //Cogemos de la URL si los datos son de un tutor o de un instructor
 const isTutorView = computed(() => route.name === "alumnosTutor");
 const isInstructorView = computed(() => route.name === "alumnosInstructor");
+const showNotasModal = ref(false);   // modal
+const notasAlumno = ref(null);       // almacena las notas del alumno seleccionado
+const alumnoSeleccionado = ref(null);
 
-function verNotas(alumno) {}
+
+
+async function verNotas(alumno) {
+  alumnoSeleccionado.value = alumno;
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await axios.get(`http://localhost:8000/api/alumno/${alumno.ID_Usuario}/mis-notas`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    notasAlumno.value = res.data;  // guarda las notas
+    showNotasModal.value = true;   // abre el modal
+  } catch (err) {
+    console.error(err);
+    alert("Error al cargar las notas del alumno");
+  }
+}
+
 function verEntregas(alumno) {}
-function verSeguimiento(alumno) {}
-function crearSeguimiento(alumno) {}
+
+function verSeguimiento(alumno) {
+  alumnoSeleccionado.value = alumno
+
+  if (alumno.Tiene_estancia) { // solo comprobar booleano
+    redireccionador.push(`/tutor/alumno/${alumno.estancia_id}/seguimiento`)
+  } else {
+    alert("Este alumno no tiene estancia asignada")
+  }
+}
+
 
 const alumnos = ref([]); // por defecto array vacío de alumnos
 const currentPage = ref(1); //por defecto se carga la primera pagina
@@ -108,13 +138,19 @@ onMounted(() => fetchAlumnos(1));
             <!-- ==== VISTA DE TUTORES ==== -->
               <span v-if="isTutorView">
 
-                <button
-                  v-if="a.Tiene_estancia"
-                  class="btn btn-sm btn-primary me-2"
-                  @click="verSeguimiento(a)"
-                >
-                  Ver Segumiento
-                </button>
+                 <button
+                    v-if="a.estancia_id"
+                    class="btn btn-sm btn-primary"
+                    @click="$router.push({
+                      name: 'seguimiento',
+                      params: { estanciaId: a.estancia_id }
+                    })"
+                  >
+                    Ver Seguimiento
+                  </button>
+
+
+
                 <button
                   v-if="!a.Tiene_estancia"
                   class="btn btn-sm btn-primary me-2"
@@ -128,6 +164,13 @@ onMounted(() => fetchAlumnos(1));
                   @click="verEntregas(a)"
                 >
                   Entregas
+                </button>
+
+                <button
+                  class="btn btn-sm btn-success"
+                  @click="verNotas(a)"
+                >
+                  Ver Notas
                 </button>
               </span>
 
@@ -159,6 +202,12 @@ onMounted(() => fetchAlumnos(1));
           </tr>
         </tbody>
       </table>
+      <NotasAlumnoModal
+        :alumno="alumnoSeleccionado"
+        :notas="notasAlumno"
+        :show="showNotasModal"
+        @close="showNotasModal = false"
+      />
     </div>
     <nav v-if="totalPages > 1">
       <ul class="pagination justify-content-center">

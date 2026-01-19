@@ -28,4 +28,9 @@ class AlumnoEntrega extends Model
         return $this->belongsTo(EntregaCuaderno::class,'ID_Entrega','id');
     }
 
+    public function nota()
+    {
+        return $this->hasOne(NotaCuaderno::class, 'ID_Alumno', 'ID_Usuario');
+    }
+
 }
