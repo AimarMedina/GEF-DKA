@@ -8,6 +8,7 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\AlumnoEntregaController;
 use App\Http\Controllers\EntregaCuadernoController;
 use App\Http\Controllers\EstanciaController;
+use App\Http\Controllers\MatrizController;
 use App\Http\Controllers\NotaCuadernoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotasEmpresaController;
@@ -118,3 +119,6 @@ Route::post('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'store'
 */
 Route::get('/grados', [GradoController::class, 'getGrados']);
 Route::get('/tutor/{id}/notas-cuaderno', [NotaCuadernoController::class, 'notasPorTutor']);
+
+
+Route::get('/matriz-competencias', [MatrizController::class, 'index']);

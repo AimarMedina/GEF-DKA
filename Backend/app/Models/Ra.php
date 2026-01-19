@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Ra extends Model
 {
     protected $table="ra";
-    protected $incrementing=false;
     protected $fillable=[
         "Descripcion",
         "ID_Asignatura"

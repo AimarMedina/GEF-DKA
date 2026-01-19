@@ -15,19 +15,19 @@ const isAlumno = computed(() => usuario.value?.tipo === 'alumno');
 
 <template>
   <div class="container mt-5">
-    
+
     <div class="text-center mb-5" v-if="usuario">
       <h1 class="display-5 fw-bold text-primary">¡Hola, {{ usuario.nombre }}!</h1>
       <p class="lead text-muted">
-        Bienvenid@ a tu panel de gestión como 
+        Bienvenid@ a tu panel de gestión como
         <span class="badge bg-secondary text-uppercase">{{ usuario.tipo }}</span>
       </p>
     </div>
 
     <!-- ========== VISTA PRINCIPAL DE ADMINISTRADOR  =========  -->
-  
+
     <div v-if="isAdmin" class="row g-4">
-      <div class="col-12 col-md-6 col-lg-4 ">
+      <div class="col-12 col-md-6 col-lg-3 ">
         <RouterLink to="/users" class="img-link">
           <div class="card h-100 border-0 shadow hover-scale overflow-hidden">
             <img src="../../public/images/Usuarios.png" class="card-img-top w-100 h-100 object-fit-cover" alt="Gestión Usuarios">
@@ -35,15 +35,22 @@ const isAlumno = computed(() => usuario.value?.tipo === 'alumno');
         </RouterLink>
       </div>
 
-        <div class="col-12 col-md-6 col-lg-4 ">
+        <div class="col-12 col-md-6 col-lg-3 ">
         <RouterLink to="/grados" class="img-link">
           <div class="card h-100 border-0 shadow hover-scale overflow-hidden">
             <img src="../../public/images/GradosAsignaturas.png" class="card-img-top w-100 h-100 object-fit-cover" alt="Gestión Grados y Asingnaturas">
           </div>
         </RouterLink>
       </div>
+        <div class="col-12 col-md-6 col-lg-3 ">
+        <RouterLink to="/competenciasXra" class="img-link">
+          <div class="card h-100 border-0 shadow hover-scale overflow-hidden">
+            <img src="../../public/images/CompetenciasRas.png" class="card-img-top w-100 h-100 object-fit-cover" alt="Gestión Grados y Asingnaturas">
+          </div>
+        </RouterLink>
+      </div>
 
-       <div class="col-12 col-md-6 col-lg-4 ">
+       <div class="col-12 col-md-6 col-lg-3 ">
         <RouterLink to="/empresa" class="img-link">
           <div class="card h-100 border-0 shadow hover-scale overflow-hidden">
             <img src="../../public/images/Empresas.png" class="card-img-top w-100 h-100 object-fit-cover" alt="Gestión Empresas">
@@ -56,8 +63,8 @@ const isAlumno = computed(() => usuario.value?.tipo === 'alumno');
       <!-- =================================================================================================== -->
 
 
-      <!-- ========== VISTA PRINCIPAL DE TUTOR  =========  --> 
-      
+      <!-- ========== VISTA PRINCIPAL DE TUTOR  =========  -->
+
     <div v-else-if="isTutor" class="row g-4 justify-content-center">
 
        <div class="col-12 col-md-6 col-lg-4 ">
@@ -67,7 +74,7 @@ const isAlumno = computed(() => usuario.value?.tipo === 'alumno');
               </div>
         </RouterLink>
       </div>
-      
+
        <div class="col-12 col-md-6 col-lg-4 ">
          <RouterLink :to="`/cuadernos-tutor`">
               <div class="card h-100 border-0 shadow hover-scale overflow-hidden">
@@ -75,7 +82,7 @@ const isAlumno = computed(() => usuario.value?.tipo === 'alumno');
               </div>
         </RouterLink>
       </div>
-      
+
     </div>
 
     <!-- ====================================================================================================== -->

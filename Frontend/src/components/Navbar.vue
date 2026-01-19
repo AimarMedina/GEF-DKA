@@ -9,8 +9,6 @@
           class="logo"
         />
       </RouterLink>
-      <!-- Bienvenida (desktop, derecha) -->
-      
 
       <!-- Hamburguesa -->
       <button
@@ -25,7 +23,10 @@
 
       <!-- Offcanvas -->
       <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar">
+
         <div class="offcanvas-header">
+                  <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Menú</h5>
+
           <button
             type="button"
             class="btn-close"
@@ -58,7 +59,7 @@
                     <RouterLink to="/users">Usuarios</RouterLink>
                   </a>
                   <a class="dropdown-item">
-                    <RouterLink to="/users">Competencias y RAs</RouterLink>
+                    <RouterLink to="/competenciasXra">Competencias y RAs</RouterLink>
                   </a>
                   <a class="dropdown-item">
                     <RouterLink to="/grados">Grados y Asignaturas</RouterLink>
@@ -114,7 +115,7 @@
               Estancia
               </RouterLink>
             </li>
-            
+
              <li class="nav-item" v-if="usuario.tipo === 'alumno'">
               <RouterLink class="nav-link" to="/cuadernos-alumno">
                 Mis Cuadernos
@@ -178,7 +179,7 @@ async function logout() {
         console.error(error);
         message.value = 'Error cerrando sesión';
     }
-  } 
+  }
 
 </script>
 
