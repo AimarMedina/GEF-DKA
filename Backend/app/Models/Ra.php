@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ra extends Model
 {
-    protected $table="ra";
-    protected $fillable=[
-        "Descripcion",
-        "ID_Asignatura"
-    ];
+    protected $table = 'ra';
+    public $timestamps = false;
 
-    public function asignatura(){
-        return $this-> belongsTo(Asignatura::class, 'ID_Asignatura');
+    protected $fillable = ['Descripcion', 'ID_Asignatura'];
+
+    public function asignatura()
+    {
+        return $this->belongsTo(Asignatura::class, 'ID_Asignatura', 'ID_Asignatura');
     }
 
-    public function compRas(){
-        return $this->hasMany(compRa::class,"ID_Ra");
+    public function compRas()
+    {
+        return $this->hasMany(CompRa::class, 'ID_Ra', 'id');
     }
-
 }
+

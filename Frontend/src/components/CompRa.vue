@@ -70,8 +70,10 @@
     const { data } = await axios.get(
       `http://localhost:8000/api/grado/${gradoSeleccionado.value}/matriz-competencias`
     )
+
     competencias.value = data.competencias
     asignaturas.value = data.asignaturas
+    
   }
 
   onMounted(async () => {

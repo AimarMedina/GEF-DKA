@@ -6,16 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Competencia extends Model
 {
-    protected $table="competencia";
-    protected $fillable=[
-        "Descripcion"
-    ];
+    protected $table = 'competencia';
+    public $timestamps = false;
 
-    public function compRa(){
-        return $this->hasOne(compRa::class,"comp_ra","ID_Comp");
-    }
-    public function notasCompentencias(){
-        return $this->hasMany(NotaCompetencia::class,"ID_Compentencia");
+    protected $fillable = ['Descripcion'];
+
+    public function compRas()
+    {
+        return $this->hasMany(CompRa::class, 'ID_Comp', 'id');
     }
 
 }
+
