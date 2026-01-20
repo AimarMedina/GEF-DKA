@@ -52,6 +52,10 @@ function abrirEditarModal(s) {
   editarModalVisible.value = true
 }
 
+function abrirEliminarModal(){
+  
+}
+
 // Guardar seguimiento (crear)
 async function guardarNuevoSeguimiento(data) {
   const token = localStorage.getItem('token')
@@ -72,7 +76,7 @@ async function guardarNuevoSeguimiento(data) {
 // Guardar seguimiento (editar)
 async function guardarEdicionSeguimiento(data) {
   console.log(data);
-  
+
   const token = localStorage.getItem('token')
   if (!data.id) {
     alert('No se puede editar: falta ID')
@@ -96,7 +100,6 @@ async function guardarEdicionSeguimiento(data) {
 
 // Eliminar seguimiento
 async function eliminarSeguimiento(id) {
-  
   if (!id) {
     alert('No se puede eliminar: falta ID')
     return
@@ -104,12 +107,12 @@ async function eliminarSeguimiento(id) {
 
   const token = localStorage.getItem('token')
   try {
-    const res = await axios.delete(`http://localhost:8000/api/seguimiento/${id}`, 
+    const res = await axios.delete(`http://localhost:8000/api/seguimiento/${id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     )
     seguimientos.value = seguimientos.value.filter(s => (s.id) !== id)
     console.log(res.data);
-    
+
   } catch (err) {
     console.error(err)
     alert('Error al eliminar seguimiento')
@@ -148,7 +151,7 @@ watch(() => props.estanciaId, cargarSeguimientos)
           <td>{{ s.Seguimiento_actividad }}</td>
           <td>
             <button class="btn btn-sm btn-warning" @click="abrirEditarModal(s)">Editar</button>
-            <button class="btn btn-sm btn-danger" 
+            <button class="btn btn-sm btn-danger"
                     @click="eliminarSeguimiento(s.id)">Eliminar</button>
           </td>
         </tr>
