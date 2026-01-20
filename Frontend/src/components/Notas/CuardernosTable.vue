@@ -1,6 +1,6 @@
 <script setup>
 const props = defineProps({
-  cuadernos: Array
+  notaCuaderno: Array
 })
 </script>
 
@@ -16,17 +16,17 @@ const props = defineProps({
           </tr>
         </thead>
         <tbody>
-          <tr v-for="c in cuadernos" :key="c.id">
+          <tr>
             <td class="text-center text-md-start">
               Nota final
             </td>
             <td class="text-center text-md-start">
               <span :class="{
-                'badge bg-success': c.nota?.Nota >= 5,
-                'badge bg-danger text-white': c.nota?.Nota < 5 && c.nota?.Nota != null,
-                'badge bg-warning text-dark': !c.nota?.Nota
+                'badge bg-success': notaCuaderno.Nota >= 5,
+                'badge bg-danger text-white': notaCuaderno.Nota < 5 && notaCuaderno.Nota != null,
+                'badge bg-warning text-dark': !notaCuaderno.Nota
               }">
-                {{ c.nota?.Nota ?? 'Pendiente' }}
+                {{ notaCuaderno.Nota ?? 'Pendiente' }}
               </span>
             </td>
           </tr>

@@ -147,8 +147,7 @@ class AlumnoController extends Controller
             'notasCompetencias.competencia',
             'notasTransversales.transversal',
             'notasEgibide.asignatura',
-            'cuadernos.entrega',
-            'cuadernos.nota'
+            'notaCuaderno'
         ])->where('ID_Usuario', $id)->first();
 
 

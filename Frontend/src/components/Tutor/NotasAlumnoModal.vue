@@ -25,7 +25,7 @@ const emit = defineEmits(['close']);
           <button type="button" class="btn-close" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
-          <CuardernosTable v-if="notas?.cuadernos" :cuadernos="notas.cuadernos" :alumno-id="alumno.ID_Usuario" />
+          <CuardernosTable v-if="notas?.nota_cuaderno" :notaCuaderno="notas.nota_cuaderno" :alumno-id="alumno.ID_Usuario" />
           <CompetenciasTable v-if="notas?.notas_competencias" :competencias="notas.notas_competencias" />
           <TransversalesTable v-if="notas?.notas_transversales" :transversales="notas.notas_transversales" />
           <EgibideTable v-if="notas?.notas_egibide" :egibide="notas.notas_egibide" />

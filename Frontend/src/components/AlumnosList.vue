@@ -39,7 +39,6 @@ async function verNotas(alumno) {
   }
 }
 
-function verEntregas(alumno) {}
 
 function verSeguimiento(alumno) {
   alumnoSeleccionado.value = alumno
@@ -106,88 +105,74 @@ onMounted(() => fetchAlumnos(1));
 </script>
 
 <template>
-  <Navbar></Navbar>
+  <Navbar />
 
-  <div>
-    <h4 class="mb-3">{{ title }}</h4>
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">{{ title }}</h4>
+      <Buscador :tipo="'Buscar Alumnos'" @search="onSearch" />
+    </div>
 
-    <Buscador :tipo="'Buscar Alumnos'" @search="onSearch" />
-    <!-- </span> -->
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover table-striped align-middle">
+        <thead class="table-indigo">
           <tr>
-            <!-- <th>ID</th> -->
             <th>Nombre</th>
             <th>Apellidos</th>
             <th>Email</th>
             <th>Grado</th>
-            <th>Acciones</th>
+            <th class="text-center">Acciones</th>
           </tr>
         </thead>
-
         <tbody>
           <tr v-for="a in alumnos" :key="a.ID_Usuario">
-            <!-- <td>{{ a.ID_Usuario }}</td> -->
             <td>{{ a.Nombre }}</td>
             <td>{{ a.Apellidos }}</td>
             <td>{{ a.Email }}</td>
             <td>{{ a.Grado }}</td>
-            <td>
-
-            <!-- ==== VISTA DE TUTORES ==== -->
+            <td class="text-center">
+              <!-- ==== VISTA DE TUTORES ==== -->
               <span v-if="isTutorView">
-
-                 <button
-                    v-if="a.estancia_id"
-                    class="btn btn-sm btn-primary"
-                    @click="$router.push({
-                      name: 'seguimiento',
-                      params: { estanciaId: a.estancia_id }
-                    })"
-                  >
-                    Ver Seguimiento
-                  </button>
-
-
-
                 <button
-                  v-if="!a.Tiene_estancia"
-                  class="btn btn-sm btn-primary me-2"
-                  @click="verSeguimiento(a)"
+                  v-if="a.estancia_id"
+                  class="btn btn-sm btn-primary me-1"
+                  @click="$router.push({ name: 'seguimiento', params: { estanciaId: a.estancia_id } })"
+                  title="Ver Seguimiento"
                 >
-                  Asignar Empresa
+                  <i class="bi bi-bar-chart-line"></i> Ver seguimiento
                 </button>
 
                 <button
-                  class="btn btn-sm btn-secondary"
-                  @click="verEntregas(a)"
+                  v-if="!a.Tiene_estancia"
+                  class="btn btn-sm btn-warning me-1"
+                  @click="verSeguimiento(a)"
+                  title="Asignar Empresa"
                 >
-                  Entregas
+                  <i class="bi bi-building"></i> Asignar estancia
                 </button>
 
                 <button
                   class="btn btn-sm btn-success"
                   @click="verNotas(a)"
+                  title="Ver Notas"
                 >
-                  Ver Notas
+                  <i class="bi bi-journal-text"></i> Ver notas
                 </button>
               </span>
 
-              <!-- ==== VISTA DE INSTRUCTORES -->
+              <!-- ==== VISTA DE INSTRUCTORES ==== -->
               <span v-else-if="isInstructorView">
-                <!-- TIENE ESTANCIA -->
                 <RouterLink
                   v-if="a.Tiene_estancia"
                   :to="`/instructor/alumnos/${a.ID_Usuario}/notas`"
-                  class="btn btn-sm btn-primary me-2"
+                  class="btn btn-sm btn-primary me-1"
+                  title="Ver Notas"
                 >
-                  Ver Notas
+                  <i class="bi bi-journal-text"></i>
                 </RouterLink>
 
-                <!-- NO TIENE ESTANCIA -->
-                <button v-else class="btn btn-sm btn-primary me-2" disabled>
-                  Ver Notas
+                <button v-else class="btn btn-sm btn-secondary me-1" disabled title="Sin Estancia">
+                  <i class="bi bi-journal-text"></i>
                 </button>
               </span>
 
@@ -198,27 +183,19 @@ onMounted(() => fetchAlumnos(1));
           </tr>
 
           <tr v-if="alumnos.length === 0">
-            <td colspan="6" class="text-center py-3">No hay alumnos</td>
+            <td colspan="5" class="text-center py-3 text-muted">
+              No hay alumnos
+            </td>
           </tr>
         </tbody>
       </table>
-      <NotasAlumnoModal
-        :alumno="alumnoSeleccionado"
-        :notas="notasAlumno"
-        :show="showNotasModal"
-        @close="showNotasModal = false"
-      />
     </div>
-    <nav v-if="totalPages > 1">
+
+    <!-- Paginación -->
+    <nav v-if="totalPages > 1" class="mt-3">
       <ul class="pagination justify-content-center">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <button
-            class="page-link"
-            @click="fetchAlumnos(currentPage - 1)"
-            :disabled="currentPage === 1"
-          >
-            Anterior
-          </button>
+          <button class="page-link" @click="fetchAlumnos(currentPage - 1)">Anterior</button>
         </li>
 
         <li
@@ -231,15 +208,16 @@ onMounted(() => fetchAlumnos(1));
         </li>
 
         <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-          <button
-            class="page-link"
-            @click="fetchAlumnos(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-          >
-            Siguiente
-          </button>
+          <button class="page-link" @click="fetchAlumnos(currentPage + 1)">Siguiente</button>
         </li>
       </ul>
     </nav>
+
+    <NotasAlumnoModal
+      :alumno="alumnoSeleccionado"
+      :notas="notasAlumno"
+      :show="showNotasModal"
+      @close="showNotasModal = false"
+    />
   </div>
 </template>
