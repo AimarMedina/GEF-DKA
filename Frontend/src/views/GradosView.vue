@@ -7,11 +7,6 @@
     const gradoSeleccionado = ref(null);
     const vistaActual = ref(null);
 
-    function seleccionarGrado(grado) {
-         gradoSeleccionado.value = grado;
-         vistaActual.value = null;
-    }
-
     function mostrarAsignaturas(grado) {
         gradoSeleccionado.value = grado;
         vistaActual.value = 'asignaturas';
@@ -28,9 +23,7 @@
     
     <div class="container-fluid mb-5">
         <div class="row">
-            
-            <GradosList 
-                @seleccionarGrado="seleccionarGrado"
+            <GradosList           
                 @verAsignaturas="mostrarAsignaturas"
                 @verCompetencias="mostrarCompetencias"
             />

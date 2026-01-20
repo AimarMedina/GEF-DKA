@@ -41,21 +41,13 @@ class GradoController extends Controller
     // Obtener competencias (Grado -> Asignatura -> Ra -> CompRa -> Competencia)
     public function getCompetencias($id)
     {
-        $grado = Grado::with('asignaturas.ras.compRas.competencia')->orderBy('id')->find($id);
+        $grado = Grado::find($id);
 
         if (!$grado) {
             return response()->json([], 404);
         }
 
-        // Usamos colecciones de Laravel para "aplanar" la estructura y sacar solo las competencias únicas
-        $competencias = $grado->asignaturas
-            ->pluck('ras')->flatten()
-            ->pluck('compRas')->flatten()
-            ->pluck('competencia')
-            ->filter()
-            ->unique('id') 
-            ->sortBy('id')
-            ->values(); 
+        $competencias = $grado->competencias()->orderBy('id')->get();
 
         return response()->json($competencias);
     }

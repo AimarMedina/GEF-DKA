@@ -97,9 +97,7 @@ const router = createRouter({
       name: "compra",
       component: CompRaView
     }
-
-
-
+  
   ],
 })
 

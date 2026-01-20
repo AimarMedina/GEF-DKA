@@ -1,6 +1,6 @@
 <template>
   <form class="d-flex flex-column justify-content-center align-items-center vh-100" @submit.prevent="login">
-    <h3>GEF-DKA</h3>
+    <img src="../../public/GEF-DKA.png" alt="Imagen de GEF-DKA" class="logo-img">
     <div class="p-4 border rounded shadow">
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-at"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0v-1.5a9 9 0 1 0 -5.5 8.28" /></svg></span>
@@ -56,4 +56,12 @@ const login = async () => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+  .logo-img {
+
+  height: 5rem; 
+  width: auto;  
+  margin-bottom: 1rem; 
+  mix-blend-mode: multiply;
+}
+</style>

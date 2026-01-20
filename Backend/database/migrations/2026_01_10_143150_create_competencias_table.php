@@ -9,6 +9,12 @@ return new class extends Migration {
         Schema::create('competencia', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion', 255);
+            $table->unsignedBigInteger('ID_Grado');
+            $table->foreign('ID_Grado')
+            ->references('id')
+            ->on('grado')
+            ->onDelete('cascade');
+
                         $table->timestamps();
 
         });

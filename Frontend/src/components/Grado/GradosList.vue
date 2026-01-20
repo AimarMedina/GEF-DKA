@@ -84,7 +84,7 @@ onMounted(() => {
             </div>
 
             <div class="d-flex gap-2 w-100 mt-2">
-                <button class="btn btn-sm btn-outline-primary flex-fill" 
+                <button class="btn btn-sm btn-outline-indigo flex-fill" 
                         @click.stop="emit('verAsignaturas', grado)">
                     <i class="bi bi-book"></i> Asignaturas
                 </button>

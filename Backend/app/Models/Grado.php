@@ -20,4 +20,7 @@ class Grado extends Model
     public function asignaturas() {
         return $this->hasMany(Asignatura::class, 'ID_Grado', 'id');
     }
-}
+    public function competencias(){
+        return $this->hasMany(Competencia::class, 'ID_Grado');
+    }
+} 

@@ -23,27 +23,40 @@ watch(() => props.grado, async (nuevoGrado) => {
 </script>
 
 <template>
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-indigo text-white fw-bold">
-            Asignaturas de {{ grado.nombre }}
+    <div class="card shadow-sm border-0 w-75">
+        <div class="card-header bg-indigo text-white fw-bold d-flex justify-content-between align-items-center">
+            
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-book"></i>
+                <span>Asignaturas de {{ grado.nombre }}</span>
+            </div>
+
+            <div>
+                <button 
+                    class="btn btn-sm btn-outline-light d-flex align-items-center gap-1" 
+                    @click="asignaturaForm"
+                >
+                    <i class="bi bi-plus-lg"></i>
+                    <span class="d-none d-sm-inline">Añadir</span>
+                </button>
+            </div>
         </div>
+
         <div class="card-body p-0">
             <div v-if="loading" class="p-4 text-center">Cargando asignaturas...</div>
             
-            <table v-else class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre de la Asignatura</th>
-                    </tr>
-                </thead>
+            <table v-else class="table table-hover table-sm mb-0 align-middle" style="font-size: 0.9rem;">
                 <tbody>
-                    <tr v-for="asig in asignaturas" :key="asig.id">
-                        <td>{{ asig.id }}</td>
-                        <td>{{ asig.nombre }}</td>
+                    <tr v-for="(asig,i) in asignaturas" :key="asig.id">
+                        <td class="text-center fw-bold text-secondary">{{ i + 1 }}</td>
+                        <td class="py-2">{{ asig.nombre }}</td>
+                        <td class="d-flex gap-2 justify-content-end"> 
+                            <button class="btn btn-sm btn-outline-indigo">RAs </button>
+                            <button class=" btn btn-sm btn-outline-danger ">Eliminar</button>
+                        </td>
                     </tr>
                     <tr v-if="asignaturas.length === 0">
-                        <td colspan="2" class="text-center py-3">No hay asignaturas registradas.</td>
+                        <td colspan="2" class="text-center py-3 text-muted">No hay asignaturas registradas.</td>
                     </tr>
                 </tbody>
             </table>
