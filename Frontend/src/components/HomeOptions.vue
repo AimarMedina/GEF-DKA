@@ -36,6 +36,8 @@ const claseRol = (tipo) => {
     </div>
 
     <!-- ========== VISTA PRINCIPAL DE ADMINISTRADOR  =========  -->
+    <!-- ====================================================== -->
+    <!-- ====================================================== -->
 
     <div v-if="isAdmin" class="row g-4">
       <div class="col-12 col-md-6 col-lg-3 ">

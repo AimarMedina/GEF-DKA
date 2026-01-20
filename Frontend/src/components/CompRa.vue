@@ -63,8 +63,17 @@
   const competencias = ref([])
   const asignaturas = ref([])
 
-  const tieneCompetencia = (ra, id) =>
-    ra.comp_ras?.some(c => c.ID_Comp === id)
+ // Función corregida y segura
+const tieneCompetencia = (ra, id) => {
+    // 1. Si el RA no existe o no tiene la propiedad comp_ras, devolvemos false
+    if (!ra || !ra.comp_ras) return false;
+
+    // 2. Si comp_ras NO es un array (por si acaso viene null u otro dato), false
+    if (!Array.isArray(ra.comp_ras)) return false;
+
+    // 3. Ahora es seguro buscar
+    return ra.comp_ras.some(c => c.ID_Comp === id);
+}
 
   const cargarMatriz = async () => {
     const { data } = await axios.get(

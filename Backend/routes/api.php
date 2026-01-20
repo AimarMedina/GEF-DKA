@@ -13,6 +13,8 @@ use App\Http\Controllers\NotaCuadernoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotasEmpresaController;
 use App\Http\Controllers\SeguimientoController;
+use App\Http\Controllers\AsignaturaController;
+use App\Http\Controllers\RaController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -139,3 +141,13 @@ Route::delete('/seguimiento/{id}', [SeguimientoController::class,'eliminarSeguim
 
 Route::get('/grado/{id}/matriz-competencias/', [MatrizController::class, 'getCompRa']);
 
+/*
+|--------------------------------------------------------------------------
+| Asignaturas y RAs
+|--------------------------------------------------------------------------
+*/
+Route::get('/asignaturas/{id}/ras', [AsignaturaController::class, 'getRas']);
+Route::post('/ras', [RaController::class, 'store']);
+Route::delete('/ras/{id}', [RaController::class, 'destroy']); 
+Route::post('/asignaturas', [AsignaturaController::class, 'store']);      
+Route::delete('/asignaturas/{id}', [AsignaturaController::class, 'destroy']);

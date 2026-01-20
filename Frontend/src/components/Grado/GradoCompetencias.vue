@@ -1,30 +1,29 @@
 <script setup>
 import { ref, watch } from "vue";
 import axios from "axios";
+import FormularioCrear from '@/components/FormularioCrear.vue';
 
 const props = defineProps({ grado: Object });
 const competencias = ref([]);
 const loading = ref(false);
+const mostrarForm = ref(false);
 
-watch(
-  () => props.grado,
-  async (nuevoGrado) => {
-    if (!nuevoGrado) return;
-
+const fetchCompetencias = async () => {
+    if (!props.grado) return;
     loading.value = true;
     try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/api/grados/${nuevoGrado.id}/competencias`
-      );
-      competencias.value = res.data;
-    } catch (e) {
-      console.error(e);
-    } finally {
-      loading.value = false;
-    }
-  },
-  { immediate: true }
-);
+        const res = await axios.get(`http://127.0.0.1:8000/api/grados/${props.grado.id}/competencias`);
+        competencias.value = res.data;
+    } catch (e) { console.error(e); } 
+    finally { loading.value = false; }
+};
+
+watch(() => props.grado, fetchCompetencias, { immediate: true });
+
+function onCreado() {
+    fetchCompetencias();
+    mostrarForm.value = false;
+}
 </script>
 
 <template>
@@ -37,10 +36,10 @@ watch(
         <div>
                 <button 
                     class="btn btn-sm btn-outline-light d-flex align-items-center gap-1" 
-                    @click="competenciaForm"
+                    @click="mostrarForm = !mostrarForm"
                 >
-                    <i class="bi bi-plus-lg"></i>
-                    <span class="d-none d-sm-inline">Añadir</span>
+                    <i :class="mostrarForm ? 'bi bi-dash-lg' : 'bi bi-plus-lg'"></i>
+                    <span class="d-none d-sm-inline">{{ mostrarForm ? 'Cerrar' : 'Añadir' }}</span>
                 </button>
             </div>
     </div>
@@ -64,5 +63,13 @@ watch(
         </tbody>
       </table>
     </div>
+    <FormularioCrear 
+            v-if="mostrarForm"
+            endpoint="http://127.0.0.1:8000/api/competencias"
+            tipo="comp"
+            :idPadre="grado.id"
+            @cancelar="mostrarForm = false"
+            @creado="onCreado"
+        />
   </div>
 </template>
