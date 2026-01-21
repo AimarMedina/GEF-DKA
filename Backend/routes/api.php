@@ -83,6 +83,7 @@ Route::get('/tutor/{id}/grados', [TutorController::class, 'grados']);
 |--------------------------------------------------------------------------
 */
 // Para tutor
+Route::post('asignarEstancia',[EstanciaController::class,'asignarEstancia'])->middleware('auth:sanctum');
 Route::get('/tutor/alumno/{id}/estancias', [EstanciaController::class, 'historialEstanciasAlumno']);
 // Para alumno
 Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaActual']);

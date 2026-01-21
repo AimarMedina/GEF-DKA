@@ -2,7 +2,7 @@
   
 import Navbar from '@/components/Navbar.vue';
 import AlumnoSeguimiento from '@/components/tutor/AlumnoSeguimiento.vue'
-import Navbar from '@/components/Navbar.vue';
+
 const props = defineProps({
   estanciaId: {
     type: Number,

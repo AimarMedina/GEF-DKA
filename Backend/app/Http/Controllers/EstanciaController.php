@@ -46,7 +46,17 @@ class EstanciaController extends Controller
         return response()->json($estanciasEmpresa);
     }
 
+    public function asignarEstancia(Request $request){
+        $data=$request->validate([
+            'ID_Alumno' =>'required',
+            'CIF_Empresa' => 'required|exists:Empresa,CIF',
+            'Fecha_inicio'=> 'required|date',
+            'Fecha_fin' =>'required|date'
+        ]);
 
+        $estancia=EstanciaAlumno::create($data);
+        return response()->json($estancia,201);
+    }
 
 }
 

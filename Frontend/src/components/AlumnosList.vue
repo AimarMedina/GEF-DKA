@@ -5,6 +5,7 @@ import UserTable from "@/components/UserTable.vue";
 import Navbar from "../components/Navbar.vue";
 import Buscador from "./Buscador.vue";
 import { useRoute, useRouter } from "vue-router";
+import AsignarEstanciaModal from "./Tutor/AsignarEstanciaModal.vue";
 import NotasAlumnoModal from "@/components/Tutor/NotasAlumnoModal.vue";
 const props = defineProps({
   endpoint: { type: String, required: true }, // URL completa
@@ -20,8 +21,7 @@ const isInstructorView = computed(() => route.name === "alumnosInstructor");
 const showNotasModal = ref(false);   // modal
 const notasAlumno = ref(null);       // almacena las notas del alumno seleccionado
 const alumnoSeleccionado = ref(null);
-
-
+const showFormEstanciaModal=ref(false);
 
 async function verNotas(alumno) {
   alumnoSeleccionado.value = alumno;
@@ -38,7 +38,10 @@ async function verNotas(alumno) {
     alert("Error al cargar las notas del alumno");
   }
 }
-
+function mostrarOcultarModal(alumno){
+  alumnoSeleccionado.value=alumno
+  showFormEstanciaModal.value = !showFormEstanciaModal.value
+}
 
 function verSeguimiento(alumno) {
   alumnoSeleccionado.value = alumno
@@ -145,7 +148,7 @@ onMounted(() => fetchAlumnos(1));
                 <button
                   v-if="!a.Tiene_estancia"
                   class="btn btn-sm btn-warning me-1"
-                  @click="verSeguimiento(a)"
+                  @click="mostrarOcultarModal(a)"
                   title="Asignar Empresa"
                 >
                   <i class="bi bi-building"></i> Asignar estancia
@@ -212,12 +215,18 @@ onMounted(() => fetchAlumnos(1));
         </li>
       </ul>
     </nav>
-
+    <AsignarEstanciaModal
+      :alumno="alumnoSeleccionado"
+      :show="showFormEstanciaModal"
+      @close="showFormEstanciaModal = false"
+    />
+    
     <NotasAlumnoModal
       :alumno="alumnoSeleccionado"
       :notas="notasAlumno"
       :show="showNotasModal"
       @close="showNotasModal = false"
     />
+
   </div>
 </template>
