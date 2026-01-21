@@ -6,7 +6,6 @@ import UsersView from '../views/UsersView.vue'
 import AlumnosInstructorView from '@/views/instructor/AlumnosInstructorView.vue'
 import AlumnosTutorView from '@/views/tutor/AlumnosTutorView.vue'
 import SeguimientoView from '@/views/tutor/SeguimientoView.vue'
-import AsignarEmpresaView from '@/views/tutor/AsignarEmpresaView.vue'
 import EmpresaView from '../views/admin/EmpresaView.vue'
 import EstanciaAlumnoView from '../views/alumno/EstanciaAlumnoView.vue'
 
