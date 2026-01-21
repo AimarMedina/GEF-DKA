@@ -52,8 +52,8 @@ function cancelar() {
           <p>{{ mensaje }}</p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="cancelar">Cancelar</button>
           <button class="btn btn-purple text-white" @click="aceptar">Aceptar</button>
+          <button class="btn btn-secondary" @click="cancelar">Cancelar</button>
         </div>
       </div>
     </div>

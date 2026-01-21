@@ -13,7 +13,7 @@ class Ra extends Model
 
     public function asignatura()
     {
-        return $this->belongsTo(Asignatura::class, 'ID_Asignatura', 'ID_Asignatura');
+        return $this->belongsTo(Asignatura::class, 'ID_Asignatura');
     }
 
     public function compRas()

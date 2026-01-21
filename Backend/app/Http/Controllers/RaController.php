@@ -12,16 +12,13 @@ class RaController extends Controller
     {
         // 1. Validar
         $validated = $request->validate([
-            'descripcion' => 'required|string|max:255',
+            'Descripcion' => 'required|string|max:255',
             'ID_Asignatura' => 'required|exists:asignatura,id' // Verifica que la asignatura exista
         ]);
 
         // 2. Crear
         // Asegúrate de que en App\Models\Ra.php tengas 'descripcion' e 'ID_Asignatura' en $fillable
-        $ra = Ra::create([
-            'descripcion' => $validated['descripcion'],
-            'ID_Asignatura' => $validated['ID_Asignatura']
-        ]);
+        $ra = Ra::create($validated);
 
         return response()->json($ra, 201);
     }

@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import FormularioCrear from '@/components/FormularioCrear.vue';
+import ConfirmarEliminar from '../ConfirmarEliminar.vue';
 
 const props = defineProps({
     asignatura: Object // Recibimos la asignatura completa (id y nombre)
@@ -10,6 +11,8 @@ const props = defineProps({
 const ras = ref([]);
 const loading = ref(false);
 const mostrarForm = ref(false);
+const raEliminar= ref(false);
+const eliminarModalVisible = ref(false);
 
 // Cargar RAs
 const fetchRas = async () => {
@@ -23,13 +26,23 @@ const fetchRas = async () => {
         loading.value = false;
     }
 };
+function abrirEliminarModal(ra){
+    raEliminar.value = ra
+    eliminarModalVisible.value= true
+}
 
-// Eliminar RA
+function confirmarEliminarRa(confirmado) {
+    if(confirmado && raEliminar.value){
+        eliminarRa(raEliminar.value.id)
+    }
+    eliminarModalVisible.value= false
+    raEliminar.value= false
+}
+
 const eliminarRa = async (id) => {
-    if(!confirm('¿Seguro que quieres eliminar este RA?')) return;
     try {
         await axios.delete(`http://127.0.0.1:8000/api/ras/${id}`);
-        fetchRas(); // Recargar lista
+        fetchRas(); 
     } catch (e) {
         alert('Error al eliminar');
     }
@@ -73,7 +86,7 @@ watch(() => props.asignatura, fetchRas, { immediate: true });
                     <span>{{ ra.descripcion || ra.Descripcion }}</span>
                 </div>
 
-                <button class="btn btn-sm btn-outline-danger" @click="eliminarRa(ra.id)">
+                <button class="btn btn-sm btn-outline-danger" @click="abrirEliminarModal(ra)">
                     <i class="bi bi-trash"></i>
                 </button>
             </li>
@@ -93,11 +106,12 @@ watch(() => props.asignatura, fetchRas, { immediate: true });
             />
         </div>
     </div>
+<ConfirmarEliminar :show="eliminarModalVisible" mensaje="¿Seguro que quieres eliminar este RA?"
+@confirm="confirmarEliminarRa" @close="eliminarModalVisible= false"/>
 </template>
 
 <style scoped>
-.text-indigo { color: #6610f2; }
-.btn-outline-indigo { color: #6610f2; border-color: #6610f2; }
-.btn-outline-indigo:hover { background-color: #6610f2; color: white; }
+
+
 .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0,0,0,.06); }
 </style>
