@@ -32,6 +32,8 @@ function abrirModal(tipoSeleccionado) {
 }
 
 async function crearUsuario(userData) {
+  console.log(userData);
+  
     try {
         const response = await axios.post('http://localhost:8000/api/user/create', {
             ...userData,
