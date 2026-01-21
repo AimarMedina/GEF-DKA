@@ -151,7 +151,7 @@ watch(() => props.estanciaId, cargarSeguimientos)
             <td>{{ s.Hora }}</td>
             <td>{{ s.Accion_seguimiento }}</td>
             <td>{{ s.Seguimiento_actividad }}</td>
-            <td>
+            <td class="d-flex gap-1 justify-content-center">
               <button class="btn btn-sm btn-warning" @click="abrirEditarModal(s)">Editar</button>
               <button class="btn btn-sm btn-danger" @click="abrirEliminarModal(s)">
                 Eliminar

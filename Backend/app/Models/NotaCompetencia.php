@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class NotaCompetencia extends Model
 {
     protected $table = "nota_competencia";
-    protected $primary="ID";
     protected $fillable=[
         "Nota"
     ];

@@ -72,7 +72,6 @@ Route::get('/grados', [GradoController::class, 'getGrados']);
 Route::get('/alumno/entregas/descargar/{id}', [AlumnoEntregaController::class, 'descargarCuaderno']);
 
 
-Route::get('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'misNotas'])->middleware('auth:sanctum');
 Route::post('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'store'])->middleware('auth:sanctum');
 
 Route::get('/tutor/{id}/grados', [TutorController::class, 'grados']);

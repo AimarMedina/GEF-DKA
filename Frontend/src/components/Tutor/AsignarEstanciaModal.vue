@@ -13,12 +13,16 @@ const emit = defineEmits(['close','crear'])
 const nuevaEstancia = ref({
   ID_Alumno: null,
   CIF_Empresa: '',
+  ID_Instructor: '',
   Fecha_inicio: '',
-  Fecha_fin: ''
+  Fecha_fin: '',
+  ID_Horario: ''
 })
 
-// Lista de empresas
+// Listas
 const empresas = ref([])
+const instructores = ref([])
+const horarios = ref([])
 
 // Cargar empresas al montar el modal
 onMounted(async () => {
@@ -34,13 +38,50 @@ onMounted(async () => {
   }
 })
 
-// Asignar ID del alumno cuando se abre el modal
+// Cuando se abre el modal, asignar ID del alumno y limpiar
 watch(() => props.show, (val) => {
   if(val && props.alumno) {
     nuevaEstancia.value.ID_Alumno = props.alumno.ID_Usuario
     nuevaEstancia.value.CIF_Empresa = ''
+    nuevaEstancia.value.ID_Instructor = ''
     nuevaEstancia.value.Fecha_inicio = ''
     nuevaEstancia.value.Fecha_fin = ''
+    nuevaEstancia.value.ID_Horario = ''
+    instructores.value = []
+    horarios.value = []
+  }
+})
+
+// Cargar instructores cuando se selecciona empresa
+watch(() => nuevaEstancia.value.CIF_Empresa, async (cif) => {
+  if(!cif) return
+  try {
+    const token = localStorage.getItem('token')
+    const res = await axios.get(`http://localhost:8000/api/empresa/${cif}/instructores`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    instructores.value = res.data || []
+    console.log(instructores)
+    nuevaEstancia.value.ID_Instructor = ''
+  } catch(err) {
+    console.error(err)
+    alert('Error al cargar instructores de la empresa')
+  }
+})
+
+// Cargar horarios cuando se selecciona instructor
+watch(() => nuevaEstancia.value.ID_Instructor, async (idInst) => {
+  if(!idInst) return
+  try {
+    const token = localStorage.getItem('token')
+    const res = await axios.get(`http://localhost:8000/api/instructores/${idInst}/horarios`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    horarios.value = res.data || []
+    nuevaEstancia.value.ID_Horario = ''
+  } catch(err) {
+    console.error(err)
+    alert('Error al cargar horarios del instructor')
   }
 })
 
@@ -83,25 +124,45 @@ function cerrarModal() {
           <form @submit.prevent="crearEstancia" class="row g-4">
             <!-- Empresa -->
             <div class="col-12">
-              <label for="empresa" class="form-label fw-semibold">Empresa</label>
-              <select v-model="nuevaEstancia.CIF_Empresa" id="empresa" class="form-select form-select-lg" required>
+              <label class="form-label fw-semibold">Empresa</label>
+              <select v-model="nuevaEstancia.CIF_Empresa" class="form-select form-select-lg" required>
                 <option value="" disabled>Selecciona una empresa</option>
-                <option v-for="e in empresas" :key="e.CIF" :value="e.CIF">
-                  {{ e.Nombre }}
+                <option v-for="e in empresas" :key="e.CIF" :value="e.CIF">{{ e.Nombre }}</option>
+              </select>
+            </div>
+
+            <!-- Instructor -->
+            <div class="col-12" v-if="instructores.length">
+              <label class="form-label fw-semibold">Instructor</label>
+              <select v-model="nuevaEstancia.ID_Instructor" class="form-select form-select-lg" required>
+                <option value="" disabled>Selecciona un instructor</option>
+                <option v-for="i in instructores" :key="i.user.ID_Usuario" :value="i.user.ID_Usuario">
+                  {{ i.user.nombre }} {{ i.user.apellidos }}
                 </option>
               </select>
             </div>
 
             <!-- Fecha Inicio -->
             <div class="col-md-6">
-              <label for="fechaInicio" class="form-label fw-semibold">Fecha Inicio</label>
-              <input type="date" id="fechaInicio" v-model="nuevaEstancia.Fecha_inicio" class="form-control form-control-lg" required />
+              <label class="form-label fw-semibold">Fecha Inicio</label>
+              <input type="date" v-model="nuevaEstancia.Fecha_inicio" class="form-control form-control-lg" required />
             </div>
 
             <!-- Fecha Fin -->
             <div class="col-md-6">
-              <label for="fechaFin" class="form-label fw-semibold">Fecha Fin</label>
-              <input type="date" id="fechaFin" v-model="nuevaEstancia.Fecha_fin" class="form-control form-control-lg" required />
+              <label class="form-label fw-semibold">Fecha Fin</label>
+              <input type="date" v-model="nuevaEstancia.Fecha_fin" class="form-control form-control-lg" required />
+            </div>
+
+            <!-- Horario -->
+            <div class="col-12" v-if="horarios.length">
+              <label class="form-label fw-semibold">Horario</label>
+              <select v-model="nuevaEstancia.ID_Horario" class="form-select form-select-lg" required>
+                <option value="" disabled>Selecciona un horario</option>
+                <option v-for="h in horarios" :key="h.ID" :value="h.ID">
+                  {{ h.Dias }} | {{ h.Horario1 }} - {{ h.Horario2 }}
+                </option>
+              </select>
             </div>
           </form>
         </div>
@@ -121,18 +182,15 @@ function cerrarModal() {
 </template>
 
 <style>
-
 .btn-indigo {
   background-color: #4f46e5;
   border-color: #4f46e5;
 }
-
 .btn-indigo:hover {
   background-color: #4338ca;
   border-color: #4338ca;
   color: white;
 }
-
 .modal-content {
   transition: transform 0.2s ease-in-out;
 }

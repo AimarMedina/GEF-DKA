@@ -61,7 +61,7 @@ class AlumnoController extends Controller
             ];
         });
 
-        return response()->json(['data' => $alumnos]);
+        return response()->json($alumnos);
     }
 
     /**

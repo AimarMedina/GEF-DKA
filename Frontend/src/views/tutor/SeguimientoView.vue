@@ -10,11 +10,11 @@ const props = defineProps({
   }
 })
 
-const estanciaIdNum = Number(props.estanciaId)
+
 
 </script>
 
 <template>
   <Navbar></Navbar>
-<AlumnoSeguimiento :estanciaId="estanciaIdNum" />
+<AlumnoSeguimiento :estanciaId="estanciaId" />
 </template>

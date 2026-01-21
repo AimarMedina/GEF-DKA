@@ -21,7 +21,7 @@ watch(
   () => props.editing,
   (val) => {
     if (val) {
-      form.value = { ...val } // ✅ incluye ID
+      form.value = { ...val } // incluye ID
     } else {
       form.value = {
         ID: null,
