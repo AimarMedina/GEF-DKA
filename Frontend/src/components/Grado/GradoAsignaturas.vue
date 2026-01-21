@@ -2,12 +2,17 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import FormularioCrear from '@/components/FormularioCrear.vue';
-import AsignaturaRas from './AsignaturaRas.vue'; // <--- IMPORTAR NUEVO COMPONENTE
+import AsignaturaRas from './AsignaturaRas.vue';
+import ConfirmarEliminar from '../ConfirmarEliminar.vue'; // <--- IMPORTAMOS
 
 const props = defineProps({ grado: Object });
 const asignaturas = ref([]);
 const loading = ref(false);
 const mostrarForm = ref(false);
+
+// Variables para el modal de eliminar
+const asigEliminar = ref(null);
+const eliminarModalVisible = ref(false);
 
 // Estado para controlar qué asignatura está abierta
 const asignaturaExpandida = ref(null);
@@ -15,7 +20,7 @@ const asignaturaExpandida = ref(null);
 const fetchAsignaturas = async () => {
     if (!props.grado) return;
     loading.value = true;
-    asignaturaExpandida.value = null; // Cerramos acordeón al cambiar de grado
+    asignaturaExpandida.value = null;
     try {
         const res = await axios.get(`http://127.0.0.1:8000/api/grados/${props.grado.id}/asignaturas`);
         asignaturas.value = res.data;
@@ -30,12 +35,34 @@ function onCreado() {
     mostrarForm.value = false;
 }
 
-// Función para abrir/cerrar el acordeón de RAs
 function toggleRas(idAsignatura) {
     if (asignaturaExpandida.value === idAsignatura) {
-        asignaturaExpandida.value = null; // Si ya está abierto, lo cerramos
+        asignaturaExpandida.value = null;
     } else {
-        asignaturaExpandida.value = idAsignatura; // Abrimos el nuevo
+        asignaturaExpandida.value = idAsignatura;
+    }
+}
+
+// --- LÓGICA DE ELIMINAR ---
+function abrirEliminarModal(asig) {
+    asigEliminar.value = asig;
+    eliminarModalVisible.value = true;
+}
+
+function confirmarEliminarAsig(confirmado) {
+    if (confirmado && asigEliminar.value) {
+        eliminarAsignatura(asigEliminar.value.id);
+    }
+    eliminarModalVisible.value = false;
+    asigEliminar.value = null;
+}
+
+async function eliminarAsignatura(id){
+    try{
+        await axios.delete(`http://127.0.0.1:8000/api/asignaturas/${id}`);
+        fetchAsignaturas();
+    } catch (e){
+        alert('Error al eliminar');
     }
 }
 </script>
@@ -77,7 +104,7 @@ function toggleRas(idAsignatura) {
                             <td class="py-2">{{ asig.nombre }}</td>
                             <td class="d-flex justify-content-end gap-2 pe-2"> 
                                 <button 
-                                    class="btn btn-sm" 
+                                    class="btn btn-sm " 
                                     :class="asignaturaExpandida === asig.id ? 'btn-indigo text-white' : 'btn-outline-indigo'"
                                     @click="toggleRas(asig.id)"
                                     title="Ver Resultados de Aprendizaje"
@@ -85,7 +112,7 @@ function toggleRas(idAsignatura) {
                                     RAs <i :class="asignaturaExpandida === asig.id ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
                                 </button>
 
-                                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                <button @click="abrirEliminarModal(asig)" class="btn btn-sm btn-outline-danger">Eliminar</button>
                             </td>
                         </tr>
 
@@ -113,18 +140,17 @@ function toggleRas(idAsignatura) {
             @cancelar="mostrarForm = false"
             @creado="onCreado"
         />
+
+        <ConfirmarEliminar 
+            :show="eliminarModalVisible" 
+            :mensaje="`¿Seguro que quieres eliminar la asignatura '${asigEliminar?.nombre}'? Esto borrará también sus RAs.`"
+            @confirm="confirmarEliminarAsig" 
+            @close="eliminarModalVisible = false"
+        />
     </div>
 </template>
 
 <style scoped>
-.bg-indigo { background-color: #6610f2; }
-.btn-indigo { background-color: #6610f2; color: white; }
-.btn-indigo:hover { background-color: #520dc2; }
-
-.btn-outline-indigo { color: #6610f2; border-color: #6610f2; }
-.btn-outline-indigo:hover { background-color: #6610f2; color: white; }
-
-/* Animación simple para el despliegue */
 .animacion-desplegar {
     animation: fadeIn 0.3s ease-in-out;
 }

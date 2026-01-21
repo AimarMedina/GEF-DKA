@@ -14,28 +14,27 @@ const texto = ref("");
 const loading = ref(false);
 const error = ref(null);
 
-// Configuración visual y de datos según el tipo
 const config = computed(() => {
     switch (props.tipo) {
         case 'asig':
             return {
                 placeholder: 'Escribe el nombre de la asignatura...',
                 btnClass: 'btn-indigo',
-                payloadKey: 'nombre',      // La API espera 'nombre'
-                fkKey: 'ID_Grado'          // La API espera 'ID_Grado'
+                payloadKey: 'nombre',     
+                fkKey: 'ID_Grado'         
             };
         case 'comp':
             return {
                 placeholder: 'Escribe la descripción de la competencia...',
                 btnClass: 'btn-success',
-                payloadKey: 'descripcion', // La API espera 'descripcion'
+                payloadKey: 'descripcion', 
                 fkKey: 'ID_Grado'
             };
         case 'ra':
             return {
                 placeholder: 'Describe el Resultado de Aprendizaje...',
                 btnClass: 'btn-indigo',
-                payloadKey: 'descripcion',
+                payloadKey: 'Descripcion',
                 fkKey: 'ID_Asignatura'
             };
         default:
@@ -50,17 +49,16 @@ const guardar = async () => {
     error.value = null;
 
     try {
-        // Construimos el objeto dinámicamente
+        
         const payload = {
-            [config.value.payloadKey]: texto.value, // nombre o descripcion
-            [config.value.fkKey]: props.idPadre     // ID_Grado o ID_Asignatura
+            [config.value.payloadKey]: texto.value, 
+            [config.value.fkKey]: props.idPadre     
         };
-
-        // Usamos el endpoint que nos pasa el padre
+        
         await axios.post(props.endpoint, payload);
         
         texto.value = "";
-        emit('creado'); // Avisamos éxito
+        emit('creado'); 
     } catch (e) {
         console.error(e);
         error.value = "Error al guardar. Verifica los datos.";
@@ -108,8 +106,8 @@ const guardar = async () => {
 </template>
 
 <style scoped>
-.btn-indigo { background-color: #6610f2; border-color: #6610f2; }
-.btn-indigo:hover { background-color: #520dc2; }
+
+
 
 /* Pequeña animación para que no aparezca de golpe */
 .animacion-entrada {

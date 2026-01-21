@@ -122,16 +122,6 @@ function cerrarModal() {
 
 <style>
 
-.btn-indigo {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
-}
-
-.btn-indigo:hover {
-  background-color: #4338ca;
-  border-color: #4338ca;
-  color: white;
-}
 
 .modal-content {
   transition: transform 0.2s ease-in-out;

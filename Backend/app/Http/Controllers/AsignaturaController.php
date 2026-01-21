@@ -22,10 +22,8 @@ class AsignaturaController extends Controller
             'ID_Grado' => 'required|exists:grado,id'
         ]);
 
-        $asignatura = Asignatura::create([
-            'nombre' => $validated['nombre'],
-            'ID_Grado' => $validated['ID_Grado']
-        ]);
+        $asignatura = Asignatura::create($validated);
+           
 
         return response()->json($asignatura, 201);
     }
