@@ -66,7 +66,7 @@ Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaActu
 //Cuaderno
 Route::get('/alumno/{id}', [AlumnoController::class, 'getGrado']);
 Route::get('/entregas/alumno/{id}', [EntregaCuadernoController::class, 'entregasAlumno'])->middleware('auth:sanctum');
-Route::post('/entregas', [EntregaCuadernoController::class, 'crearEntregaCuaderno']); // tutor
+Route::post('/grado/{gradoId}/entregas', [EntregaCuadernoController::class, 'store']);
 Route::get('/grado/{id}/entregas', [EntregaCuadernoController::class, 'porGrado']);
 Route::post('/entregarCuaderno/alumno/{id}', [AlumnoEntregaController::class, 'entregarCuaderno']);
 Route::post('/nota-cuaderno', [NotaCuadernoController::class, 'notaCuaderno']);
@@ -169,3 +169,4 @@ Route::post(
 
 Route::put('/alumnos/{alumnoId}/competencias/{competenciaId}/nota', [NotasCompetenciaController::class, 'guardarNota']);
 Route::delete('estancias/{estanciaId}/competencias/{competenciaId}', [EstanciaCompetenciaController::class, 'delete']);
+Route::delete('/grado/{gradoId}/entregas/{entregaId}', [EntregaCuadernoController::class, 'destroy']);

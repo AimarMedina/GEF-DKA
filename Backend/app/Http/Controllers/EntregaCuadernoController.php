@@ -8,23 +8,41 @@ use Illuminate\Http\Request;
 
 class EntregaCuadernoController extends Controller
 {
-    public function crearEntregaCuaderno(Request $request)
+    public function store(Request $request, $gradoId)
     {
-        return EntregaCuaderno::create([
-            'Fecha_creacion' => now(),
-            'Fecha_Limite' => $request->Fecha_Limite,
-            'ID_Grado' => $request->ID_Grado
+        $request->validate([
+            'Descripcion' => 'required|string',
+            'Fecha_Limite' => 'required|date',
         ]);
+
+        $entrega = EntregaCuaderno::create([
+            'ID_Grado' => $gradoId,
+            'Descripcion' => $request->Descripcion,
+            'Fecha_Limite' => $request->Fecha_Limite,
+            'Fecha_creacion' => now(),
+        ]);
+
+        return response()->json($entrega);
     }
 
-    public function porGrado($idGrado)
+
+    public function porGrado($gradoId, Request $request)
     {
-        return EntregaCuaderno::with([
-            'alumnoEntrega.alumno.usuario',
-        ])
-            ->where('ID_Grado', $idGrado)
+        $tutorId = $request->query('tutor_id');
+
+        return EntregaCuaderno::where('id_grado', $gradoId)
+            ->with([
+                'alumnoEntrega' => function ($q) use ($tutorId) {
+                    $q->whereHas('alumno', function ($q2) use ($tutorId) {
+                        $q2->where('ID_Tutor', $tutorId);
+                    })
+                        ->with('alumno.usuario');
+                }
+            ])
             ->get();
     }
+
+
 
     public function entregasAlumno(Request $request, $id)
     {
@@ -52,4 +70,14 @@ class EntregaCuadernoController extends Controller
         return response()->json($entregas);
     }
 
+    public function destroy($gradoId, $entregaId)
+    {
+        $entrega = EntregaCuaderno::where('id', $entregaId)
+            ->where('ID_Grado', $gradoId)
+            ->firstOrFail();
+
+        $entrega->delete();
+
+        return response()->json(['message' => 'Entrega eliminada correctamente']);
+    }
 }
