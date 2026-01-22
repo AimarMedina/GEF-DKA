@@ -19,8 +19,9 @@ class UserSeeder extends Seeder
             'tipo' => 'admin',
         ]);
 
-        // TUTORES
+        // TUTORES (para los 11 grados)
         User::create([
+            'id' => 30001,
             'nombre' => 'Maite',
             'apellidos' => 'García Lasa',
             'email' => 'maite.tutor@centro.local',
@@ -28,12 +29,93 @@ class UserSeeder extends Seeder
             'password' => bcrypt('tutor'),
             'tipo' => 'tutor',
         ]);
-
         User::create([
+            'id' => 30002,
             'nombre' => 'Iñigo',
             'apellidos' => 'Sáez Arriola',
             'email' => 'inigo.tutor@centro.local',
             'n_tel' => '600333444',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30003,
+            'nombre' => 'Elena',
+            'apellidos' => 'Martínez Ruiz',
+            'email' => 'elena.tutor@centro.local',
+            'n_tel' => '600444555',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30004,
+            'nombre' => 'Javier',
+            'apellidos' => 'González Pérez',
+            'email' => 'javier.tutor@centro.local',
+            'n_tel' => '600555666',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30005,
+            'nombre' => 'Laura',
+            'apellidos' => 'Fernández López',
+            'email' => 'laura.tutor@centro.local',
+            'n_tel' => '600666777',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30006,
+            'nombre' => 'David',
+            'apellidos' => 'Santos Moreno',
+            'email' => 'david.tutor@centro.local',
+            'n_tel' => '600777888',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30007,
+            'nombre' => 'Ana',
+            'apellidos' => 'Lopez Muñoz',
+            'email' => 'ana.tutor@centro.local',
+            'n_tel' => '600888999',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30008,
+            'nombre' => 'Pedro',
+            'apellidos' => 'Ramírez Díaz',
+            'email' => 'pedro.tutor@centro.local',
+            'n_tel' => '600999000',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30009,
+            'nombre' => 'Lucía',
+            'apellidos' => 'García Moreno',
+            'email' => 'lucia.tutor@centro.local',
+            'n_tel' => '601000111',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30010,
+            'nombre' => 'Carlos',
+            'apellidos' => 'Hernández Ruiz',
+            'email' => 'carlos.tutor@centro.local',
+            'n_tel' => '601111222',
+            'password' => bcrypt('tutor'),
+            'tipo' => 'tutor',
+        ]);
+        User::create([
+            'id' => 30011,
+            'nombre' => 'Marta',
+            'apellidos' => 'Sánchez Pérez',
+            'email' => 'marta.tutor@centro.local',
+            'n_tel' => '601222333',
             'password' => bcrypt('tutor'),
             'tipo' => 'tutor',
         ]);

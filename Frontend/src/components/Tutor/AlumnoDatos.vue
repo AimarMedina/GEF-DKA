@@ -24,7 +24,7 @@ const notasAlumno = ref({
 watch(
   () => props.alumno,
   async (alumno) => {
-    
+
     if (!alumno) {
       notasAlumno.value = {
         nota_cuaderno: [],
@@ -42,15 +42,13 @@ watch(
       )
 
       const data = res.data
-      
+
       notasAlumno.value = {
         nota_cuaderno: data?.nota_cuaderno || [],
         notas_competencias: data?.notas_competencias || [],
         notas_transversales: data?.notas_transversales || [],
         notas_egibide: data?.notas_egibide || []
       }
-      console.log(notasAlumno.value);
-      
     } catch (e) {
       console.error('Error cargando notas', e)
       notasAlumno.value = {

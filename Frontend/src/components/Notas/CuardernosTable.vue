@@ -22,11 +22,11 @@ const props = defineProps({
             </td>
             <td class="text-center text-md-start">
               <span :class="{
-                'badge bg-success': notaCuaderno.Nota >= 5,
-                'badge bg-danger text-white': notaCuaderno.Nota < 5 && notaCuaderno.Nota != null,
-                'badge bg-warning text-dark': !notaCuaderno.Nota
+                'badge bg-success': notaCuaderno?.Nota >= 5,
+                'badge bg-danger text-white': notaCuaderno?.Nota < 5 && notaCuaderno?.Nota != null,
+                'badge bg-warning text-dark': !notaCuaderno?.Nota
               }">
-                {{ notaCuaderno.Nota ?? 'Pendiente' }}
+                {{ notaCuaderno?.Nota ?? 'Pendiente' }}
               </span>
             </td>
           </tr>

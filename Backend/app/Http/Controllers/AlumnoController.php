@@ -43,8 +43,9 @@ class AlumnoController extends Controller
             ->with([
                 'usuario:id,nombre,apellidos,email,tipo',
                 'grado:id,nombre',
-                'estanciaActual:id,ID_Alumno',
-            ])->get();
+                'estanciaActual'
+            ])
+            ->get();
 
         return response()->json($alumnos);
     }
@@ -89,7 +90,8 @@ class AlumnoController extends Controller
             ])
             ->get();
         return response()->json(
-            $alumnos);
+            $alumnos
+        );
 
 
         return response()->json($alumnos);

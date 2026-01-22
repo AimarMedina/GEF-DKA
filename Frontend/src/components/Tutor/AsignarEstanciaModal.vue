@@ -14,7 +14,7 @@ const diasSemana = ['Lunes','Martes','Miércoles','Jueves','Viernes']
 const nuevaEstancia = ref({
   ID_Alumno: null,
   CIF_Empresa: '',
-  ID_Instructor: '', // Opcional
+  ID_Instructor: null, // <-- ahora null por defecto
   Fecha_inicio: '',
   Fecha_fin: '',
   horarios: []
@@ -57,7 +57,7 @@ watch(() => props.show, val => {
   if(val && props.alumno){
     nuevaEstancia.value.ID_Alumno = props.alumno.ID_Usuario
     nuevaEstancia.value.CIF_Empresa = ''
-    nuevaEstancia.value.ID_Instructor = '' // Opcional
+    nuevaEstancia.value.ID_Instructor = null // <-- reiniciamos como null
     nuevaEstancia.value.Fecha_inicio = ''
     nuevaEstancia.value.Fecha_fin = ''
     resetHorarios()
@@ -72,6 +72,7 @@ watch(() => nuevaEstancia.value.CIF_Empresa, async cif => {
     headers:{ Authorization:`Bearer ${token}` }
   })
   instructores.value = res.data || []
+  console.log(instructores.value);
 })
 
 async function crearEstancia(){
@@ -85,11 +86,10 @@ async function crearEstancia(){
     alert('Debes seleccionar fecha inicio y fin')
     return
   }
-
   const payload = {
     ID_Alumno: nuevaEstancia.value.ID_Alumno,
     CIF_Empresa: nuevaEstancia.value.CIF_Empresa,
-    ID_Instructor: nuevaEstancia.value.ID_Instructor || null, // Opcional
+    ID_Instructor: nuevaEstancia.value.ID_Instructor ? Number(nuevaEstancia.value.ID_Instructor) : null,
     Fecha_inicio: nuevaEstancia.value.Fecha_inicio,
     Fecha_fin: nuevaEstancia.value.Fecha_fin,
     horarios: horariosActivos.map(h => ({
@@ -98,8 +98,6 @@ async function crearEstancia(){
       Horario2: h.tarde.inicio && h.tarde.fin ? `${h.tarde.inicio}-${h.tarde.fin}` : null
     }))
   }
-
-  console.log('Payload a enviar:', payload)
 
   try {
     const token = localStorage.getItem('token')
@@ -147,15 +145,16 @@ function cerrarModal(){
       </div>
 
       <!-- Instructor Opcional -->
-      <div class="mb-2">
-        <label>Instructor (opcional)</label>
-        <select v-model="nuevaEstancia.ID_Instructor" class="form-control">
-          <option value="">No asignar</option>
-          <option v-for="i in instructores" :key="i.user.ID_Usuario" :value="i.user.ID_Usuario">
-            {{ i.user.nombre }} {{ i.user.apellidos }}
-          </option>
-        </select>
-      </div>
+<div class="mb-2">
+  <label>Instructor (opcional)</label>
+  <select v-model.number="nuevaEstancia.ID_Instructor" class="form-control">
+    <option :value="null">No asignar</option>
+    <option v-for="i in instructores" :key="i.user.id" :value="i.user.id">
+      {{ i.user.nombre }} {{ i.user.apellidos }}
+    </option>
+  </select>
+</div>
+
 
       <!-- Fechas -->
       <div class="row">
@@ -213,26 +212,3 @@ function cerrarModal(){
   </div>
 </template>
 
-<style>
-
-.btn-indigo {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
-  color: white;
-}
-
-.btn-indigo:hover {
-  background-color: #4338ca;
-  border-color: #4338ca;
-}
-
-.card {
-  border-radius: 6px;
-}
-.modal-content {
-  transition: transform 0.2s ease-in-out;
-}
-.modal-content:hover {
-  transform: scale(1.01);
-}
-</style>

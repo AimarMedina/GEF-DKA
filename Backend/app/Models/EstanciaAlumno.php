@@ -28,7 +28,6 @@ class EstanciaAlumno extends Model
     }
     public function alumno()
     {
-
         return $this->belongsTo(Alumno::class, 'ID_Alumno', 'ID_Usuario');
     }
     public function competencias()

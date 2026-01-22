@@ -20,7 +20,6 @@ async function cargarNotas() {
       headers: { Authorization: `Bearer ${token}` }
     })
     notas.value = res.data || null
-    console.log(notas.value);
 
   } catch (err) {
     console.error(err)

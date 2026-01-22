@@ -101,8 +101,6 @@ Route::get('/empresa/{cif}/alumnos', [EstanciaController::class, 'getCompanyAlum
 Route::get('/alumno/{id}', [AlumnoController::class, 'getGrado']);
 // Entregas de un alumno
 Route::get('/entregas/alumno/{id}', [EntregaCuadernoController::class, 'entregasAlumno'])->middleware('auth:sanctum');
-// Crear nueva entrega (tutor)
-Route::post('/entregas', [EntregaCuadernoController::class, 'crearEntregaCuaderno']);
 // Entregas por grado
 Route::get('/grado/{id}/entregas', [EntregaCuadernoController::class, 'porGrado']);
 // Subir cuaderno del alumno
@@ -169,5 +167,5 @@ Route::post(
     [EstanciaCompetenciaController::class, 'create']
 );
 
-Route::put('/alumnos/{alumnoId}/competencias/{competenciaId}/nota',[NotasCompetenciaController::class, 'guardarNota']);
-Route::delete('estancias/{estanciaId}/competencias/{competenciaId}',[EstanciaCompetenciaController::class,'delete']);
+Route::put('/alumnos/{alumnoId}/competencias/{competenciaId}/nota', [NotasCompetenciaController::class, 'guardarNota']);
+Route::delete('estancias/{estanciaId}/competencias/{competenciaId}', [EstanciaCompetenciaController::class, 'delete']);

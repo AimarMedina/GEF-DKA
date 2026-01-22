@@ -16,7 +16,7 @@ async function fetchEntregas() {
     const gradosResponse = await axios.get(
       `http://localhost:8000/api/tutor/${tutorId}/grados`
     )
-
+    console.log(gradosResponse.data);
     entregas.value = []
 
     for (const grado of gradosResponse.data) {
@@ -25,8 +25,8 @@ async function fetchEntregas() {
       )
 
       entregas.value.push(...resResponse.data)
-
     }
+    console.log(entregas.value);
   } catch (err) {
     console.error(err)
     mensaje.value = 'Error cargando entregas'
