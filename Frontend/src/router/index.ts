@@ -3,16 +3,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import UsersView from '../views/UsersView.vue'
-import AlumnosInstructorView from '@/views/instructor/AlumnosInstructorView.vue'
+import AlumnosInstructorView from '@/views/Instructor/AlumnosInstructorView.vue'
 import AlumnosTutorView from '@/views/tutor/AlumnosTutorView.vue'
 import SeguimientoView from '@/views/tutor/SeguimientoView.vue'
 import EmpresaView from '../views/admin/EmpresaView.vue'
-import EstanciaAlumnoView from '../views/alumno/EstanciaAlumnoView.vue'
+import EstanciaAlumnoView from '../views/Alumno/EstanciaAlumnoView.vue'
 
-import AlumnoCuadernosView from '@/views/cuadernos/AlumnoCuadernosView.vue';
-import TutorCuadernosView from '@/views/cuadernos/TutorCuadernosView.vue';
+import AlumnoCuadernosView from '@/views/Cuadernos/AlumnoCuadernosView.vue';
+import TutorCuadernosView from '@/views/Cuadernos/TutorCuadernosView.vue';
 
-import AlumnoNotasView from '@/views/alumno/AlumnoNotasView.vue'
+import AlumnoNotasView from '@/views/Alumno/AlumnoNotasView.vue'
 import CompRaView from '@/views/CompRaView.vue'
 import GradosView from '@/views/GradosView.vue'
 
