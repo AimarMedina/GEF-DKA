@@ -4,9 +4,9 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import UsersView from '../views/UsersView.vue'
 import AlumnosInstructorView from '@/views/Instructor/AlumnosInstructorView.vue'
-import AlumnosTutorView from '@/views/tutor/AlumnosTutorView.vue'
-import SeguimientoView from '@/views/tutor/SeguimientoView.vue'
-import EmpresaView from '../views/admin/EmpresaView.vue'
+import AlumnosTutorView from '@/views/Tutor/AlumnosTutorView.vue'
+import SeguimientoView from '@/views/Tutor/SeguimientoView.vue'
+import EmpresaView from '../views/Admin/EmpresaView.vue'
 import EstanciaAlumnoView from '../views/Alumno/EstanciaAlumnoView.vue'
 
 import AlumnoCuadernosView from '@/views/Cuadernos/AlumnoCuadernosView.vue';
