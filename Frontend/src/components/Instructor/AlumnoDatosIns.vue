@@ -36,7 +36,7 @@ watch(
 
       competencias.value = resEstancia.data.competencias.map(c => ({
         ...c,
-        nota: c.notas?.[0]?.Nota ?? null 
+        nota: c.notas?.[0]?.Nota ?? null
       }));
 
       const resGrados = await axios.get(
