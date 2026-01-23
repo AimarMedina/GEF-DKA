@@ -1,5 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
+import ConfirmarEliminar from '../ConfirmarEliminar.vue'
+
 const props = defineProps({
   visible: Boolean,
   editing: Object
@@ -14,12 +16,21 @@ const form = ref({
   Seguimiento_actividad: ''
 })
 
+const confirmarModalVisible = ref(false) // <-- nuevo
+
 watch(() => props.editing, (val) => {
-  if (val) form.value = { ...val } // copia los datos incluyendo ID
+  if (val) form.value = { ...val }
 }, { immediate: true })
 
 function guardar() {
-  emit('save', { ...form.value }) // envía ID al padre
+  confirmarModalVisible.value = true // abrir modal de confirmación
+}
+
+function confirmarGuardado(confirmado) {
+  if (confirmado) {
+    emit('save', { ...form.value }) // enviar datos al padre
+  }
+  confirmarModalVisible.value = false
 }
 </script>
 
@@ -43,5 +54,12 @@ function guardar() {
         </div>
       </div>
     </div>
+
+    <!-- Modal de confirmación -->
+    <ConfirmarEliminar 
+      :show="confirmarModalVisible"
+      mensaje="¿Seguro que quieres guardar los cambios?"
+      @confirm="confirmarGuardado"
+      @close="confirmarModalVisible = false" />
   </div>
 </template>

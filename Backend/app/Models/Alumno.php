@@ -58,10 +58,6 @@ class Alumno extends Model
             ->latestOfMany();
     }
 
-
-
-
-
     public function cuadernos()
     {
         return $this->hasMany(

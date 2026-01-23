@@ -4,7 +4,8 @@ import axios from 'axios'
 
 const props = defineProps({
   egibide: Array,
-  alumnoId: Number
+  alumnoId: Number,
+  puedeEditar: Boolean // true si es tutor/admin, false si es alumno
 })
 
 const notasEditable = ref([])
@@ -19,7 +20,6 @@ watch(
 )
 
 async function guardarNota(nota) {
-  console.log(nota)
   try {
     const token = localStorage.getItem('token')
     await axios.post(
@@ -44,16 +44,42 @@ async function guardarNota(nota) {
         <tr>
           <th>Asignatura</th>
           <th>Nota</th>
-          <th>Acciones</th>
+          <th v-if="puedeEditar">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(n, i) in notasEditable" :key="n.ID">
           <td class="text-center text-md-start">{{ n.asignatura?.nombre ?? 'Sin nombre' }}</td>
+          
+          <!-- Nota: badge si es alumno, input si puede editar -->
           <td class="text-center text-md-start">
-            <input type="number" min="0" max="10" step="0.1" v-model="n.nota" class="form-control form-control-sm" />
+            <template v-if="!puedeEditar">
+              <span :class="{
+                'badge bg-success': n.nota >= 5,
+                'badge bg-danger text-white': n.nota < 5 && n.nota != null,
+                'badge bg-warning text-dark': n.nota == null
+              }">
+                {{ n.nota ?? 'Pendiente' }}
+              </span>
+            </template>
+            <template v-else>
+              <input
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                v-model.number="n.nota"
+                class="form-control form-control-sm"
+                :class="{
+                  'border-success bg-success bg-opacity-10': n.nota >= 5,
+                  'border-danger bg-danger bg-opacity-10': n.nota < 5 && n.nota !== null,
+                  'border-warning bg-warning bg-opacity-10': n.nota === null
+                }"
+              />
+            </template>
           </td>
-          <td class="text-center text-md-start">
+
+          <td class="text-center text-md-start" v-if="puedeEditar">
             <button class="btn btn-sm btn-success" @click="guardarNota(n)">Guardar</button>
           </td>
         </tr>

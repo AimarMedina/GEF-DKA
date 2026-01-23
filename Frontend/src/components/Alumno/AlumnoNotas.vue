@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/userStore'
 import CuardernosTable from '../Notas/CuardernosTable.vue'
 import CompetenciasTable from '../Notas/CompetenciasTable.vue'
 import TransversalesTable from '../Notas/TransversalesTable.vue'
-import EgibideTable from '@/components/notas/EgibideTable.vue'
+import EgibideTable from '@/components/Notas/EgibideTable.vue'
 
 const notas = ref(null)
 const mensaje = ref('')

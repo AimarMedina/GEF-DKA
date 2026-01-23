@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import Buscador from '@/components/Buscador.vue'
 import { useUserStore } from '@/stores/userStore'
@@ -10,19 +10,28 @@ const prop = defineProps({
 
 const userStore = useUserStore()
 const tutorId = userStore.user.id
+const rol=userStore.user.tipo
 
 const alumnos = ref([])
 const cargando = ref(false)
 const alumnoSeleccionado = ref(null)
 const emit = defineEmits(['seleccionarAlumno'])
 
-const alumnosConEstancia = computed(() =>
-  alumnos.value.filter(a => a.estancia_actual?.id)
-)
+const alumnosConEstancia = computed(() => {
+  if (rol === 'tutor') return alumnos.value.filter(a => a.estancia_actual?.id)
+  if (rol === 'instructor') return alumnos.value // Instructor ve solo los suyos
+  return alumnos.value
+})
 
-const alumnosSinEstancia = computed(() =>
-  alumnos.value.filter(a => !a.estancia_actual?.id)
-)
+const alumnosSinEstancia = computed(() => {
+  if (rol === 'tutor') return alumnos.value.filter(a => !a.estancia_actual?.id)
+  return [] // Instructor no necesita esta lista
+})
+
+watch(alumnos, (newAlumnos) => {
+  console.log('Alumnos actualizados:', newAlumnos)
+}, { deep: true })
+
 
 async function cargarAlumnos() {
   cargando.value = true
@@ -54,56 +63,46 @@ onMounted(cargarAlumnos)
 <template>
   <div class="col-md-3 mt-3">
 
-    <!-- ================= CON ESTANCIA ================= -->
-    <div class="mb-4">
+    <!-- Solo para tutores -->
+    <div v-if="rol === 'tutor'" class="mb-4">
       <div class="list-group shadow-sm">
-        <div class="list-group-item bg-success text-white fw-semibold">
-          Alumnos con estancia
-        </div>
-
-        <li
-          v-for="a in alumnosConEstancia"
-          :key="a.ID_Usuario"
-          class="list-group-item cursor-pointer"
-          :class="{ 'bg-light text-dark': alumnoSeleccionado?.ID_Usuario === a.ID_Usuario }"
-          @click="seleccionarAlumno(a)"
-        >
+        <div class="list-group-item bg-success text-white fw-semibold">Alumnos con estancia</div>
+        <li v-for="a in alumnosConEstancia" :key="a.ID_Usuario"
+            class="list-group-item cursor-pointer"
+            :class="{ 'bg-light text-dark': alumnoSeleccionado?.ID_Usuario === a.ID_Usuario }"
+            @click="seleccionarAlumno(a)">
           {{ a.usuario?.nombre }} {{ a.usuario?.apellidos }}
         </li>
-
-        <div
-          v-if="!alumnosConEstancia.length && !cargando"
-          class="list-group-item text-muted text-center"
-        >
+        <div v-if="!alumnosConEstancia.length && !cargando" class="list-group-item text-muted text-center">
           Ninguno
         </div>
       </div>
     </div>
 
-    <!-- ================= SIN ESTANCIA ================= -->
-    <div>
+    <div v-if="rol === 'tutor'">
       <div class="list-group shadow-sm">
-        <div class="list-group-item bg-warning fw-semibold">
-          Alumnos sin estancia
-        </div>
-
-        <li
-          v-for="a in alumnosSinEstancia"
-          :key="a.ID_Usuario"
-          class="list-group-item cursor-pointer"
-          :class="{ 'bg-light text-dark': alumnoSeleccionado?.ID_Usuario === a.ID_Usuario }"
-          @click="seleccionarAlumno(a)"
-        >
+        <div class="list-group-item bg-warning fw-semibold">Alumnos sin estancia</div>
+        <li v-for="a in alumnosSinEstancia" :key="a.ID_Usuario"
+            class="list-group-item cursor-pointer"
+            :class="{ 'bg-light text-dark': alumnoSeleccionado?.ID_Usuario === a.ID_Usuario }"
+            @click="seleccionarAlumno(a)">
           {{ a.usuario?.nombre }} {{ a.usuario?.apellidos }}
         </li>
-
-        <div
-          v-if="!alumnosSinEstancia.length && !cargando"
-          class="list-group-item text-muted text-center"
-        >
+        <div v-if="!alumnosSinEstancia.length && !cargando" class="list-group-item text-muted text-center">
           Ninguno
         </div>
       </div>
+    </div>
+
+    <!-- Para instructor o roles que solo vean su lista -->
+    <div v-else class="list-group shadow-sm">
+      <div class="list-group-item bg-indigo text-white fw-semibold">Mis alumnos</div>
+      <li v-for="a in alumnosConEstancia" :key="a.ID_Usuario"
+          class="list-group-item cursor-pointer"
+          :class="{ 'bg-light text-dark': alumnoSeleccionado?.ID_Usuario === a.ID_Usuario }"
+          @click="seleccionarAlumno(a)">
+        {{ a.usuario?.nombre }} {{ a.usuario?.apellidos }}
+      </li>
     </div>
 
     <!-- ================= LOADING ================= -->
