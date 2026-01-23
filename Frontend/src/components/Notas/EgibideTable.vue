@@ -1,34 +1,41 @@
 <script setup>
 import { ref, watch } from 'vue'
-import axios from 'axios'
 import api from '@/services/api.js'
 
 const props = defineProps({
   egibide: Array,
   alumnoId: Number,
-  puedeEditar: Boolean // true si es tutor/admin, false si es alumno
+  puedeEditar: Boolean
 })
 
 const notasEditable = ref([])
 
-// Actualiza notasEditable cuando cambian las props
 watch(
   () => props.egibide,
   (val) => {
-    notasEditable.value = val.map(n => ({ ...n }))
+    notasEditable.value = (val ?? []).map(n => ({ ...n }))
   },
   { immediate: true }
 )
 
 async function guardarNota(nota) {
+  console.log(nota);
+  
   try {
     const token = localStorage.getItem('token')
+
     await api.post(
       `/api/alumnos/${props.alumnoId}/nota-egibide`,
-      { id: nota.id, nota: nota.nota },
-      { headers: { Authorization: `Bearer ${token}` } }
+      {
+        id_asignatura: nota.id_asignatura,
+        nota: nota.nota
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
     )
-    alert(`Nota de ${nota.asignatura?.nombre || 'Asignatura'} guardada correctamente`)
+
+    alert(`Nota de ${nota.asignatura} guardada correctamente`)
   } catch (err) {
     console.error(err)
     alert('Error al guardar la nota')
@@ -36,33 +43,36 @@ async function guardarNota(nota) {
 }
 </script>
 
+
 <template>
 <div class="mb-5">
   <h5>Asignaturas (Egibide)</h5>
+
   <div class="table-responsive">
     <table class="table table-striped table-bordered">
-      <thead class="table-indigo text-white text-center text-md-start">
+      <thead class="table-indigo text-white">
         <tr>
           <th>Asignatura</th>
           <th>Nota</th>
           <th v-if="puedeEditar">Acciones</th>
         </tr>
       </thead>
+
       <tbody>
-        <tr v-for="(n, i) in notasEditable" :key="n.ID">
-          <td class="text-center text-md-start">{{ n.asignatura?.nombre ?? 'Sin nombre' }}</td>
-          
-          <!-- Nota: badge si es alumno, input si puede editar -->
-          <td class="text-center text-md-start">
+        <tr v-for="n in notasEditable" :key="n.id_asignatura">
+          <td>{{ n.asignatura }}</td>
+
+          <td>
             <template v-if="!puedeEditar">
               <span :class="{
                 'badge bg-success': n.nota >= 5,
-                'badge bg-danger text-white': n.nota < 5 && n.nota != null,
-                'badge bg-warning text-dark': n.nota == null
+                'badge bg-danger': n.nota < 5 && n.nota !== null,
+                'badge bg-warning text-dark': n.nota === null
               }">
                 {{ n.nota ?? 'Pendiente' }}
               </span>
             </template>
+
             <template v-else>
               <input
                 type="number"
@@ -80,8 +90,10 @@ async function guardarNota(nota) {
             </template>
           </td>
 
-          <td class="text-center text-md-start" v-if="puedeEditar">
-            <button class="btn btn-sm btn-success" @click="guardarNota(n)">Guardar</button>
+          <td v-if="puedeEditar">
+            <button class="btn btn-sm btn-success" @click="guardarNota(n)">
+              Guardar
+            </button>
           </td>
         </tr>
       </tbody>
@@ -89,3 +101,4 @@ async function guardarNota(nota) {
   </div>
 </div>
 </template>
+

@@ -20,7 +20,7 @@ const props = defineProps({
 <template>
   <div v-if="alumno" class="ceard mt-2 shadow-sm">
     <div class="card-header bg-indigo text-white">
-      <h5 class="mb-0">Notas de {{ alumno.Nombre }} {{ alumno.Apellidos }}</h5>
+      <h5 class="mb-0">Notas</h5>
     </div>
     <div class="card-body">
       <CuardernosTable v-if="notas?.nota_cuaderno" :notaCuaderno="[notas.nota_cuaderno]" :alumno-id="alumno.ID_Usuario" />

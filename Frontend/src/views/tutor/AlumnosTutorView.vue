@@ -9,7 +9,11 @@ const alumnoSeleccionado = ref(null)
 const route = useRoute();
 
 const tutorId = route.params.id;
+const alumnosListRef = ref(null)
 
+function recargarAlumnos() {
+  alumnosListRef.value?.recargar()
+}
 </script>
 
 <template>
@@ -17,8 +21,11 @@ const tutorId = route.params.id;
 
   <div class="container-fluid">
     <div class="row">
-      <AlumnosList @seleccionarAlumno="alumnoSeleccionado = $event" :endpoint="`/api/tutores/${tutorId}/alumnos`" />
-      <AlumnoDatos :alumno="alumnoSeleccionado" />
+      <AlumnosList ref="alumnosListRef" @seleccionarAlumno="alumnoSeleccionado = $event"
+        :endpoint="`/api/tutores/${tutorId}/alumnos`" />
+
+      <AlumnoDatos :alumno="alumnoSeleccionado" @estanciaCreada="recargarAlumnos" />
+
     </div>
   </div>
 </template>
