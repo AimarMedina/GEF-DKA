@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import axios from 'axios'
 import { useUserStore } from '@/stores/userStore'
 import FormEntregaModal from './FormEntregaModal.vue'
+import api from '@/services/api.js'
 
 const userStore = useUserStore()
 const tutorId = userStore.user?.id
@@ -44,11 +44,11 @@ function onEntregaGuardada(nuevaEntrega) {
 async function fetchEntregas() {
   if (!tutorId) return
   try {
-    const { data: grados } = await axios.get(`http://localhost:8000/api/tutor/${tutorId}/grados`)
+    const { data: grados } = await api.get(`/api/tutor/${tutorId}/grados`)
     entregasPorGrado.value = []
 
     for (const grado of grados) {
-      const { data: entregas } = await axios.get(`http://localhost:8000/api/grado/${grado.id}/entregas`, {
+      const { data: entregas } = await api.get(`/api/grado/${grado.id}/entregas`, {
         params: { tutor_id: tutorId }
       })
 
@@ -68,7 +68,7 @@ async function fetchEntregas() {
 // Guardar observaciones y feedback
 async function guardarObservacionYFeedback(alumnoEntrega) {
   try {
-    await axios.post('http://localhost:8000/api/observacionesCuadernoAlumno', {
+    await api.post('/api/observacionesCuadernoAlumno', {
       ID_Cuaderno: alumnoEntrega.id,
       Observaciones: alumnoEntrega.Observaciones ?? '',
       Feedback: alumnoEntrega.Feedback ?? null,
@@ -85,7 +85,7 @@ async function eliminarEntrega(entregaId, gradoId) {
   if (!confirm('¿Seguro que quieres eliminar esta entrega?')) return
 
   try {
-    await axios.delete(`http://localhost:8000/api/grado/${gradoId}/entregas/${entregaId}`)
+    await api.delete(`/api/grado/${gradoId}/entregas/${entregaId}`)
     const bloque = entregasPorGrado.value.find(b => b.grado.id === gradoId)
     if (bloque) bloque.entregas = bloque.entregas.filter(e => e.id !== entregaId)
     alert('Entrega eliminada correctamente')
@@ -148,7 +148,7 @@ onMounted(fetchEntregas)
                   <td>{{ alumnoEntrega.alumno?.usuario?.nombre ?? '—' }}</td>
                   <td class="text-center">
                     <a v-if="alumnoEntrega.URL_Cuaderno"
-                      :href="`http://localhost:8000/api/alumno/entregas/descargar/${alumnoEntrega.id}`" target="_blank">
+                      :href="`/api/alumno/entregas/descargar/${alumnoEntrega.id}`" target="_blank">
                       Descargar PDF
                     </a>
                   </td>

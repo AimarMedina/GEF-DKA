@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, watch } from 'vue'
-import axios from 'axios'
+import api from '@/services/api.js'
+
 
 const props = defineProps({
   visible: Boolean,
@@ -34,8 +35,8 @@ async function guardarEntrega() {
   }
 
   try {
-    const { data } = await axios.post(
-      `http://localhost:8000/api/grado/${props.grado.id}/entregas`,
+    const { data } = await api.post(
+      `/api/grado/${props.grado.id}/entregas`,
       {
         Descripcion: nuevaEntrega.Descripcion,
         Fecha_Limite: nuevaEntrega.Fecha_Limite
