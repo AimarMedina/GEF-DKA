@@ -64,37 +64,73 @@ protected $notasService;
         return response()->json($competencias);
     }
 
-   public function getDatosGestionTutor(Request $request)
+  public function getDatosGestionTutor(Request $request)
     {
         $user = $request->user();
 
-        // 1. Obtener Grado
+        // 1. Obtener Grado del Tutor
         $grado = DB::table('grado')->where('ID_Tutor', $user->id)->first();
-        if (!$grado) return response()->json(['message' => 'Sin grado'], 404);
+        if (!$grado) return response()->json(['message' => 'Sin grado asignado'], 404);
 
-        // 2. Obtener Asignaturas
-        $asignaturas = DB::table('asignatura')->where('ID_Grado', $grado->id)->get();
+        // 2. Obtener Asignaturas del Grado
+        // Necesitamos los modelos (Eloquent) para pasarlos al servicio, no el Query Builder
+        $asignaturas = Asignatura::where('ID_Grado', $grado->id)->get();
 
-        // 3. Obtener Alumnos
+        // 3. Obtener Alumnos matriculados en ese grado
         $alumnos = User::where('tipo', 'alumno')
             ->whereHas('alumno', function($q) use ($grado) {
                 $q->where('ID_Grado', $grado->id);
             })
-            ->with('alumno') // Cargar relación alumno para tener su ID
+            ->with('alumno') // Cargamos la relación para acceder a sus IDs
             ->orderBy('apellidos', 'asc')
             ->get();
 
-        // 4. --- MAGIA AQUÍ: Inyectar notas a cada alumno ---
-        // Transformamos la colección de alumnos para añadirle las notas
-        $alumnos = $alumnos->map(function ($usuarioAlumno) use ($grado) {
-            // Obtenemos el ID de la tabla 'alumno' (no del user)
-            $idAlumnoTabla = $usuarioAlumno->alumno->id;
+        // 4. CALCULAR NOTAS PARA CADA ALUMNO
+        $alumnos = $alumnos->map(function ($usuarioAlumno) use ($asignaturas) {
+            
+            // IMPORTANTE: Según tus migraciones, la FK es 'id_usuario' en la tabla alumno
+            $idAlumno = $usuarioAlumno->alumno->id_usuario; 
 
-            // Llamamos al servicio
-            $notas = $this->notasService->obtenerNotasDelAlumno($idAlumnoTabla, $grado->id);
+            // A. Notas Globales
+            $notaCuaderno    = $this->notasService->obtenerNotaCuaderno($idAlumno);
+            $notaTransversal = $this->notasService->obtenerNotaTransversal($idAlumno);
 
-            // Añadimos la propiedad al objeto JSON
-            $usuarioAlumno->notas_calculadas = $notas;
+            // B. Notas Técnicas por asignatura (Calcula medias de RAs)
+            // Devuelve: [ID_Asig => NotaTecnica]
+            $notasTecnicas   = $this->notasService->obtenerNotaTecnicaPorAsignatura($idAlumno, $asignaturas);
+
+            // C. Notas de Empresa (Aplica la fórmula 20% + 20% + 60%)
+            // Devuelve: [ID_Asig => NotaEmpresa]
+            $notasEmpresa    = $this->notasService->calcularNotaFinalEmpresa($notaCuaderno, $notaTransversal, $notasTecnicas);
+
+            // D. Notas de Egibide (Del tutor)
+            // Devuelve: [ID_Asig => NotaEgibide]
+            $notasEgibide    = $this->notasService->obtenerNotasEgibide($idAlumno);
+
+            // E. NOTA FINAL ABSOLUTA (20% Empresa + 80% Egibide)
+            $notasFinales    = $this->notasService->calcularNotasFinalesPorAsignatura($notasEmpresa, $notasEgibide);
+
+            // F. Empaquetar todo en un formato fácil para Vue
+            // Creamos un array donde la clave es el ID de la asignatura
+            $packNotas = [];
+            foreach ($asignaturas as $asig) {
+                $id = $asig->id;
+                $packNotas[$id] = [
+                    'cuaderno'    => $notaCuaderno,    // Igual para todas
+                    'transversal' => $notaTransversal, // Igual para todas
+                    
+                    // Usamos null coalescing (??) por si no existe la clave
+                    'tecnica'     => $notasTecnicas[$id] ?? '-', 
+                    'egibide'     => $notasEgibide[$id] ?? '-',
+                    
+                    // Totales
+                    'nota_empresa_calculada' => $notasEmpresa[$id] ?? '-',
+                    'final'       => $notasFinales[$id] ?? '-'
+                ];
+            }
+
+            // Inyectamos el paquete de notas en el objeto alumno
+            $usuarioAlumno->notas_calculadas = $packNotas;
 
             return $usuarioAlumno;
         });
