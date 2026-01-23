@@ -9,6 +9,8 @@ import api from '@/services/api.js'
 const props = defineProps({
   alumno: Object
 })
+const emit = defineEmits(['estanciaCreada'])
+
 const router = useRouter()
 const route = useRoute()
 const isTutorView = computed(() => route.name === 'alumnosTutor')
@@ -20,21 +22,25 @@ const notasAlumno = ref({
   notas_transversales: [],
   notas_egibide: []
 })
+function estanciaCreada() {
+  showEstanciaModal.value = false
+  emit('estanciaCreada')
+}
 
 // Cargar notas automáticamente al cambiar el alumno
 watch(
   () => props.alumno,
   async (alumno) => {
-
     if (!alumno) {
       notasAlumno.value = {
-        nota_cuaderno: [],
+        nota_cuaderno: null,
         notas_competencias: [],
         notas_transversales: [],
         notas_egibide: []
       }
       return
     }
+
     try {
       const token = localStorage.getItem('token')
       const res = await api.get(
@@ -45,15 +51,22 @@ watch(
       const data = res.data
 
       notasAlumno.value = {
-        nota_cuaderno: data?.nota_cuaderno || [],
-        notas_competencias: data?.notas_competencias || [],
-        notas_transversales: data?.notas_transversales || [],
-        notas_egibide: data?.notas_egibide || []
+        nota_cuaderno: data.nota_cuaderno ?? null,
+        notas_competencias: data.notas_competencias ?? [],
+        notas_transversales: data.notas_transversales ?? [],
+        notas_egibide: data.grado?.asignaturas?.map(a => ({
+          id_asignatura: a.id,
+          asignatura: a.nombre,
+          nota: a.nota_egibide ? Number(a.nota_egibide.nota) : null
+        })) ?? []
       }
+
+
+
     } catch (e) {
       console.error('Error cargando notas', e)
       notasAlumno.value = {
-        nota_cuaderno: [],
+        nota_cuaderno: null,
         notas_competencias: [],
         notas_transversales: [],
         notas_egibide: []
@@ -62,6 +75,7 @@ watch(
   },
   { immediate: true }
 )
+
 
 </script>
 
@@ -77,37 +91,23 @@ watch(
         <p><strong>Grado:</strong> {{ alumno?.grado.nombre || 'N/A' }}</p>
 
         <div class="d-flex gap-2 mt-3" v-if="isTutorView">
-          <button
-            v-if="alumno?.estancia_actual?.id"
-            class="btn btn-primary"
-            @click="router.push(`/tutor/seguimiento/${alumno?.estancia_actual?.id}`)"
-          >
+          <button v-if="alumno?.estancia_actual?.id" class="btn btn-primary"
+            @click="router.push(`/tutor/seguimiento/${alumno?.estancia_actual?.id}`)">
             <i class="bi bi-bar-chart-line"></i> Seguimiento
           </button>
 
-          <button
-            v-else
-            class="btn btn-warning"
-            @click="showEstanciaModal = true"
-          >
+          <button v-else class="btn btn-warning" @click="showEstanciaModal = true">
             <i class="bi bi-building"></i> Asignar estancia
           </button>
         </div>
 
         <!-- Notas -->
-        <NotasAlumno
-        v-if="alumno && alumno?.estancia_actual?.id"
-        :alumno="alumno"
-        :notas="notasAlumno"
-        />
+        <NotasAlumno v-if="alumno && alumno?.estancia_actual?.id" :alumno="alumno" :notas="notasAlumno" />
 
       </div>
 
-      <AsignarEstanciaModal
-        :alumno="alumno"
-        :show="showEstanciaModal"
-        @close="showEstanciaModal = false"
-      />
+      <AsignarEstanciaModal :alumno="alumno" :show="showEstanciaModal" @close="showEstanciaModal = false"
+        @crear="estanciaCreada" />
     </div>
   </div>
 </template>

@@ -17,7 +17,7 @@ class AlumnoController extends Controller
         // 1. Si es Admin, entra siempre.
         // 2. Si es Tutor, verificamos que su ID sea igual al ID de la ruta.
         if ($user->tipo !== 'admin') {
-            if ($user->tipo !== 'tutor' || (int)$user->id !== $id) {
+            if ($user->tipo !== 'tutor' || (int) $user->id !== $id) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'No autorizado: No puedes ver los alumnos de otro tutor.'
@@ -56,25 +56,25 @@ class AlumnoController extends Controller
      * Ruta: /api/instructores/{id}/alumnos
      */
     public function alumnosDeInstructor(Request $request, int $id)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    // Seguridad
-    if ($user->tipo !== 'admin' && ($user->tipo !== 'instructor' || $user->id != $id)) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'No autorizado: No puedes ver los alumnos de otro instructor.'
-        ], 403);
+        // Seguridad
+        if ($user->tipo !== 'admin' && ($user->tipo !== 'instructor' || $user->id != $id)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No autorizado: No puedes ver los alumnos de otro instructor.'
+            ], 403);
+        }
+
+        $alumnos = Alumno::where('ID_Instructor', $id)
+            ->with(['usuario', 'grado', 'estanciaActual'])
+            ->get();
+
+        return response()->json($alumnos);
     }
 
-    $alumnos = Alumno::where('ID_Instructor', $id)
-        ->with(['usuario', 'grado', 'estanciaActual'])
-        ->get();
 
-    return response()->json($alumnos);
-}
-
-    
     public function getGrado($id)
     {
         return Alumno::with('grado')->findOrFail($id);
@@ -99,9 +99,12 @@ class AlumnoController extends Controller
             'grado:id,nombre',
             'notasCompetencias.competencia',
             'notasTransversales.transversal',
-            'notasEgibide.asignatura',
+            'grado.asignaturas.notaEgibide' => function ($q) use ($id) {
+                $q->where('ID_Alumno', $id);
+            },
             'notaCuaderno'
         ])->where('ID_Usuario', $id)->first();
+
 
 
         return response()->json($alumno);
@@ -110,20 +113,32 @@ class AlumnoController extends Controller
     public function guardarNotaEgibide(Request $request, $idAlumno)
     {
         $request->validate([
-            'id' => 'required|integer|exists:nota_egibide,id',
+            'id_asignatura' => 'required|integer|exists:asignatura,id',
             'nota' => 'required|numeric|min:0|max:10',
         ]);
 
         // Autorización
         $alumno = Alumno::findOrFail($idAlumno);
         $user = $request->user();
-        if ($user->tipo !== 'admin' && $user->id != $alumno->ID_Tutor && $user->id != $alumno->ID_Instructor) {
+
+        if (
+            $user->tipo !== 'admin' &&
+            $user->id != $alumno->ID_Tutor &&
+            $user->id != $alumno->ID_Instructor
+        ) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        $nota = NotaEgibide::findOrFail($request->id);
-        $nota->nota = $request->nota;
-        $nota->save();
+        // updateOrCreate
+        $nota = NotaEgibide::updateOrCreate(
+            [
+                'ID_Alumno' => $idAlumno,
+                'ID_Asignatura' => $request->id_asignatura,
+            ],
+            [
+                'nota' => $request->nota
+            ]
+        );
 
         return response()->json([
             'status' => 'success',
@@ -131,4 +146,5 @@ class AlumnoController extends Controller
             'nota' => $nota
         ]);
     }
+
 }

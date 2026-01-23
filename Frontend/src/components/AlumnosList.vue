@@ -8,6 +8,9 @@ import api from '@/services/api.js'
 const prop = defineProps({
   endpoint: String
 })
+defineExpose({
+  recargar: cargarAlumnos
+})
 
 const userStore = useUserStore()
 const tutorId = userStore.user.id
@@ -28,10 +31,6 @@ const alumnosSinEstancia = computed(() => {
   if (rol === 'tutor') return alumnos.value.filter(a => !a.estancia_actual?.id)
   return [] // Instructor no necesita esta lista
 })
-
-watch(alumnos, (newAlumnos) => {
-  console.log('Alumnos actualizados:', newAlumnos)
-}, { deep: true })
 
 
 async function cargarAlumnos() {
@@ -54,9 +53,6 @@ function seleccionarAlumno(a) {
   alumnoSeleccionado.value = a
   emit('seleccionarAlumno', a)
 }
-
-
-
 
 onMounted(cargarAlumnos)
 </script>
