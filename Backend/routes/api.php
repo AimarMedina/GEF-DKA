@@ -177,3 +177,5 @@ Route::post(
 Route::put('/alumnos/{alumnoId}/competencias/{competenciaId}/nota', [NotasCompetenciaController::class, 'guardarNota']);
 Route::delete('estancias/{estanciaId}/competencias/{competenciaId}', [EstanciaCompetenciaController::class, 'delete']);
 Route::delete('/grado/{gradoId}/entregas/{entregaId}', [EntregaCuadernoController::class, 'destroy']);
+Route::delete('/users/{id}', [UserController::class, 'delete']);
+Route::put('/users/{id}', [UserController::class, 'update']);
