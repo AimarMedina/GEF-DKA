@@ -32,8 +32,25 @@ function estanciaCreada() {
   emit('estanciaCreada')
 }
 
-function instructorAsignado() {
+async function instructorAsignado() {
   showInstructorModal.value = false
+  
+  // Recargar los datos del alumno para obtener el instructor actualizado
+  try {
+    const token = localStorage.getItem('token')
+    const res = await api.get(
+      `/api/alumno/${props.alumno.ID_Usuario}/mis-notas`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    
+    // Actualizar el instructor en el objeto alumno
+    if (res.data.instructor) {
+      props.alumno.instructor = res.data.instructor
+    }
+  } catch (e) {
+    console.error('Error recargando datos del instructor:', e)
+  }
+  
   emit('instructorAsignado')
 }
 
@@ -62,7 +79,7 @@ async function eliminarEstancia(estanciaId) {
     await api.delete(`/api/estancia/${estanciaId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-
+    console.log('Estancia eliminada correctamente')
     
     // Limpiar la estancia del alumno para que baje a la tabla de sin estancia
     if (props.alumno) {
