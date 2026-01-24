@@ -89,7 +89,7 @@ protected $notasService;
         $alumnos = $alumnos->map(function ($usuarioAlumno) use ($asignaturas) {
             
             // IMPORTANTE: Según tus migraciones, la FK es 'id_usuario' en la tabla alumno
-            $idAlumno = $usuarioAlumno->alumno->id_usuario; 
+            $idAlumno = $usuarioAlumno->alumno->ID_Usuario; 
 
             // A. Notas Globales
             $notaCuaderno    = $this->notasService->obtenerNotaCuaderno($idAlumno);

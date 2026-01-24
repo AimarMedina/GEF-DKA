@@ -70,7 +70,7 @@ class NotasAlumnoService
 
             foreach ($ras as $ra) {
                 // B. Buscar qué competencias tiene este RA en la tabla pivote 'comp_ra'
-                $idsCompetenciasDelRa = \Illuminate\Support\Facades\DB::table('comp_ra')
+                $idsCompetenciasDelRa = DB::table('comp_ra')
                                             ->where('ID_Ra', $ra->id)
                                             ->pluck('ID_Comp');
                 
