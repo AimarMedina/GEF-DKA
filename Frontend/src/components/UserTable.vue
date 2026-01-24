@@ -7,6 +7,7 @@
           <th>Nombre</th>
           <th>Email</th>
           <th>Tipo</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -15,11 +16,14 @@
           <td>{{ user.nombre }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.tipo }}</td>
+          <td class="d-flex gap-1">
+            <button class="btn btn-outline-indigo btn-sm" @click="abrirEditar(user)">Modificar</button>
+            <button class="btn btn-danger btn-sm" @click="mostrarConfirmarModal = true; currentUser = user">Eliminar</button>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <!-- Paginación Bootstrap -->
     <nav v-if="totalPages > 1">
       <ul class="pagination">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -40,12 +44,31 @@
         </li>
       </ul>
     </nav>
+
+    <ConfirmarEliminar
+      :show="mostrarConfirmarModal"
+      :mensaje="'¿Estás seguro de que quieres eliminar este ' + currentUser?.tipo + '?'"
+      @confirm="handleConfirmDelete"
+      @close="mostrarConfirmarModal = false"
+    />
+
+    <FormularioUsuario
+      :show="mostrarModalUsuario"
+      :tipo="tipoModal"
+      :id_grado="idGradoModal"
+      :usuario="usuarioEditar"
+      @close="cerrarModalUsuario"
+      @crear="guardarUsuario"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch } from "vue";
 import api from '@/services/api.js'
+import ConfirmarEliminar from './ConfirmarEliminar.vue'
+import FormularioUsuario from './FormularioUsuario.vue'
+
 const props = defineProps({
   filters: Object
 });
@@ -55,11 +78,18 @@ const currentPage = ref(1);
 const totalPages = ref(1);
 const perPage = ref(5);
 
+const mostrarConfirmarModal = ref(false)
+const currentUser = ref(null)
+
+const mostrarModalUsuario = ref(false)
+const usuarioEditar = ref(null)
+const tipoModal = ref('')
+const idGradoModal = ref(false)
+
 async function fetchUsers(page = 1) {
   currentPage.value = page;
 
   try {
-
     const response = await api.get("/api/users", {
       params: {
         page,
@@ -70,7 +100,6 @@ async function fetchUsers(page = 1) {
     });
 
     users.value = response.data.data.data || [];
-
     totalPages.value = response.data.data.last_page;
   } catch (error) {
     console.error(error);
@@ -85,13 +114,59 @@ watch(
       totalPages.value = 0
       return
     }
-
     fetchUsers(1)
   },
   { immediate: true }
 );
-</script>
 
+function abrirEditar(user) {
+  usuarioEditar.value = user
+  tipoModal.value = user.tipo
+  idGradoModal.value = user.tipo === 'alumno' ? user.id_grado : false
+  mostrarModalUsuario.value = true
+}
+
+function cerrarModalUsuario() {
+  mostrarModalUsuario.value = false
+  usuarioEditar.value = null
+}
+
+async function guardarUsuario(data) {
+  try {
+    if(data.id){
+      await api.put(`/api/users/${data.id}`, data)
+      alert('Usuario actualizado correctamente')
+    } else {
+      await api.post(`/api/users`, data)
+      alert('Usuario creado correctamente')
+    }
+    fetchUsers(currentPage.value)
+    cerrarModalUsuario()
+  } catch (e) {
+    console.error(e)
+    alert('Error al guardar usuario')
+  }
+}
+
+async function handleConfirmDelete(confirm) {
+  if (!confirm || !currentUser.value) return
+
+  try {
+    await api.delete(`/api/users/${currentUser.value.id}`)
+    fetchUsers(currentPage.value)
+    alert('Usuario eliminado correctamente')
+  } catch (e) {
+    console.error(e)
+    alert('Error al eliminar usuario')
+  } finally {
+    mostrarConfirmarModal.value = false
+    currentUser.value = null
+  }
+}
+
+// --- Inicializar tabla ---
+fetchUsers()
+</script>
 
 <style scoped>
 .pagination {

@@ -3,21 +3,12 @@
     <div class="container-fluid">
       <!-- Logo -->
       <RouterLink to="/home">
-        <img
-          src="../../public/LOGO-EGIBIDE.png"
-          alt="Logo Egibide"
-          class="logo"
-        />
+        <img src="../../public/LOGO-EGIBIDE.png" alt="Logo Egibide" class="logo" />
       </RouterLink>
 
       <!-- Hamburguesa -->
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#offcanvasNavbar"
-        aria-controls="offcanvasNavbar"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+        aria-controls="offcanvasNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -26,12 +17,7 @@
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Menú</h5>
 
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="offcanvas"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
 
         <div class="offcanvas-body">
@@ -44,12 +30,7 @@
             <li class="nav-item"></li>
 
             <li class="nav-item dropdown" v-if="usuario.tipo === 'admin'">
-              <a
-                class="nav-link dropdown-toggle"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Gestión
               </a>
               <ul class="dropdown-menu">
@@ -58,9 +39,7 @@
                     <RouterLink to="/users">Usuarios</RouterLink>
                   </a>
                   <a class="dropdown-item">
-                    <RouterLink to="/competenciasXra"
-                      >Competencias y RAs</RouterLink
-                    >
+                    <RouterLink to="/competenciasXra">Competencias y RAs</RouterLink>
                   </a>
                   <a class="dropdown-item">
                     <RouterLink to="/grados">Grados y Asignaturas</RouterLink>
@@ -73,21 +52,13 @@
             </li>
 
             <li class="nav-item dropdown" v-if="usuario.tipo === 'tutor'">
-              <a
-                class="nav-link dropdown-toggle"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Gestión
               </a>
 
               <ul class="dropdown-menu">
                 <li>
-                  <RouterLink
-                    class="dropdown-item"
-                    :to="`/tutores/${usuario.id}/alumnos`"
-                  >
+                  <RouterLink class="dropdown-item" :to="`/tutores/${usuario.id}/alumnos`">
                     Alumnos
                   </RouterLink>
                 </li>
@@ -99,10 +70,7 @@
                 </li>
                 <li v-if="usuario.es_tutor">
                   <hr class="dropdown-divider" />
-                  <RouterLink
-                    class="dropdown-item fw-bold text-indigo"
-                    to="/mi-grado"
-                  >
+                  <RouterLink class="dropdown-item fw-bold text-indigo" to="/mi-grado">
                     <i class="bi bi-mortarboard-fill me-1"></i> Mi Grado
                   </RouterLink>
                 </li>
@@ -110,18 +78,12 @@
             </li>
 
             <li class="nav-item" v-if="usuario.tipo === 'instructor'">
-              <RouterLink
-                class="nav-link"
-                :to="`/instructores/${usuario.id}/alumnos`"
-              >
+              <RouterLink class="nav-link" :to="`/instructores/${usuario.id}/alumnos`">
                 Alumnos
               </RouterLink>
             </li>
             <li class="nav-item" v-if="usuario.tipo === 'alumno'">
-              <RouterLink
-                class="nav-link"
-                :to="`/alumno/${usuario.id}/estancia`"
-              >
+              <RouterLink class="nav-link" :to="`/alumno/${usuario.id}/estancia`">
                 Estancia
               </RouterLink>
             </li>
@@ -136,33 +98,30 @@
                 Mis Notas
               </RouterLink>
             </li>
-           <li class="nav-item dropdown">
-  <a
-    class="nav-link dropdown-toggle"
-    href="#"
-    role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-  >
-    <i class="bi bi-person-circle me-1"></i> {{ usuario.nombre || 'Mi Cuenta' }}
-  </a>
-  <ul class="dropdown-menu dropdown-menu-end">
-    
-    <li>
-      <RouterLink class="dropdown-item" to="/cambiar-contrasena">
-        <i class="bi bi-key me-2"></i> Cambiar Contraseña
-      </RouterLink>
-    </li>
-    
-    <li><hr class="dropdown-divider"></li>
-    
-    <li>
-      <button class="dropdown-item text-danger" @click="logout">
-        <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
-      </button>
-    </li>
-  </ul>
-</li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="bi bi-person-circle me-1"></i> {{ usuario.nombre || 'Mi Cuenta' }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+
+                <li>
+                  <RouterLink class="dropdown-item" to="/cambiar-contrasena">
+                    <i class="bi bi-key me-2"></i> Cambiar Contraseña
+                  </RouterLink>
+                </li>
+
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+
+                <li>
+                  <button class="dropdown-item text-danger" @click="logout">
+                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                  </button>
+                </li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -179,15 +138,6 @@
 a {
   text-decoration: none;
   color: black;
-}
-.nav-link {
-    font-size: 1.2rem; 
-    font-weight: 500;   
-}
-
-
-.dropdown-item {
-    font-size: 1.1rem; 
 }
 </style>
 

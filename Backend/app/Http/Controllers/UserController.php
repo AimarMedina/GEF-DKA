@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alumno;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,15 +13,16 @@ use Illuminate\Validation\ValidationException;
 class UserController extends Controller
 {
 
-private function checkEsTutor($user) {
+    private function checkEsTutor($user)
+    {
         // Solo hacemos la comprobación si el usuario es de tipo 'tutor'
         if ($user->tipo === 'tutor') {
-            
+
             // CORRECCIÓN: Buscamos en la tabla 'grado' por la columna 'ID_Tutor'
             $existe = DB::table('grado')
-                        ->where('id_tutor', $user->id) 
-                        ->exists(); // Devuelve true si encuentra al menos uno
-            
+                ->where('id_tutor', $user->id)
+                ->exists(); // Devuelve true si encuentra al menos uno
+
             // Añadimos la propiedad al objeto usuario para el frontend
             $user->es_tutor = $existe;
         } else {
@@ -39,7 +41,7 @@ private function checkEsTutor($user) {
                 'message' => 'No autenticado'
             ], 401);
         }
-    $userAuth = $this->checkEsTutor($userAuth);
+        $userAuth = $this->checkEsTutor($userAuth);
         return response()->json([
             'status' => 'success',
             'message' => 'Autenticado',
@@ -95,14 +97,21 @@ private function checkEsTutor($user) {
 
         $query = User::query()->orderBy('id');
 
+        // Filtrar por tipo
         if ($req->filled('tipo')) {
             $query->where('tipo', $req->tipo);
         }
 
+        // Filtrar por id_grado si es alumno
         if ($req->filled('id_grado')) {
             $query->whereHas('alumno', function ($q) use ($req) {
                 $q->where('ID_Grado', $req->id_grado);
             });
+        }
+
+        // Traer relación alumno y grado solo si es tipo alumno
+        if ($req->tipo === 'alumno') {
+            $query->with(['alumno.grado']);
         }
 
         $usuarios = $query->paginate($perPage);
@@ -113,6 +122,8 @@ private function checkEsTutor($user) {
         ]);
     }
 
+
+    // Crear usuario
     public function create(Request $req)
     {
         $data = $req->validate([
@@ -122,57 +133,62 @@ private function checkEsTutor($user) {
             'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/', 'unique:users,n_tel'],
             'password' => 'required|string|min:6',
             'tipo' => 'required|string|in:alumno,tutor,instructor,admin',
-            'id_grado' => 'nullable|exists:grado,id', // solo para alumno
-        ], [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.max' => 'El nombre no puede superar los 255 caracteres.',
-            'apellidos.max' => 'Los apellidos no pueden superar los 255 caracteres.',
-            'email.required' => 'El email es obligatorio.',
-            'email.email' => 'Debes introducir un email válido.',
-            'email.unique' => 'Este email ya está registrado.',
-            'n_tel.regex' => 'El número de teléfono debe tener exactamente 9 dígitos.',
-            'n_tel.unique' => 'Este número de teléfono ya está registrado.',
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
-            'tipo.required' => 'Debes especificar el tipo de usuario.',
-            'tipo.in' => 'Tipo de usuario inválido.',
-            'id_grado.exists' => 'El grado seleccionado no existe.',
+            'id_grado' => 'nullable|exists:grado,id',
         ]);
 
-        // Creamos el usuario
         $user = User::create([
             'nombre' => $data['nombre'],
             'apellidos' => $data['apellidos'] ?? null,
             'email' => $data['email'],
             'n_tel' => $data['n_tel'] ?? null,
-            'password' => $data['password'],
+            'password' => bcrypt($data['password']), // ¡ojo, has que la contraseña se encripte!
             'tipo' => $data['tipo'],
         ]);
 
         if ($req->tipo === "alumno" && isset($data['id_grado'])) {
-            // Cargar la relación alumno del usuario recién creado
-            $user->load('alumno');
-
-            $alumno = $user->alumno;
-
-            if ($alumno) {
-                $alumno->ID_Grado = $data['id_grado']; // asignar el grado
-                $alumno->save(); // guardar cambios
-            }
+            $user->alumno()->updateOrCreate([], ['ID_Grado' => $data['id_grado']]);
         }
 
-
-        return response()->json([
-            'message' => "{$data['tipo']} creado correctamente",
-            'usuario' => $user,
-        ], 201);
+        return response()->json(['message' => "{$data['tipo']} creado correctamente", 'usuario' => $user], 201);
     }
 
-   public function changePassword(Request $request)
+    // Actualizar usuario
+    public function update(Request $req, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $data = $req->validate([
+            'nombre' => 'sometimes|required|string|max:255',
+            'apellidos' => 'nullable|string|max:255',
+            'email' => ['sometimes', 'required', 'email', 'max:255', 'unique:users,email,' . $id],
+            'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/', 'unique:users,n_tel,' . $id],
+            'password' => 'nullable|string|min:6',
+            'tipo' => 'sometimes|required|string|in:alumno,tutor,instructor,admin',
+            'id_grado' => 'nullable|exists:grado,id',
+        ]);
+
+        $user->update([
+            'nombre' => $data['nombre'] ?? $user->nombre,
+            'apellidos' => $data['apellidos'] ?? $user->apellidos,
+            'email' => $data['email'] ?? $user->email,
+            'n_tel' => $data['n_tel'] ?? $user->n_tel,
+            'password' => isset($data['password']) ? bcrypt($data['password']) : $user->password,
+            'tipo' => $data['tipo'] ?? $user->tipo,
+        ]);
+
+        if ($user->tipo === "alumno" && isset($data['id_grado'])) {
+            $user->alumno()->updateOrCreate([], ['ID_Grado' => $data['id_grado']]);
+        }
+
+        return response()->json(['message' => "Usuario actualizado correctamente", 'usuario' => $user]);
+    }
+
+
+    public function changePassword(Request $request)
     {
         $request->validate([
             'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed', 
+            'new_password' => 'required|min:8|confirmed',
         ]);
 
         $user = $request->user();
@@ -196,4 +212,28 @@ private function checkEsTutor($user) {
         ]);
     }
 
+    public function delete($id)
+    {
+        // Buscamos al usuario
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        // Si es un instructor, revisar alumnos
+        if ($user->tipo === 'instructor') {
+            // Poner a null el ID_Instructor en los alumnos asociados
+            Alumno::where('ID_Instructor', $user->id)
+                ->update(['ID_Instructor' => null]);
+        }
+
+        // Borrar el usuario
+        $user->delete();
+
+        return response()->json(['message' => 'Usuario eliminado correctamente']);
+    }
+
 }
+
+

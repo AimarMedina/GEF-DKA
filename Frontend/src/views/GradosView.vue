@@ -1,37 +1,31 @@
 <script setup>
-    import Navbar from '@/components/Navbar.vue';
-    import GradosList from '@/components/Grado/GradosList.vue'; 
-    import GradoDatos from '@/components/Grado/GradoDatos.vue'; 
-    import { ref } from 'vue';
+import Navbar from '@/components/Navbar.vue';
+import GradosList from '@/components/Grado/GradosList.vue';
+import GradoDatos from '@/components/Grado/GradoDatos.vue';
+import { ref } from 'vue';
 
-    const gradoSeleccionado = ref(null);
-    const vistaActual = ref(null);
+const gradoSeleccionado = ref(null);
+const vistaActual = ref(null);
 
-    function mostrarAsignaturas(grado) {
-        gradoSeleccionado.value = grado;
-        vistaActual.value = 'asignaturas';
-    }
+function mostrarAsignaturas(grado) {
+    gradoSeleccionado.value = grado;
+    vistaActual.value = 'asignaturas';
+}
 
-    function mostrarCompetencias(grado) {
-        gradoSeleccionado.value = grado;
-        vistaActual.value = 'competencias';
-    }
+function mostrarCompetencias(grado) {
+    gradoSeleccionado.value = grado;
+    vistaActual.value = 'competencias';
+}
 </script>
 
 <template>
     <Navbar></Navbar>
-    
+
     <div class="container-fluid mb-5">
         <div class="row">
-            <GradosList           
-                @verAsignaturas="mostrarAsignaturas"
-                @verCompetencias="mostrarCompetencias"
-            />
+            <GradosList @verAsignaturas="mostrarAsignaturas" @verCompetencias="mostrarCompetencias" />
 
-            <GradoDatos 
-                :grado="gradoSeleccionado" 
-                :vista="vistaActual" 
-            />
+            <GradoDatos :grado="gradoSeleccionado" :vista="vistaActual" />
         </div>
     </div>
 </template>
