@@ -2,6 +2,8 @@
 const props = defineProps({
   notaCuaderno: Array
 })
+console.log(props.notaCuaderno);
+
 </script>
 
 <template>
@@ -22,12 +24,13 @@ const props = defineProps({
             </td>
             <td class="text-center text-md-start">
               <span :class="{
-                'badge bg-success': notaCuaderno?.Nota >= 5,
-                'badge bg-danger text-white': notaCuaderno?.Nota < 5 && notaCuaderno?.Nota != null,
-                'badge bg-warning text-dark': !notaCuaderno?.Nota
+                'badge bg-success': notaCuaderno?.[0]?.Nota >= 5,
+                'badge bg-danger text-white': notaCuaderno?.[0]?.Nota < 5 && notaCuaderno?.[0]?.Nota != null,
+                'badge bg-warning text-dark': !notaCuaderno?.[0]?.Nota
               }">
-                {{ notaCuaderno?.Nota ?? 'Pendiente' }}
+                {{ notaCuaderno?.[0]?.Nota ?? 'Pendiente' }}
               </span>
+
             </td>
           </tr>
         </tbody>

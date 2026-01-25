@@ -76,9 +76,10 @@ async function fetchEntregas() {
 
       entregasPorGrado.value.push({
         grado,
-        esTutorPrincipal: grado.id_tutor === tutorId,
+        esTutorPrincipal: grado.ID_Tutor === tutorId,
         entregas
       })
+      
     }
     console.log('Entregas cargadas:', entregasPorGrado.value)
   } catch (err) {

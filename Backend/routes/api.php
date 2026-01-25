@@ -118,6 +118,7 @@ Route::get('/alumno/entregas/descargar/{id}', [AlumnoEntregaController::class, '
 */
 // Notas de alumno
 Route::get('/alumno/{id}/mis-notas', [AlumnoController::class, 'misNotas']);
+Route::get('/alumno/{id}/mis-notasAlumno', [AlumnoController::class, 'misNotasAlumno']);
 Route::post('/alumnos/{idAlumno}/nota-egibide', [AlumnoController::class, 'guardarNotaEgibide'])->middleware('auth:sanctum');
 
 // Notas por alumno (empresa)

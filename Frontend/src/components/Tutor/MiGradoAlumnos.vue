@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "@/services/api.js"
+import { useNotasStore } from "@/stores/notas.js";
 
+const notasStore = useNotasStore();
 // Estados
 const alumnos = ref([]);
 const asignaturas = ref([]);
@@ -24,25 +26,27 @@ const toggleNotas = (idAlumno) => {
 const fetchDatosGrado = async (page = 1) => {
   loading.value = true;
   currentPage.value = page;
-  
+
   try {
     const token = localStorage.getItem('token');
     const res = await api.get("/api/mi-grado/gestion", {
       headers: { Authorization: `Bearer ${token}` },
-      params: {
-        page: page,
-        per_page: perPage.value
-      }
+      params: { page, per_page: perPage.value }
     });
-    
-    // Los datos vienen paginados del backend
+
+    // Guardar en los refs locales para la tabla
     alumnos.value = res.data.alumnos.data;
-    totalPages.value = res.data.alumnos.last_page;
-    
     asignaturas.value = res.data.asignaturas;
     gradoNombre.value = res.data.grado.nombre;
+    totalPages.value = res.data.alumnos.last_page;
 
-    // Cerrar acordeón al cambiar de página
+    // Guardar en Pinia
+    notasStore.setDatosGrado({
+      alumnosData: res.data.alumnos.data,
+      asignaturasData: res.data.asignaturas,
+      grado: res.data.grado
+    });
+
     alumnoDesplegado.value = null;
 
   } catch (error) {
@@ -52,6 +56,8 @@ const fetchDatosGrado = async (page = 1) => {
     loading.value = false;
   }
 };
+
+
 
 // Función para obtener el estado de un alumno
 const obtenerEstadoAlumno = (alumno) => {
@@ -99,21 +105,21 @@ const obtenerEstadoAlumno = (alumno) => {
   if (errores.length === 0) {
     return { 
       tipo: 'completo', 
-      mensaje: `✓ Todas (${totalAsignaturas}/${totalAsignaturas})`, 
+      mensaje: `(${totalAsignaturas}/${totalAsignaturas})`, 
       icono: 'bi-check-circle-fill',
       errores: []
     };
   } else if (asignaturasCompletas > 0) {
     return { 
       tipo: 'parcial', 
-      mensaje: `⚠ ${asignaturasCompletas}/${totalAsignaturas}`, 
+      mensaje: `${asignaturasCompletas}/${totalAsignaturas}`, 
       icono: 'bi-exclamation-triangle-fill',
       errores: errores
     };
   } else {
     return { 
       tipo: 'incompleto', 
-      mensaje: `✗ 0/${totalAsignaturas}`, 
+      mensaje: `0/${totalAsignaturas}`, 
       icono: 'bi-x-circle-fill',
       errores: errores
     };
@@ -133,6 +139,8 @@ const getBadgeClass = (tipo) => {
 onMounted(() => {
   fetchDatosGrado(1);
 });
+
+
 </script>
 
 <template>
@@ -198,7 +206,7 @@ onMounted(() => {
                       <div>
                         <strong>No se pueden calcular las notas finales</strong>
                         <ul class="mb-0 mt-2 small">
-                          <li v-for="(error, idx) in obtenerEstadoAlumno(alumno).errores" :key="idx">
+                          <li v-for="(error, idx) in obtenerEstadoAlumno(alumno).errores" :key="idx" class="text-start">
                             {{ error }}
                           </li>
                         </ul>

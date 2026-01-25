@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\NotasAlumnoService;
+use App\Models\Asignatura;
 use App\Models\NotaCuaderno;
 use App\Models\NotaEgibide;
 use App\Models\Alumno;
@@ -9,6 +11,12 @@ use Illuminate\Http\Request;
 
 class AlumnoController extends Controller
 {
+        protected $notasService;
+
+    public function __construct(NotasAlumnoService $notasService)
+    {
+        $this->notasService = $notasService;
+    }
     public function alumnosDeTutor(Request $request, int $id)
     {
         $user = $request->user();
@@ -80,6 +88,43 @@ class AlumnoController extends Controller
         return Alumno::with('grado')->findOrFail($id);
     }
 
+    public function misNotasAlumno(Request $request, $id)
+{
+    $alumno = Alumno::with('grado')->findOrFail($id); // Alumno con su grado
+    $grado = $alumno->grado;
+    $asignaturas = Asignatura::where('ID_Grado', $grado->id)->get();
+
+
+    $notaCuaderno = $this->notasService->obtenerNotaCuaderno($id);
+    $notaTransversal = $this->notasService->obtenerNotaTransversal($id);
+    $notasTecnicas = $this->notasService->obtenerNotaTecnicaPorAsignatura($id, $asignaturas);
+    $notasEmpresa = $this->notasService->calcularNotaFinalEmpresa($notaCuaderno, $notaTransversal, $notasTecnicas);
+    $notasEgibide = $this->notasService->obtenerNotasEgibide($id);
+    $notasFinales = $this->notasService->calcularNotasFinalesPorAsignatura($notasEmpresa, $notasEgibide);
+
+    $packNotas = [];
+    foreach ($asignaturas as $asig) {
+        $packNotas[$asig->id] = [
+            'cuaderno' => $notaCuaderno,
+            'transversal' => $notaTransversal,
+            'tecnica' => $notasTecnicas[$asig->id] ?? '-',
+            'egibide' => $notasEgibide[$asig->id] ?? '-',
+            'nota_empresa_calculada' => $notasEmpresa[$asig->id] ?? '-',
+            'final' => $notasFinales[$asig->id] ?? '-'
+        ];
+    }
+
+    return response()->json([
+        'usuario' => $alumno->usuario,
+        'grado' => $grado,
+        'asignaturas' => $asignaturas,
+        'nota_cuaderno' => $notaCuaderno,
+        'notas_competencias' => $notasTecnicas,
+        'notas_transversales' => $notaTransversal,
+        'notas_egibide' => $notasEgibide,
+        'notas_calculadas' => $packNotas,
+    ]);
+}
     public function misNotas($id)
     {
         if (!$id) {

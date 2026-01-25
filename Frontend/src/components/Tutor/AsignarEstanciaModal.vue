@@ -52,7 +52,6 @@ onMounted(async () => {
     headers:{ Authorization:`Bearer ${token}` }
   })
   empresas.value = res.data.data || []
-  console.log(empresas.value);
   
 })
 

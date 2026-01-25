@@ -98,6 +98,7 @@ async function eliminarEstancia(estanciaId) {
 // Cargar notas automáticamente al cambiar el alumno
 watch(
   () => props.alumno,
+
   async (alumno) => {
     if (!alumno) {
       notasAlumno.value = {
@@ -117,7 +118,6 @@ watch(
       )
 
       const data = res.data
-      console.log('Datos del alumno:', data)
       
       // Solo actualizar si vienen datos válidos (para alumnos CON estancia)
       if (data.instructor) {
@@ -162,7 +162,7 @@ watch(
       <div class="card-body">
         <p><strong>Email:</strong> {{ alumno?.usuario?.email || 'N/A' }}</p>
         <p><strong>Grado:</strong> {{ alumno?.grado?.nombre || 'N/A' }}</p>
-        <p><strong>Empresa:</strong> {{ alumno?.estancia_actual?.empresa?.nombre || 'N/A' }}</p>
+        <p><strong>Empresa:</strong> {{ alumno?.estancia_actual?.empresa?.Nombre || 'N/A' }}</p>
 
         <!-- Mostrar instructor o botón para asignar -->
         <div class="d-flex align-items-center gap-2 mb-3">
