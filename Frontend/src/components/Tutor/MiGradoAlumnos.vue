@@ -340,23 +340,6 @@ onMounted(() => {
   margin: 0;
 }
 
-.page-link {
-  color: #6f42c1;
-  border-color: #dee2e6;
-}
-
-.page-link:hover {
-  color: #5a32a3;
-  background-color: #f8f9fa;
-  border-color: #dee2e6;
-}
-
-.page-item.active .page-link {
-  background-color: #6f42c1;
-  border-color: #6f42c1;
-  color: white;
-}
-
 .page-item.disabled .page-link {
   color: #6c757d;
   pointer-events: none;

@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
 {
-    public function getCompanys(Request $req)
+   public function getCompanys(Request $req)
     {
         $q = trim((string) $req->query('q', ''));
+
+        $perPage = $req->query('per_page', 5); 
+
         $query = Empresa::query();
 
         if ($q !== '') {
@@ -21,7 +24,9 @@ class EmpresaController extends Controller
                     ->orWhere('N_Tel', 'like', "%{$q}%");
             });
         }
-        $empresas = $query->get();
+        
+        $empresas = $query->paginate($perPage);
+        
         return response()->json($empresas);
     }
     public function create(Request $req)

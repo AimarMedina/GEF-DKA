@@ -7,45 +7,38 @@ import UserTable from "@/components/UserTable.vue";
 const filters = ref(null);
 
 function onFiltersChange(newFilters) {
-  filters.value = null;
+  // Inicializamos objeto base
+  let filtrosActivos = {};
 
   if (newFilters.tipo === "NONE") {
+    filters.value = null;
     return;
   }
 
-  if (newFilters.tipo === "alumno" && (!newFilters.id_grado || newFilters.id_grado === "NONE")) {
-    return;
-  }
+  // Lógica base
+  filtrosActivos.tipo = newFilters.tipo;
+  filtrosActivos.search = newFilters.search || null; // <--- AGREGAMOS SEARCH
 
-  if (newFilters.tipo === "alumno" && newFilters.id_grado === ".") {
-    filters.value = { tipo: "alumno", id_grado: null };
-    return;
-  }
-
-  if (newFilters.tipo === ".") {
-    filters.value = {};
-    return;
-  }
-
+  // Lógica específica para alumnos
   if (newFilters.tipo === "alumno") {
-    filters.value = {
-      tipo: "alumno",
-      id_grado: newFilters.id_grado
-    };
-    return;
+    if (!newFilters.id_grado || newFilters.id_grado === "NONE") {
+        filters.value = null; // Si es alumno y no hay grado, no mostramos nada (según tu lógica anterior)
+        return;
+    }
+    if (newFilters.id_grado !== ".") {
+        filtrosActivos.id_grado = newFilters.id_grado;
+    }
   }
 
-  filters.value = {
-    tipo: newFilters.tipo,
-    id_grado: null
-  };
+  // Si seleccionan "Todos" (el punto) en tipo
+  if (newFilters.tipo === ".") {
+     filters.value = { search: newFilters.search }; // Solo filtramos por texto si hay
+     return;
+  }
 
+  filters.value = filtrosActivos;
   console.log("Filters activos:", filters.value);
 }
-
-
-
-
 </script>
 
 <template>

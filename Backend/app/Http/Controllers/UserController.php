@@ -91,27 +91,39 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUsers(Request $req)
+  public function getUsers(Request $req)
     {
         $perPage = $req->get('per_page', 5);
 
         $query = User::query()->orderBy('id');
 
-        // Filtrar por tipo
+        // 1. Filtrar por tipo
         if ($req->filled('tipo')) {
             $query->where('tipo', $req->tipo);
         }
 
-        // Filtrar por id_grado si es alumno
+        // 2. Filtrar por id_grado si es alumno
         if ($req->filled('id_grado')) {
             $query->whereHas('alumno', function ($q) use ($req) {
                 $q->where('ID_Grado', $req->id_grado);
             });
         }
 
-        // Traer relación alumno y grado solo si es tipo alumno
+        // 3. NUEVO: Buscador por texto (Nombre, Apellidos o Email)
+        if ($req->filled('search')) {
+            $search = $req->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%{$search}%")
+                  ->orWhere('apellidos', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+       
         if ($req->tipo === 'alumno') {
             $query->with(['alumno.grado']);
+        } elseif ($req->tipo === 'instructor') {
+            $query->with(['instructor.empresa']); //Si es instructor buscamos la empresa para facilitar la busqyeda al admin
         }
 
         $usuarios = $query->paginate($perPage);
@@ -141,7 +153,7 @@ class UserController extends Controller
             'apellidos' => $data['apellidos'] ?? null,
             'email' => $data['email'],
             'n_tel' => $data['n_tel'] ?? null,
-            'password' => bcrypt($data['password']), // ¡ojo, has que la contraseña se encripte!
+            'password' => bcrypt($data['password']),
             'tipo' => $data['tipo'],
         ]);
 

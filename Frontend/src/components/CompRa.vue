@@ -6,12 +6,14 @@
     </h2>
 
     <div class="mb-4 col-12 col-md-4">
-      <select v-model="gradoSeleccionado" class="form-select" @change="cargarMatriz">
-        <option disabled value="">Selecciona un grado</option>
-        <option v-for="g in grados" :key="g.id" :value="g.id">
-          {{ g.nombre }}
-        </option>
-      </select>
+     <BuscadorSelect 
+        v-model="gradoSeleccionado" 
+        :options="grados" 
+        label-key="nombre" 
+        value-key="id"
+        placeholder="Buscar grado..." 
+        @change="cargarMatriz" 
+      />
     </div>
 
     <div v-if="asignaturas.length" class="table-responsive">
@@ -74,6 +76,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import api from '@/services/api.js'
+import BuscadorSelect from '@/components/BuscadorSelect.vue'
 
 const grados = ref([])
 const gradoSeleccionado = ref('')

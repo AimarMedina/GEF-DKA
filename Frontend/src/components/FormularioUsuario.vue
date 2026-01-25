@@ -28,12 +28,17 @@
             <input v-model="nuevoUsuario.password" type="password" class="form-control" />
           </div>
 
-          <div v-if="tipo === 'alumno' && id_grado === false" class="mb-2">
+         <div v-if="tipo === 'alumno' && id_grado === false" class="mb-2">
             <label>Grado</label>
-            <select v-model="gradoSeleccionado" class="form-select">
-              <option value="">Selecciona un grado</option>
-              <option v-for="g in grados" :key="g.id" :value="g.id">{{ g.nombre }}</option>
-            </select>
+            
+            <BuscadorSelect 
+              v-model="gradoSeleccionado"
+              :options="grados"
+              label-key="nombre"
+              value-key="id"
+              placeholder="Buscar o seleccionar grado..."
+            />
+
           </div>
 
           <div v-if="errorMessage" class="alert alert-danger text-start">
@@ -54,6 +59,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import api from '@/services/api.js'
+import BuscadorSelect from './BuscadorSelect.vue'
 
 const props = defineProps({
   show: Boolean,
