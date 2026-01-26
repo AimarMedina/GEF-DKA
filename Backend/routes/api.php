@@ -18,6 +18,7 @@ use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\RaController;
 use App\Http\Controllers\CompetenciaController;
+use App\Http\Controllers\TransversalController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -184,4 +185,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/grado/{gradoId}/entregas/{entregaId}', [EntregaCuadernoController::class, 'destroy']);
     Route::delete('/users/{id}', [UserController::class, 'delete']);
     Route::put('/users/{id}', [UserController::class, 'update']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Transversales
+|--------------------------------------------------------------------------
+*/
+    Route::get('/transversales', [TransversalController::class, 'getTransversales']);
+    Route::get('/transversales/alumno/{idAlumno}', [TransversalController::class, 'getTransversalesAlumno']);
+    Route::put('/alumnos/{idAlumno}/transversales/{transversalId}/nota', [TransversalController::class, 'actualizarNotaTransversal']);
+    Route::post('/transversales', [TransversalController::class, 'crearTransversal']);
+    Route::put('/transversales/{id}', [TransversalController::class, 'actualizarTransversal']);
+    Route::delete('/transversales/{id}', [TransversalController::class, 'eliminarTransversal']);
 });

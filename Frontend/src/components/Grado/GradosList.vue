@@ -3,6 +3,7 @@ import { ref, onMounted, defineEmits } from "vue";
 import axios from "axios";
 import Buscador from "../Buscador.vue";
 import CrearGradoModal from "./CrearGradoModal.vue";
+import TransversalModal from "@/components/Grado/TranversalModal.vue";
 import ConfirmarEliminar from "../ConfirmarEliminar.vue";
 import api from '@/services/api.js'
 
@@ -15,6 +16,7 @@ const currentPage = ref(1);
 const totalPages = ref(1);
 const loading = ref(false);
 const mostrarModal = ref(false);
+const mostrarTransversalModal = ref(false);
 const eliminarModal = ref(false);
 const gradoEliminar = ref(null);
 
@@ -100,9 +102,14 @@ onMounted(() => {
 
     <Buscador tipo="Buscar grado..." @search="onSearch" />
 
-    <button class="btn btn-secondary mb-2" @click="mostrarModal = true">
+    <div class="d-flex gap-2 mb-2">
+      <button class="btn btn-secondary flex-fill" @click="mostrarModal = true">
         <i class="bi bi-building-fill-add"></i> Añadir Grado
-    </button>
+      </button>
+      <button class="btn btn-secondary flex-fill" @click="mostrarTransversalModal = true">
+        <i class="bi "></i> Transversales
+      </button>
+    </div>
 
     <div v-if="!loading" class="list-group shadow-sm">
         <div class="list-group-item text-white bg-indigo cursor-pointer"
@@ -177,6 +184,11 @@ onMounted(() => {
       :show="mostrarModal"
       @close="mostrarModal = false"
       @created="crearGrado"
+    />
+
+    <TransversalModal
+      :show="mostrarTransversalModal"
+      @close="mostrarTransversalModal = false"
     />
 
     <ConfirmarEliminar

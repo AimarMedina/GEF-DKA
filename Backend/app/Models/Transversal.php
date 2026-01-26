@@ -8,7 +8,7 @@ class Transversal extends Model
 {
     protected $table = "transversales";
     protected $fillable = [
-        'Descripcion'
+        'descripcion'
     ];
 
     public function notasTransversales(){
