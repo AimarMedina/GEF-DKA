@@ -159,11 +159,6 @@ class TransversalController extends Controller
         // Verificar si tiene notas asociadas
         $notasCount = $transversal->notasTransversales()->count();
         
-        if ($notasCount > 0) {
-            return response()->json([
-                'message' => "No se puede eliminar la transversal porque tiene {$notasCount} nota(s) asociada(s)"
-            ], 422);
-        }
         
         $transversal->delete();
         
