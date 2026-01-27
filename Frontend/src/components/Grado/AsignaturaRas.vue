@@ -98,7 +98,7 @@ watch(() => props.asignatura, fetchRas, { immediate: true });
 
         <div v-if="mostrarForm" class="mt-3">
             <FormularioCrear
-                endpoint="http://127.0.0.1:8000/api/ras"
+                endpoint="/api/ras"
                 tipo="ra"
                 :idPadre="asignatura.id"
                 @cancelar="mostrarForm = false"

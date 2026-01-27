@@ -109,7 +109,7 @@ async function eliminarCompetencia(id) {
     </div>
     <FormularioCrear
       v-if="mostrarForm"
-      endpoint="http://127.0.0.1:8000/api/competencias"
+      endpoint="/api/competencias"
       tipo="comp"
       :idPadre="grado.id"
       @cancelar="mostrarForm = false"

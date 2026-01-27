@@ -134,7 +134,7 @@ async function eliminarAsignatura(id){
 
         <FormularioCrear
             v-if="mostrarForm"
-            endpoint="http://127.0.0.1:8000/api/asignaturas"
+            endpoint="/api/asignaturas"
             tipo="asig"
             :idPadre="grado.id"
             @cancelar="mostrarForm = false"
