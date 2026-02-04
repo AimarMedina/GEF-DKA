@@ -19,11 +19,13 @@ class TransversalController extends Controller
         $alumno = Alumno::findOrFail($idAlumno);
 
         // Solo admin, tutor del alumno o instructor del alumno pueden ver
-        if (
+        if
+        (
             $user->tipo !== 'admin' &&
             $user->id != $alumno->ID_Tutor &&
             $user->id != $alumno->ID_Instructor
-        ) {
+        )
+        {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -33,7 +35,7 @@ class TransversalController extends Controller
             $nota = NotaTransversal::where('ID_Transversal', $t->id)
                         ->where('ID_Alumno', $idAlumno)
                         ->first();
-            
+
             return [
                 'id' => $t->id,
                 'descripcion' => $t->descripcion,
@@ -68,7 +70,7 @@ class TransversalController extends Controller
         ]);
 
         // Verificar que la transversal existe
-        $transversal = Transversal::findOrFail($transversalId);
+        Transversal::findOrFail($transversalId);
 
         if ($request->nota === null) {
             // Si la nota es null, eliminar el registro si existe
@@ -155,13 +157,13 @@ class TransversalController extends Controller
     public function eliminarTransversal($id)
     {
         $transversal = Transversal::findOrFail($id);
-        
+
         // Verificar si tiene notas asociadas
         $notasCount = $transversal->notasTransversales()->count();
-        
-        
+
+
         $transversal->delete();
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Transversal eliminada correctamente'

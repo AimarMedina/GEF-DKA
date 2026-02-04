@@ -91,8 +91,7 @@ class UserController extends Controller
         ], 200);
     }
 
-  public function getUsers(Request $req)
-    {
+    public function getUsers(Request $req){
         $perPage = $req->get('per_page', 5);
 
         $query = User::query()->orderBy('id');
@@ -119,11 +118,12 @@ class UserController extends Controller
             });
         }
 
-       
+
         if ($req->tipo === 'alumno') {
             $query->with(['alumno.grado']);
         } elseif ($req->tipo === 'instructor') {
-            $query->with(['instructor.empresa']); //Si es instructor buscamos la empresa para facilitar la busqyeda al admin
+            $query->with(['instructor.empresa']);
+            //Si es instructor buscamos la empresa para facilitar la busqyeda al admin
         }
 
         $usuarios = $query->paginate($perPage);
@@ -134,10 +134,9 @@ class UserController extends Controller
         ]);
     }
 
-
     // Crear usuario
-    public function create(Request $req)
-    {
+    public function create(Request $req){
+
         $data = $req->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
@@ -165,8 +164,7 @@ class UserController extends Controller
     }
 
     // Actualizar usuario
-    public function update(Request $req, $id)
-    {
+    public function update(Request $req, $id){
         $user = User::findOrFail($id);
 
         $data = $req->validate([
@@ -245,7 +243,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuario eliminado correctamente']);
     }
-
 }
 
 

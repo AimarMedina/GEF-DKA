@@ -34,8 +34,6 @@ class SeguimientoController extends Controller
         return response()->json($seguimientos);
     }
 
-
-
     // Crear nuevo seguimiento
     public function crearSeguimiento(Request $request)
     {
@@ -67,22 +65,22 @@ class SeguimientoController extends Controller
         return response()->json($seguimiento);
     }
 
-    public function eliminarSeguimiento($id)
-{
-    $seguimiento = Seguimiento::find($id);
+    public function eliminarSeguimiento($id){
 
-    if (!$seguimiento) {
+        $seguimiento = Seguimiento::find($id);
+
+        if (!$seguimiento) {
+            return response()->json([
+                'message' => 'Seguimiento no encontrado'
+            ], 404);
+        }
+
+        $seguimiento->delete();
+
         return response()->json([
-            'message' => 'Seguimiento no encontrado'
-        ], 404);
-    }
-
-    $seguimiento->delete();
-
-    return response()->json([
-        'message' => 'Seguimiento eliminado',
-        'seguimientio' => $seguimiento
-    ], 200);
+            'message' => 'Seguimiento eliminado',
+            'seguimientio' => $seguimiento
+        ], 200);
 }
 
 }

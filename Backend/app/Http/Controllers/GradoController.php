@@ -64,7 +64,7 @@ class GradoController extends Controller
        $grado = Grado::create([
             'Nombre' => $request->nombre,
             'Curso' => $request->curso,
-            'ID_Tutor' => $request->id_tutor 
+            'ID_Tutor' => $request->id_tutor
         ]);
 
         return response()->json([
@@ -79,18 +79,18 @@ class GradoController extends Controller
     public function eliminarGrado($id)
     {
         $grado = Grado::findOrFail($id);
-        
+
         // Verificar si tiene alumnos asignados
         $alumnosCount = $grado->alumnos()->count();
-        
+
         if ($alumnosCount > 0) {
             return response()->json([
                 'message' => "No se puede eliminar el grado porque tiene {$alumnosCount} alumno(s) asignado(s)"
             ], 422);
         }
-        
+
         $grado->delete();
-        
+
         return response()->json([
             'message' => 'Grado eliminado correctamente'
         ]);
@@ -100,7 +100,6 @@ class GradoController extends Controller
     public function getAsignaturas($id)
     {
         // Buscamos las asignaturas que pertenezcan a este grado
-        // Asegúrate de usar 'asignaturas' si es así en tu modelo
         $asignaturas = Asignatura::where('ID_Grado', $id)->orderBy('id')->get();
         return response()->json($asignaturas);
     }
@@ -147,7 +146,7 @@ class GradoController extends Controller
 
         // 5. CALCULAR NOTAS PARA CADA ALUMNO
         $alumnosConNotas = $alumnosPaginados->getCollection()->map(function ($usuarioAlumno) use ($asignaturas) {
-            
+
             $idAlumno = $usuarioAlumno->id;
 
             // A. Notas Globales
@@ -173,7 +172,7 @@ class GradoController extends Controller
                 $packNotas[$id] = [
                     'cuaderno'    => $notaCuaderno,
                     'transversal' => $notaTransversal,
-                    'tecnica'     => $notasTecnicas[$id] ?? '-', 
+                    'tecnica'     => $notasTecnicas[$id] ?? '-',
                     'egibide'     => $notasEgibide[$id] ?? '-',
                     'nota_empresa_calculada' => $notasEmpresa[$id] ?? '-',
                     'final'       => $notasFinales[$id] ?? '-'
