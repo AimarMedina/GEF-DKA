@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getUsers']);
     Route::post('/user/create', [UserController::class, 'create']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
-    /*
+/*
 |--------------------------------------------------------------------------
 | Empresas
 |--------------------------------------------------------------------------
@@ -46,7 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
     Route::post('/empresa/create', [EmpresaController::class, 'create']);
 
-    /*
+/*
 |--------------------------------------------------------------------------
 | Instructores
 |--------------------------------------------------------------------------
@@ -59,7 +59,7 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
 
 
 
-    /*
+/*
 |--------------------------------------------------------------------------
 | Tutores y Alumnos
 |--------------------------------------------------------------------------
