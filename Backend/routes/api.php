@@ -80,6 +80,7 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::post('/nota-cuaderno', [NotaCuadernoController::class, 'notaCuaderno']);
     Route::post('/observacionesCuadernoAlumno', [NotaCuadernoController::class, 'observacionesCuadernoAlumno']);
     Route::get('/grados', [GradoController::class, 'getGrados']);
+    Route::get('/grados2', [GradoController::class, 'getGradosSinPaginar']);
     Route::get('/alumno/entregas/descargar/{id}', [AlumnoEntregaController::class, 'descargarCuaderno']);
 
 
