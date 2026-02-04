@@ -43,8 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
 | Empresas
 |--------------------------------------------------------------------------
 */
-    Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
+    Route::get('/empresas', [EmpresaController::class, 'index']);
     Route::post('/empresa/create', [EmpresaController::class, 'create']);
+    Route::get('/empresa/{cif}/instructores', [EmpresaController::class, 'getInstructores']);
+
 
     /*
 |--------------------------------------------------------------------------
@@ -52,7 +54,6 @@ Route::middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
 Route::post('/empresa/instructor/create', [InstructorController::class, 'crearInstructor']);
 Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor'])->middleware('auth:sanctum');
 Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, 'asignarInstructor'])->middleware('auth:sanctum');
