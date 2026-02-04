@@ -7,31 +7,10 @@ use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
 {
-   public function getCompanys(Request $req)
-    {
-        $q = trim((string) $req->query('q', ''));
 
-        $perPage = $req->query('per_page', 5); 
+    private function validateRequest(Request $req) {
 
-        $query = Empresa::query();
-
-        if ($q !== '') {
-            $query->where(function ($u) use ($q) {
-                $u->where('CIF', 'like', "%{$q}%")
-                    ->orWhere('Nombre', 'like', "%{$q}%")
-                    ->orWhere('Direccion', 'like', "%{$q}%")
-                    ->orWhere('Email', 'like', "%{$q}%")
-                    ->orWhere('N_Tel', 'like', "%{$q}%");
-            });
-        }
-        
-        $empresas = $query->paginate($perPage);
-        
-        return response()->json($empresas);
-    }
-    public function create(Request $req)
-    {
-        $data = $req->validate([
+        return $req->validate([
             'Nombre' => 'required|string|max:255',
             'Direccion' => 'nullable|string|max:255',
             'CIF' => ['required', 'string', 'max:20', 'unique:empresa,CIF'],
@@ -49,6 +28,33 @@ class EmpresaController extends Controller
             'N_Tel.regex' => 'El teléfono debe tener exactamente 9 dígitos.',
             'N_Tel.unique' => 'El teléfono ya está registrado.',
         ]);
+    }
+
+   public function getCompanys(Request $req)
+    {
+        $q = trim((string) $req->query('q', ''));
+
+        $perPage = $req->query('per_page', 5);
+
+        $query = Empresa::query();
+
+        if ($q !== '') {
+            $query->where(function ($u) use ($q) {
+                $u->where('CIF', 'like', "%{$q}%")
+                    ->orWhere('Nombre', 'like', "%{$q}%")
+                    ->orWhere('Direccion', 'like', "%{$q}%")
+                    ->orWhere('Email', 'like', "%{$q}%")
+                    ->orWhere('N_Tel', 'like', "%{$q}%");
+            });
+        }
+
+        $empresas = $query->paginate($perPage);
+
+        return response()->json($empresas);
+    }
+    public function create(Request $req)
+    {
+        $data = $this->validateRequest($req);
 
         Empresa::create([
             'CIF' => $data['CIF'],
