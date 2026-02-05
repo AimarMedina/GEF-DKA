@@ -4,7 +4,10 @@ import api from "@/services/api.js"
 import { useNotasStore } from "@/stores/notas.js";
 
 const notasStore = useNotasStore();
-
+const notaInput = ref('');
+const datosModal = ref({ idAlumno: null, titulo: '', callback: null });
+const transversalSeleccionada = ref(''); // Para guardar el ID del select
+const listaTransversales = ref([]); // Para las opciones del select
 // Estados
 const alumnos = ref([]);
 const asignaturas = ref([]);
@@ -60,39 +63,101 @@ const fetchDatosGrado = async (page = 1, loadingGlobal = true) => {
     loading.value = false;
   }
 };
-
-// --- FUNCIÓN PARA GUARDAR NOTA DE EGIBIDE ---
-const actualizarNotaEgibide = async (idAlumno, idAsignatura, nuevaNota) => {
-    const key = `${idAlumno}-${idAsignatura}`;
-    
-    // Validación básica
-    if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
-        alert("La nota debe estar entre 0 y 10");
-        return;
-    }
-
+const cargarTransversales = async () => {
     try {
-        // Llamada a la API
-        await api.post(`/api/alumnos/${idAlumno}/nota-egibide`, {
-            id_asignatura: idAsignatura,
-            nota: nuevaNota
-        });
-
-        // Feedback visual: Verde
-        inputStatus.value[key] = 'is-valid'; // Clase de Bootstrap
-        setTimeout(() => delete inputStatus.value[key], 2000);
-
-        // Recargamos los datos "en silencio" para que se recalcule la NOTA FINAL y los PROMEDIOS
-        await fetchDatosGrado(currentPage.value, false);
-
+        const response = await api.get('/api/competencias');
+        listaTransversales.value = response.data;
     } catch (error) {
-        console.error(error);
-        // Feedback visual: Rojo
-        inputStatus.value[key] = 'is-invalid';
-        alert("Error al guardar la nota. Inténtalo de nuevo.");
+        console.error("Error cargando transversales:", error);
     }
 };
 
+// Llamamos a la carga al iniciar
+onMounted(cargarTransversales);
+// Función genérica para abrir el Pop-up
+const mostrarModalNota = (idAlumno, titulo, funcionCallback) => {
+  datosModal.value = { idAlumno, titulo, callback: funcionCallback };
+  notaInput.value = ''; // Resetear el input
+  
+  // Esto abre el modal de Bootstrap sin importar librerías raras
+  const modal = new bootstrap.Modal(document.getElementById('modalNotaBootstrap'));
+  modal.show();
+};
+const confirmarGuardar = async () => {
+  // Cerramos el modal buscando su instancia
+  const modalElement = document.getElementById('modalNotaBootstrap');
+  const modal = bootstrap.Modal.getInstance(modalElement);
+  
+  // Ejecutamos tu función (actualizarNotaTec o actualizarNotaTrans)
+  await datosModal.value.callback(datosModal.value.idAlumno, notaInput.value);
+  
+  modal.hide();
+};
+
+
+const actualizarNotaTec = async(idAlumno, nuevaNota)=>{
+  if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
+    alert("Introduce una nota entre 0 y 10");
+    return;
+  }
+  // Convertimos la nota de base 10 a base 4
+  // Ejemplo: un 5 se convierte en 2, un 10 en 4.
+  const notaProporcional = (parseFloat(nuevaNota) * 4) / 10;
+  try {
+      await api.post(`/api/alumno/${idAlumno}/notaTec`, {
+          nota: notaProporcional
+        // Enviamos el valor ya convertido
+      });
+      await fetchDatosGrado(currentPage.value, false);
+  } catch (error) {
+      console.error("Error al guardar:", error.response?.data);
+  }
+
+}
+const actualizarNotaTrans = async (idAlumno, nuevaNota) => {
+  if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
+    alert("Introduce una nota entre 0 y 10");
+    return;
+  }
+  // Convertimos la nota de base 10 a base 4
+  // Ejemplo: un 5 se convierte en 2, un 10 en 4.
+  const notaProporcional = (parseFloat(nuevaNota) * 4) / 10;
+
+  try {
+      await api.post(`/api/alumno/${idAlumno}/notaTrans`, {
+          nota: notaProporcional
+        // Enviamos el valor ya convertido
+      });
+      await fetchDatosGrado(currentPage.value, false);
+  } catch (error) {
+      console.error("Error al guardar:", error.response?.data);
+  }
+}
+const actualizarNotacuad = async (idAlumno, nuevaNota) => {
+  // Evitamos llamadas innecesarias si la nota no es válida
+  if (nuevaNota === '' || nuevaNota === '-' || nuevaNota < 0 || nuevaNota > 10) {
+    return;
+  }
+  
+  try {
+      // Llamada a tu ruta exacta: alumno/{id}/notaCuad
+      await api.post(`/api/alumno/${idAlumno}/notaCuad`, {
+          nota: nuevaNota
+      });
+      
+      // Recargamos para que se vean los cambios en los cálculos globales
+      await fetchDatosGrado(currentPage.value, false);
+  } catch (error) {
+      console.error("Error al actualizar la nota de cuaderno única:", error.response?.data);
+      // Si el error es 404, es que no existe la fila en la BD para ese alumno
+  }
+};
+const actualizatrans = async ()=>{
+
+}
+const actualizatec = async ()=>{
+  
+}
 
 // Función para obtener el estado de un alumno
 const obtenerEstadoAlumno = (alumno) => {
@@ -298,16 +363,28 @@ onMounted(() => {
                             >
                           </td>
 
-                          <td class="text-muted fst-italic">
-                            {{ alumno.notas_calculadas?.[asig.id]?.tecnica ?? '-' }}
+                          <td class="text-center cursor-pointer" @click="mostrarModalNota(alumno.id, 'Nota Técnica', actualizarNotaTec)">
+                            <span class="text-muted fst-italic">
+                              {{ alumno.notas_calculadas?.[asig.id]?.tecnica ?? '-' }}
+                            </span>
+                            <i class="bi bi-pencil-square ms-1 small"></i> </td>
+
+                          <td class="text-center cursor-pointer" @click="mostrarModalNota(alumno.id, 'Nota Transversal', actualizarNotaTrans)">
+                            <span class="text-muted fst-italic">
+                              {{ alumno.notas_calculadas?.[asig.id]?.transversal ?? '-' }}
+                            </span>
+                            <i class="bi bi-pencil-square ms-1 small"></i>
                           </td>
+
                           <td class="text-muted fst-italic">
-                            {{ alumno.notas_calculadas?.[asig.id]?.transversal ?? '-' }}
+                            <input 
+                              type="number" 
+                              step="0.1"
+                              class="form-control form-control-sm border-0 bg-transparent text-muted fst-italic no-spinners" 
+                              :value="alumno.notas_calculadas?.[asig.id]?.cuaderno ?? '-'"
+                              @change="actualizarNotacuad(alumno.id, $event.target.value)"
+                            >
                           </td>
-                          <td class="text-muted fst-italic">
-                            {{ alumno.notas_calculadas?.[asig.id]?.cuaderno ?? '-' }}
-                          </td>
-                          
                           <td class="fw-bold fs-6" 
                               :class="(alumno.notas_calculadas?.[asig.id]?.final === '-' || !alumno.notas_calculadas?.[asig.id]?.final) ? 'text-danger bg-danger-subtle' : 'text-dark bg-success-subtle'">
                             {{ alumno.notas_calculadas?.[asig.id]?.final ?? '-' }}
@@ -358,6 +435,46 @@ onMounted(() => {
 
     </div>
   </div>
+  </div>
+  <div class="modal fade" id="modalNotaBootstrap" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content shadow border-0">
+        
+        <div class="modal-header bg-indigo text-white border-0">
+          <h5 class="modal-title fw-bold">{{ datosModal.titulo }}</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Competencia:</label>
+            <select class="form-select shadow-sm" v-model="transversalSeleccionada">
+              <option value="" disabled>Selecciona una...</option>
+              <option v-for="t in listaTransversales" :key="t.id" :value="t.id">
+                {{ t.descripcion }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-2 text-center">
+            <label class="form-label fw-semibold small">Nota (0-10):</label>
+            <input 
+              type="text" 
+              class="form-control form-control-lg text-center shadow-sm" 
+              v-model="notaInput" 
+              placeholder="0.0"
+              @keyup.enter="confirmarGuardar"
+            >
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light border-0 justify-content-center">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-indigo btn-sm px-4" @click="confirmarGuardar">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
   </div>
 </template>
 

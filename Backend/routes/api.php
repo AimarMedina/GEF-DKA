@@ -125,6 +125,11 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
 |--------------------------------------------------------------------------
 */
     // Notas de alumno
+    Route::get('/competencias', [CompetenciaController::class, 'index']);
+
+    Route::post('alumno/{id}/notaTrans', [TransversalController::class, 'update']);
+    Route::post('alumno/{id}/notaTec', [NotasEmpresaController::class, 'update']);
+    Route::post('alumno/{id}/notaCuad', [NotaCuadernoController::class, 'update']);
     Route::get('/alumno/{id}/mis-notas', [AlumnoController::class, 'misNotas']);
     Route::get('/alumno/{id}/mis-notasAlumno', [AlumnoController::class, 'misNotasAlumno']);
     Route::post('/alumnos/{idAlumno}/nota-egibide', [AlumnoController::class, 'guardarNotaEgibide']);
@@ -201,4 +206,5 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::post('/transversales', [TransversalController::class, 'crearTransversal']);
     Route::put('/transversales/{id}', [TransversalController::class, 'actualizarTransversal']);
     Route::delete('/transversales/{id}', [TransversalController::class, 'eliminarTransversal']);
+
 });

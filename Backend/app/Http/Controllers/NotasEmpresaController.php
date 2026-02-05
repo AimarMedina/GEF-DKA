@@ -108,6 +108,15 @@ class NotasEmpresaController extends Controller
             ]
         ]);
     }
+    public function update(Request $request, $id) {
+        $request->validate(['nota' => 'required|numeric|min:0|max:10']);
+        
+        // Actualiza TODOS los registros de ese alumno
+        // Si tu base de datos usa minúsculas, cambia el controlador a:
+        NotaCompetencia::where('id_alumno', $id)->update(['nota' => $request->nota]);
+
+        return response()->json(['message' => 'Notas transversales actualizadas']);
+    }
 
     /**
      * POST /api/alumnos/{id}/notas
