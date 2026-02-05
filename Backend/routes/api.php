@@ -137,6 +137,7 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
 |--------------------------------------------------------------------------
 */
     Route::get('/grados', [GradoController::class, 'getGrados']);
+    Route::get('/gradosTodos', [GradoController::class, 'getTodosGrados']);
     Route::post('/grados', [GradoController::class, 'crearGrado']);
     Route::delete('/grados/{id}', [GradoController::class, 'eliminarGrado']);
     Route::get('/grados/{id}/asignaturas', [GradoController::class, 'getAsignaturas']);
