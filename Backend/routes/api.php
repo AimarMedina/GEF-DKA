@@ -8,6 +8,7 @@ use App\Http\Controllers\TutorController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\AlumnoEntregaController;
+use App\Http\Controllers\AlumnoImportController;
 use App\Http\Controllers\CompRaController;
 use App\Http\Controllers\EntregaCuadernoController;
 use App\Http\Controllers\EstanciaController;
@@ -38,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getUsers']);
     Route::post('/user/create', [UserController::class, 'create']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
-/*
+    /*
 |--------------------------------------------------------------------------
 | Empresas
 |--------------------------------------------------------------------------
@@ -46,20 +47,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
     Route::post('/empresa/create', [EmpresaController::class, 'create']);
 
-/*
+    /*
 |--------------------------------------------------------------------------
 | Instructores
 |--------------------------------------------------------------------------
 */
 
-Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
-Route::post('/empresa/instructor/create', [InstructorController::class, 'crearInstructor']);
-Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor'])->middleware('auth:sanctum');
-Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, 'asignarInstructor'])->middleware('auth:sanctum');
+    Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
+    Route::post('/empresa/instructor/create', [InstructorController::class, 'crearInstructor']);
+    Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor'])->middleware('auth:sanctum');
+    Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, 'asignarInstructor'])->middleware('auth:sanctum');
 
 
 
-/*
+    /*
 |--------------------------------------------------------------------------
 | Tutores y Alumnos
 |--------------------------------------------------------------------------
@@ -189,7 +190,7 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::put('/users/{id}', [UserController::class, 'update']);
 
 
-/*
+    /*
 |--------------------------------------------------------------------------
 | Transversales
 |--------------------------------------------------------------------------
@@ -200,4 +201,13 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::post('/transversales', [TransversalController::class, 'crearTransversal']);
     Route::put('/transversales/{id}', [TransversalController::class, 'actualizarTransversal']);
     Route::delete('/transversales/{id}', [TransversalController::class, 'eliminarTransversal']);
+
+    /*
+|--------------------------------------------------------------------------
+| Admin Alumno CSV
+|--------------------------------------------------------------------------
+*/
+
+    Route::post('/alumnos/importar', [AlumnoImportController::class, 'importar']);
+    Route::post('/alumnos/vista-previa', [AlumnoImportController::class, 'vistaPrevia']);
 });
