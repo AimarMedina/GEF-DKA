@@ -167,15 +167,15 @@ class UserController extends Controller
     public function update(Request $req, $id){
         $user = User::findOrFail($id);
 
-        $data = $req->validate([
-            'nombre' => 'sometimes|required|string|max:255',
-            'apellidos' => 'nullable|string|max:255',
-            'email' => ['sometimes', 'required', 'email', 'max:255', 'unique:users,email,' . $id],
-            'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/', 'unique:users,n_tel,' . $id],
-            'password' => 'nullable|string|min:6',
-            'tipo' => 'sometimes|required|string|in:alumno,tutor,instructor,admin',
-            'id_grado' => 'nullable|exists:grado,id',
-        ]);
+            $data = $req->validate([
+                'nombre' => 'sometimes|required|string|max:255',
+                'apellidos' => 'nullable|string|max:255',
+                'email' => ['sometimes', 'required', 'email', 'max:255', 'unique:users,email,' . $id],
+                'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/', 'unique:users,n_tel,' . $id],
+                'password' => 'nullable|string|min:6',
+                'tipo' => 'sometimes|required|string|in:alumno,tutor,instructor,admin',
+                'id_grado' => 'nullable|exists:grado,id',
+            ]);
 
         $user->update([
             'nombre' => $data['nombre'] ?? $user->nombre,

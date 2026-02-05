@@ -64,6 +64,8 @@ class User extends Authenticatable
 
             $user->id = $lastNumber ? $lastNumber +1 : $start +1;
         });
+
+
         //  static::created(function ($user) {
         //      match ($user->tipo) {
         //          'alumno'     => Alumno::create(['ID_Usuario' => $user->id]),
