@@ -1,33 +1,82 @@
 <script setup>
+import { ref } from 'vue';
+import api from '@/services/api.js';
+
 const props = defineProps({
-  competencias: Array
-})
+  competencias: Array,
+  alumnoId: Number,
+});
+
+const editando = ref(false);
+
+const actualizarNota = async (competencia) => {
+  if (competencia.Nota === null || competencia.Nota < 0 || competencia.Nota > 4) {
+    alert('La nota debe estar entre 0 y 4');
+    return;
+  }
+
+  try {
+    await api.put(`/api/alumnos/${props.alumnoId}/competencias/${competencia.id}/nota`, {
+      nota: competencia.Nota,
+    });
+  } catch (e) {
+    console.error(e);
+    alert('Error al guardar la nota');
+  }
+};
 </script>
 
 <template>
-<div class="mb-5">
-  <h5>Competencias</h5>
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered">
-      <thead class="table-indigo text-white text-center text-md-start">
-        <tr>
-          <th>Competencia</th>
-          <th>Nota</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="n in competencias" :key="n.id">
-          <td class="text-center text-md-start">{{ n.competencia?.descripcion ?? 'Sin descripción' }}</td>
-          <td class="text-center text-md-start">
-            <span :class="{
-              'badge bg-success': n.Nota >= 3,
-              'badge bg-danger text-white': n.Nota < 3,
-              'badge bg-warning text-dark': n.Nota == null
-            }">{{ n.Nota ?? 'Sin nota' }}</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="mb-5">
+    <h5>Competencias</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead class="table-indigo text-white text-center text-md-start">
+          <tr>
+            <th>Competencia</th>
+            <th>
+              <div class="d-flex justify-content-between align-items-center">
+                Nota
+                <button class="btn btn-warning" @click="editando = !editando">
+                  <i class="bi bi-pencil" v-if="!editando"></i>
+                  <i class="bi bi-x-lg" v-if="editando"></i>
+                </button>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="n in competencias" :key="n.id">
+            <td class="text-center text-md-start">
+              {{ n.competencia?.descripcion ?? 'Sin descripción' }}
+            </td>
+
+            <td class="text-center text-md-start">
+              <span
+                :class="{
+                  'badge bg-success': n.Nota >= 3,
+                  'badge bg-danger text-white': n.Nota < 3,
+                  'badge bg-warning text-dark': n.Nota == null,
+                }"
+                class="mb-2"
+                v-if="!editando"
+                >{{ n.Nota ?? 'Sin nota' }}</span
+              >
+              <input
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                class="form-control form-control-sm fw-bold"
+                v-model.number="n.Nota"
+                v-if="editando"
+                @change="actualizarNota(n)"
+                placeholder="—"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 </template>
