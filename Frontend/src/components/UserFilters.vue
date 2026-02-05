@@ -1,18 +1,19 @@
 <script setup>
-import { ref, watch, onMounted } from "vue";
-import UserCreationButtons from "./UserCreationButtons.vue";
-import api from "@/services/api.js";
-import BuscadorSelect from "./BuscadorSelect.vue";
-import Buscador from "./Buscador.vue";
-const emit = defineEmits(["change"]);
+import { ref, watch, onMounted } from 'vue';
+import UserCreationButtons from './UserCreationButtons.vue';
+import api from '@/services/api.js';
+import BuscadorSelect from './BuscadorSelect.vue';
+import Buscador from './Buscador.vue';
+import ImportarAlumnos from './Alumno/ImportarAlumnos.vue';
+const emit = defineEmits(['change']);
 
-const tipo = ref("NONE");
-const grado = ref("NONE");
-const busquedaTexto = ref("");
+const tipo = ref('NONE');
+const grado = ref('NONE');
+const busquedaTexto = ref('');
 const grados = ref([]);
 async function cargarGrados() {
   try {
-    const response = await api.get("/api/grados");
+    const response = await api.get('/api/grados');
     grados.value = response.data.data;
   } catch (e) {
     console.error(e);
@@ -24,12 +25,12 @@ onMounted(() => {
 });
 
 watch(tipo, () => {
-  busquedaTexto.value = "";
-  grado.value = "NONE";
+  busquedaTexto.value = '';
+  grado.value = 'NONE';
 });
 
 watch([tipo, grado, busquedaTexto], () => {
-  emit("change", {
+  emit('change', {
     tipo: tipo.value,
     id_grado: grado.value,
     search: busquedaTexto.value,
@@ -67,20 +68,12 @@ function actualizarBusqueda(texto) {
           placeholder="Buscar o seleccionar grado..."
         />
       </div>
-      <div
-        v-if="tipo === 'tutor' || tipo === 'instructor'"
-        class="col-md-4 mb-3"
-      >
+      <div v-if="tipo === 'tutor' || tipo === 'instructor'" class="col-md-4 mb-3">
         <label class="form-label">Buscar por nombre</label>
-        <Buscador
-          :tipo="'Buscar ' + tipo + '...'"
-          @search="actualizarBusqueda"
-        />
+        <Buscador :tipo="'Buscar ' + tipo + '...'" @search="actualizarBusqueda" />
       </div>
-      <UserCreationButtons
-        :tipo="tipo"
-        :grado="grado == '.' ? false : grado"
-      ></UserCreationButtons>
+      <UserCreationButtons :tipo="tipo" :grado="grado == '.' ? false : grado" />
+      <ImportarAlumnos v-if="tipo === 'alumno'" />
     </div>
   </div>
 </template>
