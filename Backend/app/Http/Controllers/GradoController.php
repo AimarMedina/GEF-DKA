@@ -29,8 +29,8 @@ class GradoController extends Controller
 
             // Buscamos coincidencias en Nombre O en Curso
             $query->where(function($q) use ($search) {
-                $q->where('Nombre', 'LIKE', "%{$search}%")
-                  ->orWhere('Curso', 'LIKE', "%{$search}%");
+                $q->where('nombre', 'LIKE', "%{$search}%")
+                  ->orWhere('curso', 'LIKE', "%{$search}%");
             });
         }
 
@@ -40,6 +40,11 @@ class GradoController extends Controller
         return response()->json($grados);
     }
 
+    public function getTodosGrados(){
+        $grados= Grado::all();
+        return response()->json($grados);
+    }
+    
     /**
      * Crear un nuevo grado
      */

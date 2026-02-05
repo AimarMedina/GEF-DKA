@@ -9,7 +9,7 @@
      <BuscadorSelect
         v-model="gradoSeleccionado"
         :options="grados"
-        label-key="nombre"
+        label-key="label"
         value-key="id"
         placeholder="Buscar grado..."
         @change="cargarMatriz"
@@ -151,9 +151,13 @@ async function toggleCompRa(asig, ra, comp) {
   }
 }
 
-onMounted(async () => {
-  const { data } = await api.get('/api/grados')
-  grados.value = data.data
+  onMounted(async () => {
+  const { data } = await api.get('/api/gradosTodos')
+
+  grados.value = data.map(g => ({
+    ...g,
+    label: `${g.nombre} (${g.curso})`
+  }))
 })
 
 
