@@ -38,10 +38,5 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('es-alumno', function (User $user) {
             return $user->tipo === 'alumno';
         });
-
-        // Gates combinados (útiles para permisos compartidos)
-        Gate::define('es-personal', function (User $user) {
-            return in_array($user->tipo, ['admin', 'tutor', 'instructor']);
-        });
     }
 }
