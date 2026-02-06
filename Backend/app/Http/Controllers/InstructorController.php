@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Instructor;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class InstructorController extends Controller
 {
@@ -45,7 +46,7 @@ class InstructorController extends Controller
             'apellidos' => $data['apellidos'] ?? null,
             'email' => $data['email'],
             'n_tel' => $data['n_tel'] ?? null,
-            'password' => $data['password'],
+            'password' => Hash::make($data['password']),
             'tipo' => 'instructor',
         ]);
 
