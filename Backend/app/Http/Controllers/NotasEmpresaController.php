@@ -6,6 +6,7 @@ use App\Models\Alumno;
 use App\Models\Transversal;
 use App\Models\NotaTransversal;
 use App\Models\NotaCompetencia;
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 
 class NotasEmpresaController extends Controller
@@ -77,7 +78,7 @@ class NotasEmpresaController extends Controller
             $nota = NotaTransversal::where('ID_Transversal', $t->id)
                         ->where('ID_Alumno', $idAlumno)
                         ->first();
-            
+
             return [
                 'id' => $t->id,
                 'descripcion' => $t->Descripcion,

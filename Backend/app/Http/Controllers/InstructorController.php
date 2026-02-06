@@ -12,10 +12,8 @@ class InstructorController extends Controller
         $instructores = Instructor::with('user')->where('CIF_Empresa',$cif)->get();
         return response()->json($instructores);
     }
-     public function crearInstructor(Request $request)
-    {
-        // Validamos los datos básicos
-        $data = $request->validate([
+    private function validarReq(Request $request){
+        return $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
             'email' => ['required','email','max:255','unique:users,email'],
@@ -36,8 +34,12 @@ class InstructorController extends Controller
             'CIF_Empresa.required' => 'Debes seleccionar una empresa.',
             'CIF_Empresa.exists' => 'La empresa seleccionada no existe.',
         ]);
+    }
 
-
+     public function crearInstructor(Request $request)
+    {
+        // Validamos los datos básicos
+        $data = $this->validarReq($request);
 
         // Creamos el usuario
         $user = User::create([
@@ -58,7 +60,6 @@ class InstructorController extends Controller
             $instructor->CIF_Empresa = $data['CIF_Empresa'];
             $instructor->save();
         }
-
 
         return response()->json([
             'message' => 'Instructor creado correctamente',

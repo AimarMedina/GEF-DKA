@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
 {
+<<<<<<< HEAD
+
+    private function validateRequest(Request $req) {
+
+        return $req->validate([
+=======
 public function getInstructores($cif)
 {
     $empresa = Empresa::where('CIF', $cif)->firstOrFail();
@@ -42,6 +48,7 @@ public function getInstructores($cif)
     public function create(Request $req)
     {
         $data = $req->validate([
+>>>>>>> d6bed55349d0cd731c6497486a5270d6720104ad
             'Nombre' => 'required|string|max:255',
             'Direccion' => 'nullable|string|max:255',
             'CIF' => ['required', 'string', 'max:20', 'unique:empresa,CIF'],
@@ -59,6 +66,33 @@ public function getInstructores($cif)
             'N_Tel.regex' => 'El teléfono debe tener exactamente 9 dígitos.',
             'N_Tel.unique' => 'El teléfono ya está registrado.',
         ]);
+    }
+
+   public function getCompanys(Request $req)
+    {
+        $q = trim((string) $req->query('q', ''));
+
+        $perPage = $req->query('per_page', 5);
+
+        $query = Empresa::query();
+
+        if ($q !== '') {
+            $query->where(function ($u) use ($q) {
+                $u->where('CIF', 'like', "%{$q}%")
+                    ->orWhere('Nombre', 'like', "%{$q}%")
+                    ->orWhere('Direccion', 'like', "%{$q}%")
+                    ->orWhere('Email', 'like', "%{$q}%")
+                    ->orWhere('N_Tel', 'like', "%{$q}%");
+            });
+        }
+
+        $empresas = $query->paginate($perPage);
+
+        return response()->json($empresas);
+    }
+    public function create(Request $req)
+    {
+        $data = $this->validateRequest($req);
 
         Empresa::create([
             'CIF' => $data['CIF'],

@@ -38,11 +38,8 @@ class EntregaCuadernoController extends Controller
                     })
                         ->with('alumno.usuario');
                 }
-            ])
-            ->get();
+            ])->get();
     }
-
-
 
     public function entregasAlumno(Request $request, $id)
     {
@@ -55,7 +52,7 @@ class EntregaCuadernoController extends Controller
         $idGrado = Alumno::where('ID_Usuario', $id)->value('ID_Grado');
 
         if (!$idGrado) {
-            return response()->json([], 200);
+            return response()->json([], 404);
         }
 
         // Entregas del grado + entrega del alumno (si existe)
@@ -63,9 +60,7 @@ class EntregaCuadernoController extends Controller
             'alumnoEntrega' => function ($q) use ($id) {
                 $q->where('ID_Alumno', $id);
             }
-        ])
-            ->where('ID_Grado', $idGrado)
-            ->get();
+        ])->where('ID_Grado', $idGrado)->get();
 
         return response()->json($entregas);
     }

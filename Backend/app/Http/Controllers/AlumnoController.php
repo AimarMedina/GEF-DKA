@@ -32,10 +32,8 @@ class AlumnoController extends Controller
                 ], 403);
             }
         }
-        // ----------------
 
         // Lógica de búsqueda y paginación (la mantenemos igual)
-        $perPage = (int) $request->query('per_page', 5);
         $q = trim((string) $request->query('q', ''));
 
         $query = Alumno::query()->where('id_tutor', $id);
@@ -88,8 +86,8 @@ class AlumnoController extends Controller
         return Alumno::with('grado')->findOrFail($id);
     }
 
-    public function misNotasAlumno(Request $request, $id)
-{
+    public function misNotasAlumno($id){
+
     $alumno = Alumno::with('grado')->findOrFail($id); // Alumno con su grado
     $grado = $alumno->grado;
     $asignaturas = Asignatura::where('ID_Grado', $grado->id)->get();
