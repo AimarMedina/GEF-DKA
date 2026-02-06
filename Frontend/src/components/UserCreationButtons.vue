@@ -1,61 +1,58 @@
 <script setup>
-import { ref, computed } from 'vue'
-import FormularioUsuario from './FormularioUsuario.vue'
-import api from '@/services/api.js'
+import { ref, computed } from 'vue';
+import FormularioUsuario from './FormularioUsuario.vue';
+import api from '@/services/api.js';
 
 const props = defineProps({
-    tipo: {
-        type: String,
-        default: '.'
-    },
-    grado: {
-        type: [Number, String],
-        default: 'NONE'
-    }
-})
+  tipo: {
+    type: String,
+    default: '.',
+  },
+  grado: {
+    type: [Number, String],
+    default: 'NONE',
+  },
+});
 
-const showModal = ref(false)
-const errorMessage = ref(null)
-const tipoUsuario = ref(null)
+const showModal = ref(false);
+const errorMessage = ref(null);
+const tipoUsuario = ref(null);
 
 // si grado es NONE → false
 const idGradoProp = computed(() => {
-    if (props.tipo !== 'alumno') return false
-    if (props.grado === 'NONE' || props.grado === '.') return false
-    return props.grado
-})
-
+  if (props.tipo !== 'alumno') return false;
+  if (props.grado === 'NONE' || props.grado === '.') return false;
+  return props.grado;
+});
 
 function abrirModal(tipoSeleccionado) {
-    tipoUsuario.value = tipoSeleccionado
-    showModal.value = true
+  tipoUsuario.value = tipoSeleccionado;
+  showModal.value = true;
 }
 
 async function crearUsuario(userData) {
   console.log(userData);
 
-    try {
-        const response = await api.post('/api/user/create', {
-            ...userData,
-            tipo: tipoUsuario.value
-        })
-        console.log(response.data);
-        showModal.value = false
-        errorMessage.value = {}
-    } catch (error) {
+  try {
+    const response = await api.post('/api/user/create', {
+      ...userData,
+      tipo: tipoUsuario.value,
+    });
+    console.log(response.data);
+    showModal.value = false;
+    errorMessage.value = {};
+  } catch (error) {
     if (error.response && error.response.status === 422) {
-        errorMessage.value = error.response.data.errors || {};
+      errorMessage.value = error.response.data.errors || {};
     } else {
-        console.error(error)
+      console.error(error);
     }
-}
-
+  }
 }
 </script>
 
 <template>
   <div class="d-flex gap-2 mb-3" v-if="tipo !== 'NONE'">
-
     <button
       v-if="tipo === '.' || tipo === 'alumno'"
       class="btn btn-outline-primary"
@@ -79,7 +76,6 @@ async function crearUsuario(userData) {
     >
       Crear admin
     </button>
-
   </div>
 
   <FormularioUsuario
@@ -87,11 +83,12 @@ async function crearUsuario(userData) {
     :errorMessage="errorMessage"
     :tipo="tipoUsuario"
     :id_grado="idGradoProp"
-    @close="showModal = false; errorMessage = null"
+    @close="
+      showModal = false;
+      errorMessage = null;
+    "
     @crear="crearUsuario"
   />
 </template>
-
-
 
 <style scoped></style>

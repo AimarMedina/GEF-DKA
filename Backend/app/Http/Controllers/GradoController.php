@@ -9,17 +9,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class GradoController extends Controller
-{
+class GradoController extends Controller {
     protected $notasService;
 
-    public function __construct(NotasAlumnoService $notasService)
-    {
+    public function __construct(NotasAlumnoService $notasService) {
         $this->notasService = $notasService;
     }
 
-    public function getGrados(Request $request)
-    {
+    public function getGrados(Request $request) {
         // Iniciamos la consulta
         $query = Grado::query();
 
@@ -28,28 +25,27 @@ class GradoController extends Controller
             $search = $request->input('q');
 
             // Buscamos coincidencias en Nombre O en Curso
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'LIKE', "%{$search}%")
-                  ->orWhere('curso', 'LIKE', "%{$search}%");
+                    ->orWhere('curso', 'LIKE', "%{$search}%");
             });
         }
 
         // Paginamos el resultado (ya filtrado o completo)
-        $grados = $query->paginate(5);
+        $grados = $query->orderBy('id', 'desc')->get();
 
         return response()->json($grados);
     }
 
-    public function getTodosGrados(){
-        $grados= Grado::all();
+    public function getTodosGrados() {
+        $grados = Grado::all();
         return response()->json($grados);
     }
-    
+
     /**
      * Crear un nuevo grado
      */
-    public function crearGrado(Request $request)
-    {
+    public function crearGrado(Request $request) {
         $request->validate([
             'nombre' => 'required|string|max:150',
             'curso' => 'nullable|string|max:50'
@@ -66,10 +62,10 @@ class GradoController extends Controller
             }
         }
 
-       $grado = Grado::create([
+        $grado = Grado::create([
             'Nombre' => $request->nombre,
             'Curso' => $request->curso,
-            'ID_Tutor' => $request->id_tutor 
+            'ID_Tutor' => $request->id_tutor
         ]);
 
         return response()->json([
@@ -81,29 +77,27 @@ class GradoController extends Controller
     /**
      * Eliminar un grado
      */
-    public function eliminarGrado($id)
-    {
+    public function eliminarGrado($id) {
         $grado = Grado::findOrFail($id);
-        
+
         // Verificar si tiene alumnos asignados
         $alumnosCount = $grado->alumnos()->count();
-        
+
         if ($alumnosCount > 0) {
             return response()->json([
                 'message' => "No se puede eliminar el grado porque tiene {$alumnosCount} alumno(s) asignado(s)"
             ], 422);
         }
-        
+
         $grado->delete();
-        
+
         return response()->json([
             'message' => 'Grado eliminado correctamente'
         ]);
     }
 
     // Obtener asignaturas simples
-    public function getAsignaturas($id)
-    {
+    public function getAsignaturas($id) {
         // Buscamos las asignaturas que pertenezcan a este grado
         // Asegúrate de usar 'asignaturas' si es así en tu modelo
         $asignaturas = Asignatura::where('ID_Grado', $id)->orderBy('id')->get();
@@ -111,8 +105,7 @@ class GradoController extends Controller
     }
 
     // Obtener competencias (Grado -> Asignatura -> Ra -> CompRa -> Competencia)
-    public function getCompetencias($id)
-    {
+    public function getCompetencias($id) {
         $grado = Grado::find($id);
 
         if (!$grado) {
@@ -124,8 +117,7 @@ class GradoController extends Controller
         return response()->json($competencias);
     }
 
-    public function getDatosGestionTutor(Request $request)
-    {
+    public function getDatosGestionTutor(Request $request) {
         $user = $request->user();
 
         // 1. Obtener Grado del Tutor
@@ -141,7 +133,7 @@ class GradoController extends Controller
 
         // 4. Obtener Alumnos matriculados en ese grado CON PAGINACIÓN
         $alumnosQuery = User::where('tipo', 'alumno')
-            ->whereHas('alumno', function($q) use ($grado) {
+            ->whereHas('alumno', function ($q) use ($grado) {
                 $q->where('ID_Grado', $grado->id);
             })
             ->with('alumno')
@@ -152,7 +144,7 @@ class GradoController extends Controller
 
         // 5. CALCULAR NOTAS PARA CADA ALUMNO
         $alumnosConNotas = $alumnosPaginados->getCollection()->map(function ($usuarioAlumno) use ($asignaturas) {
-            
+
             $idAlumno = $usuarioAlumno->id;
 
             // A. Notas Globales
@@ -178,7 +170,7 @@ class GradoController extends Controller
                 $packNotas[$id] = [
                     'cuaderno'    => $notaCuaderno,
                     'transversal' => $notaTransversal,
-                    'tecnica'     => $notasTecnicas[$id] ?? '-', 
+                    'tecnica'     => $notasTecnicas[$id] ?? '-',
                     'egibide'     => $notasEgibide[$id] ?? '-',
                     'nota_empresa_calculada' => $notasEmpresa[$id] ?? '-',
                     'final'       => $notasFinales[$id] ?? '-'

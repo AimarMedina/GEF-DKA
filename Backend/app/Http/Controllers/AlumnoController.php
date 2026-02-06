@@ -10,16 +10,13 @@ use App\Models\Alumno;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
 
-class AlumnoController extends Controller
-{
-        protected $notasService;
+class AlumnoController extends Controller {
+    protected $notasService;
 
-    public function __construct(NotasAlumnoService $notasService)
-    {
+    public function __construct(NotasAlumnoService $notasService) {
         $this->notasService = $notasService;
     }
-    public function alumnosDeTutor(Request $request, int $id)
-    {
+    public function alumnosDeTutor(Request $request, int $id) {
         $user = $request->user();
 
         // --- SEGURIDAD ---
@@ -65,8 +62,7 @@ class AlumnoController extends Controller
      * Obtener alumnos de un INSTRUCTOR específico.
      * Ruta: /api/instructores/{id}/alumnos
      */
-    public function alumnosDeInstructor(Request $request, int $id)
-    {
+    public function alumnosDeInstructor(Request $request, int $id) {
         $user = $request->user();
 
         // Seguridad
@@ -84,36 +80,34 @@ class AlumnoController extends Controller
         return response()->json($alumnos);
     }
 
-    public function getGrado($id)
-    {
+    public function getGrado($id) {
         return Alumno::with('grado')->findOrFail($id);
     }
 
-    public function misNotasAlumno(Request $request, $id)
-{
-    $alumno = Alumno::with('grado')->findOrFail($id); // Alumno con su grado
-    $grado = $alumno->grado;
-    $asignaturas = Asignatura::where('ID_Grado', $grado->id)->get();
+    public function misNotasAlumno(Request $request, $id) {
+        $alumno = Alumno::with('grado')->findOrFail($id); // Alumno con su grado
+        $grado = $alumno->grado;
+        $asignaturas = Asignatura::where('ID_Grado', $grado->id)->get();
 
 
-    $notaCuaderno = $this->notasService->obtenerNotaCuaderno($id);
-    $notaTransversal = $this->notasService->obtenerNotaTransversal($id);
-    $notasTecnicas = $this->notasService->obtenerNotaTecnicaPorAsignatura($id, $asignaturas);
-    $notasEmpresa = $this->notasService->calcularNotaFinalEmpresa($notaCuaderno, $notaTransversal, $notasTecnicas);
-    $notasEgibide = $this->notasService->obtenerNotasEgibide($id);
-    $notasFinales = $this->notasService->calcularNotasFinalesPorAsignatura($notasEmpresa, $notasEgibide);
+        $notaCuaderno = $this->notasService->obtenerNotaCuaderno($id);
+        $notaTransversal = $this->notasService->obtenerNotaTransversal($id);
+        $notasTecnicas = $this->notasService->obtenerNotaTecnicaPorAsignatura($id, $asignaturas);
+        $notasEmpresa = $this->notasService->calcularNotaFinalEmpresa($notaCuaderno, $notaTransversal, $notasTecnicas);
+        $notasEgibide = $this->notasService->obtenerNotasEgibide($id);
+        $notasFinales = $this->notasService->calcularNotasFinalesPorAsignatura($notasEmpresa, $notasEgibide);
 
-    $packNotas = [];
-    foreach ($asignaturas as $asig) {
-        $packNotas[$asig->id] = [
-            'cuaderno' => $notaCuaderno,
-            'transversal' => $notaTransversal,
-            'tecnica' => $notasTecnicas[$asig->id] ?? '-',
-            'egibide' => $notasEgibide[$asig->id] ?? '-',
-            'nota_empresa_calculada' => $notasEmpresa[$asig->id] ?? '-',
-            'final' => $notasFinales[$asig->id] ?? '-'
-        ];
-    }
+        $packNotas = [];
+        foreach ($asignaturas as $asig) {
+            $packNotas[$asig->id] = [
+                'cuaderno' => $notaCuaderno,
+                'transversal' => $notaTransversal,
+                'tecnica' => $notasTecnicas[$asig->id] ?? '-',
+                'egibide' => $notasEgibide[$asig->id] ?? '-',
+                'nota_empresa_calculada' => $notasEmpresa[$asig->id] ?? '-',
+                'final' => $notasFinales[$asig->id] ?? '-'
+            ];
+        }
 
     return response()->json([
         'usuario' => $alumno->usuario,
@@ -254,8 +248,7 @@ class AlumnoController extends Controller
         return response()->json($alumno);
     }
 
-    public function guardarNotaEgibide(Request $request, $idAlumno)
-    {
+    public function guardarNotaEgibide(Request $request, $idAlumno) {
         $request->validate([
             'id_asignatura' => 'required|integer|exists:asignatura,id',
             'nota' => 'required|numeric|min:0|max:10',
@@ -290,8 +283,7 @@ class AlumnoController extends Controller
         ]);
     }
 
-    public function asignarInstructor(Request $request, $idAlumno)
-    {
+    public function asignarInstructor(Request $request, $idAlumno) {
         $user = $request->user();
 
         // Solo tutor o admin
