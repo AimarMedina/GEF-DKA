@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class NotaCompetencia extends Model
 {
-    protected $table = "nota_competencia";
-    protected $fillable=[
-        "Nota"
-    ];
+    // Nombre de la tabla si no es el plural automático
+    protected $table = 'nota_competencia'; 
 
+    // CAMPOS PERMITIDOS (Deben coincidir con tu tabla de la BD)
+    protected $fillable = [
+        'ID_Competencia', 
+        'ID_Alumno', 
+        'Nota'
+    ];
     
     public function alumno()
     {
