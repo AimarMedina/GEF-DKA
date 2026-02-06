@@ -1,132 +1,9 @@
-<script>
-import * as XLSX from 'xlsx';
-import axios from 'axios';
-import api from '@/services/api.js';
-
-export default {
-  name: 'ImportarAlumnos',
-
-  data() {
-    return {
-      archivo: null,
-      vistaPrevia: [],
-      procesando: false,
-      progreso: 0,
-      mensajeProgreso: '',
-      resultados: null,
-      opciones: {
-        crearGrados: true,
-        contraseñaDefecto: 'Egibide2025',
-      },
-    };
-  },
-
-  computed: {
-    alertClass() {
-      return this.resultados?.exito ? 'alert-success' : 'alert-warning';
-    },
-    alertIcon() {
-      return this.resultados?.exito
-        ? 'fas fa-check-circle me-2'
-        : 'fas fa-exclamation-triangle me-2';
-    },
-  },
-
-  methods: {
-    handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.cargarArchivo(file);
-      }
-    },
-
-    async cargarArchivo(file) {
-      this.archivo = file;
-      this.resultados = null;
-
-      // Leer archivo y generar vista previa
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-
-        // Generar vista previa (primeras 5 filas)
-        this.vistaPrevia = jsonData.slice(0, 5).map((row) => ({
-          nombre: row['NOMBRE ALUMNO'],
-          apellidos: `${row['APELLIDO1 ALUMNO']} ${row['APELLIDO2 ALUMNO']}`,
-          email: row['EMAIL ALUMNO'],
-          clase: row['CLASE'],
-          dni: row['DNI ALUMNO'],
-          matricula: row['MATRICULA ALUMNO'],
-          id: row['ID PERSONA'],
-        }));
-      };
-      reader.readAsArrayBuffer(file);
-    },
-
-    eliminarArchivo() {
-      this.archivo = null;
-      this.vistaPrevia = [];
-      this.resultados = null;
-      this.$refs.fileInput.value = '';
-    },
-
-    async procesarArchivo() {
-      this.procesando = true;
-      this.progreso = 0;
-      this.mensajeProgreso = 'Preparando importación...';
-
-      const formData = new FormData();
-      formData.append('archivo', this.archivo);
-      formData.append('opciones', JSON.stringify(this.opciones));
-
-      try {
-        const response = await api.post('/api/alumnos/importar', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          onUploadProgress: (progressEvent) => {
-            this.progreso = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          },
-        });
-
-        this.mensajeProgreso = 'Procesando datos...';
-        this.progreso = 100;
-
-        this.resultados = response.data;
-
-        if (this.resultados.exito) {
-          this.$toast?.success(`${this.resultados.importados} alumnos importados correctamente`);
-        } else {
-          this.$toast?.warning('Importación completada con algunos errores');
-        }
-      } catch (error) {
-        this.$toast?.error('Error durante la importación: ' + error.message);
-        this.resultados = {
-          exito: false,
-          importados: 0,
-          errores: [{ mensaje: error.message }],
-        };
-      } finally {
-        this.procesando = false;
-      }
-    },
-
-    formatearTamaño(bytes) {
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-      return (bytes / 1048576).toFixed(2) + ' MB';
-    },
-  },
-};
-</script>
-
 <template>
   <div>
     <!-- Botón para abrir modal -->
     <button
       type="button"
-      class="btn btn-primary"
+      class="btn btn-outline-primary"
       data-bs-toggle="modal"
       data-bs-target="#importarAlumnosModal"
     >
@@ -191,37 +68,6 @@ export default {
               <button @click="eliminarArchivo" class="btn btn-sm btn-outline-danger">
                 <i class="fas fa-trash"></i>
               </button>
-            </div>
-
-            <!-- Vista previa -->
-            <div v-if="vistaPrevia.length > 0" class="mb-4">
-              <h6 class="mb-3">Vista Previa (primeras {{ vistaPrevia.length }} filas)</h6>
-              <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Apellidos</th>
-                      <th>Email</th>
-                      <th>Clase</th>
-                      <th>DNI</th>
-                      <th>Matrícula</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(alumno, index) in vistaPrevia" :key="index">
-                      <td>{{ alumno.nombre }}</td>
-                      <td>{{ alumno.apellidos }}</td>
-                      <td>
-                        <small>{{ alumno.email }}</small>
-                      </td>
-                      <td>{{ alumno.clase }}</td>
-                      <td>{{ alumno.dni }}</td>
-                      <td>{{ alumno.matricula }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
 
             <!-- Opciones -->
@@ -324,6 +170,95 @@ export default {
     </div>
   </div>
 </template>
+
+<script>
+import * as XLSX from 'xlsx';
+import api from '@/services/api.js';
+
+export default {
+  name: 'ImportarAlumnos',
+  data() {
+    return {
+      archivo: null,
+      procesando: false,
+      progreso: 0,
+      mensajeProgreso: '',
+      resultados: null,
+      opciones: {
+        crearGrados: true,
+        contraseñaDefecto: 'Egibide2025',
+      },
+    };
+  },
+  computed: {
+    alertClass() {
+      return this.resultados?.exito ? 'alert-success' : 'alert-warning';
+    },
+    alertIcon() {
+      return this.resultados?.exito
+        ? 'fas fa-check-circle me-2'
+        : 'fas fa-exclamation-triangle me-2';
+    },
+  },
+  methods: {
+    handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.archivo = file;
+        this.resultados = null;
+      }
+    },
+    eliminarArchivo() {
+      this.archivo = null;
+      this.resultados = null;
+      this.$refs.fileInput.value = '';
+    },
+    async procesarArchivo() {
+      this.procesando = true;
+      this.progreso = 0;
+      this.mensajeProgreso = 'Preparando importación...';
+
+      const formData = new FormData();
+      formData.append('archivo', this.archivo);
+      formData.append('opciones', JSON.stringify(this.opciones));
+
+      try {
+        const response = await api.post('/api/alumnos/importar', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: (progressEvent) => {
+            this.progreso = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          },
+        });
+
+        this.mensajeProgreso = 'Procesando datos...';
+        this.progreso = 100;
+
+        this.resultados = response.data;
+
+        if (this.resultados.exito) {
+          this.$toast?.success(`${this.resultados.importados} alumnos importados correctamente`);
+        } else {
+          this.$toast?.warning('Importación completada con algunos errores');
+        }
+      } catch (error) {
+        this.$toast?.error('Error durante la importación: ' + error.message);
+        this.resultados = {
+          exito: false,
+          importados: 0,
+          errores: [{ mensaje: error.message }],
+        };
+      } finally {
+        this.procesando = false;
+      }
+    },
+    formatearTamaño(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+      return (bytes / 1048576).toFixed(2) + ' MB';
+    },
+  },
+};
+</script>
 
 <style scoped>
 .table-responsive {
