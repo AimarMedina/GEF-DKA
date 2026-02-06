@@ -1,4 +1,4 @@
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '../stores/userStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
@@ -23,24 +23,24 @@ const router = createRouter({
       {
         path: '/tutores/:id/alumnos',
         name: 'alumnosTutor',
-        component: () => import('@/views/tutor/AlumnosTutorView.vue'),
+        component: () => import('../views/tutor/AlumnosTutorView.vue'),
         meta: { requiresAuth: true }
       },
       {
         path: '/instructores/:id/alumnos',
         name: 'alumnosInstructor',
-        component: () => import('@/views/instructor/AlumnosInstructorView.vue'),
+        component: () => import('../views/instructor/AlumnosInstructorView.vue'),
         meta: { requiresAuth: true }
       },
       {
         path: '/tutor/alumno/:id/seguimiento',
         name: 'seguimientoAlumno',
-        component: () => import('@/views/tutor/SeguimientoView.vue')
+        component: () => import('../views/tutor/SeguimientoView.vue')
       },
       {
         path: '/tutor/seguimiento/:estanciaId',
         name: 'seguimiento',
-        component: () => import('@/views/tutor/SeguimientoView.vue'),
+        component: () => import('../views/tutor/SeguimientoView.vue'),
         props: true
       },
       {
@@ -56,38 +56,38 @@ const router = createRouter({
       {
         path: '/cuadernos-alumno',
         name: 'alumno-cuadernos',
-        component: () => import('@/views/cuadernos/AlumnoCuadernosView.vue')
+        component: () => import('../views/cuadernos/AlumnoCuadernosView.vue')
       },
       {
         path: '/cuadernos-tutor',
         name: 'tutor-cuadernos',
-        component: () => import('@/views/cuadernos/TutorCuadernosView.vue')
+        component: () => import('../views/cuadernos/TutorCuadernosView.vue')
       },
       {
         path: '/alumno/mis-notas',
         name: 'alumno-notas',
-        component: () => import('@/views/alumno/AlumnoNotasView.vue'),
+        component: () => import('../views/alumno/AlumnoNotasView.vue'),
         meta: { requiresAuth: true }
       },
       {
         path: '/grados',
         name: 'grados',
-        component: () => import('@/views/GradosView.vue')
+        component: () => import('../views/GradosView.vue')
       },
       {
         path: '/competenciasXra',
         name: 'compra',
-        component: () => import('@/views/CompRaView.vue')
+        component: () => import('../views/CompRaView.vue')
       },
       {
         path: '/mi-grado',
         name: 'miGrado',
-        component: () => import('@/views/tutor/MiGradoView.vue')
+        component: () => import('../views/tutor/MiGradoView.vue')
       },
       {
         path: '/cambiar-contrasena',
         name: 'cambiar-contrasena',
-        component: () => import('@/views/CambiarContrasenaView.vue'),
+        component: () => import('../views/CambiarContrasenaView.vue'),
         meta: { requiresAuth: true }
       },
       {

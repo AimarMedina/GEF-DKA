@@ -37,7 +37,6 @@ function onFiltersChange(newFilters) {
   }
 
   filters.value = filtrosActivos;
-  console.log("Filters activos:", filters.value);
 }
 </script>
 

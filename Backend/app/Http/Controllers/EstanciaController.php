@@ -51,7 +51,9 @@ class EstanciaController extends Controller
 
     public function getCompanyAlumnos($CIF)
     {
-        $estanciasEmpresa = EstanciaAlumno::with(['alumno.usuario', 'alumno.instructor.user'])->where('CIF_Empresa', $CIF)->get();
+        $estanciasEmpresa =
+            EstanciaAlumno::with(['alumno.usuario', 'alumno.instructor.user'])
+                ->where('CIF_Empresa', $CIF)->get();
         return response()->json($estanciasEmpresa);
     }
 
@@ -140,18 +142,18 @@ class EstanciaController extends Controller
     public function eliminarEstancia($id)
     {
         $estancia = EstanciaAlumno::findOrFail($id);
-        
+
         $idAlumno = $estancia->ID_Alumno;
-        
+
          $user = auth()->user();
          if ($user->tipo !== 'admin' && $user->tipo !== 'tutor') {
              return response()->json(['message' => 'No autorizado'], 403);
          }
-        
+
         $estancia->delete();
-        
+
         Alumno::where('ID_Usuario', $idAlumno)->update(['ID_Instructor' => null]);
-        
+
         return response()->json([
             'message' => 'Estancia eliminada correctamente'
         ]);
