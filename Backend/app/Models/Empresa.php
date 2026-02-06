@@ -21,7 +21,7 @@ class Empresa extends Model
     public function estancia(){
         return $this->hasOne(EstanciaAlumno::class);
     }
-    public function instructor(){
-        return $this->hasMany(Instructor::class,'ID_Usuario');
+    public function instructores(){
+        return $this->hasMany(Instructor::class, 'CIF_Empresa', 'CIF');
     }
 }

@@ -7,10 +7,48 @@ use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
 {
+<<<<<<< HEAD
 
     private function validateRequest(Request $req) {
 
         return $req->validate([
+=======
+public function getInstructores($cif)
+{
+    $empresa = Empresa::where('CIF', $cif)->firstOrFail();
+
+    $instructores = $empresa->instructores()
+        ->whereNotNull('ID_Usuario') // asegurarse de que tengan usuario
+        ->with('user:id,nombre,apellidos') // carga el usuario
+        ->get()
+        ->filter(fn($i) => $i->user !== null); // opcional, por seguridad
+
+    return response()->json([
+        'data' => $instructores
+    ]);
+}
+
+
+
+
+
+    public function index(){
+        // Traemos todas las empresas con solo los campos necesarios
+        $empresas = Empresa::all(['CIF', 'Nombre']);
+
+        // Retornamos en formato JSON
+        return response()->json([
+            'data' => $empresas
+        ]);
+    }
+
+
+
+
+    public function create(Request $req)
+    {
+        $data = $req->validate([
+>>>>>>> d6bed55349d0cd731c6497486a5270d6720104ad
             'Nombre' => 'required|string|max:255',
             'Direccion' => 'nullable|string|max:255',
             'CIF' => ['required', 'string', 'max:20', 'unique:empresa,CIF'],
@@ -67,4 +105,5 @@ class EmpresaController extends Controller
 
         return response()->json($data, 201);
     }
+
 }

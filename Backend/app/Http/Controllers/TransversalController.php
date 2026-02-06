@@ -50,6 +50,7 @@ class TransversalController extends Controller
      * Actualizar nota de transversal para un alumno
      * PUT /api/alumnos/{idAlumno}/transversales/{transversalId}/nota
      */
+
     public function actualizarNotaTransversal(Request $request, $idAlumno, $transversalId)
     {
         // Verificar autorización
@@ -149,6 +150,15 @@ class TransversalController extends Controller
             'message' => 'Transversal actualizada correctamente',
             'transversal' => $transversal
         ]);
+    }
+    public function update(Request $request, $id) {
+        $request->validate(['nota' => 'required|numeric|min:0|max:10']);
+
+        // Actualiza TODOS los registros de ese alumno
+        // Si tu base de datos usa minúsculas, cambia el controlador a:
+        NotaTransversal::where('id_alumno', $id)->update(['nota' => $request->nota]);
+
+        return response()->json(['message' => 'Notas transversales actualizadas']);
     }
 
     /**

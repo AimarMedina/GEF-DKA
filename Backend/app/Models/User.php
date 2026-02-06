@@ -74,7 +74,6 @@ class User extends Authenticatable
         //          default      => null,
         //      };
         //  });
-
     }
 
     public function alumno(){

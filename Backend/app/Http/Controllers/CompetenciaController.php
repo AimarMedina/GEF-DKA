@@ -28,4 +28,10 @@ class CompetenciaController extends Controller
         $competencia->delete();
         return response()-> json(['message'=> "Competencia eliminada correctamente"]);
     }
+    public function index()
+    {
+        $competencia = Competencia::all();
+        return response()->json($competencia);
+    }
+
 }

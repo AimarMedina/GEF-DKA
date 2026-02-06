@@ -39,6 +39,12 @@ class GradoController extends Controller
 
         return response()->json($grados);
     }
+    public function getGradosSinPaginar(Request $request){
+
+        $grados = Grado::all(); 
+
+        return response()->json($grados, 200);
+    }
 
     /**
      * Crear un nuevo grado
