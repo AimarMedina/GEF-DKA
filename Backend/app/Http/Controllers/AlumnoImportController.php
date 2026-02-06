@@ -218,12 +218,12 @@ class AlumnoImportController extends Controller {
         $grado = Grado::where('Nombre', $datos['clase'])->first();
 
         // Crear Alumno
-        /* Alumno::create([
-            'ID_Usuario' => $usuario->ID,
-            'ID_Grado' => $grado ? $grado->ID : null,
+        Alumno::create([
+            'ID_Usuario' => $usuario->id,
+            'ID_Grado' => $grado ? $grado->id : null,
             'ID_Tutor' => null,
             'ID_Instructor' => null
-        ]); */
+        ]);
     }
 
     /**
