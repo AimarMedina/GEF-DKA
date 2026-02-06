@@ -1,103 +1,130 @@
-import {ref} from 'vue';
-import {defineStore} from 'pinia';
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
 import api from '../services/api.js';
 
 export const useUsersStore = defineStore('users', () => {
-  const users = ref([])
-  const currentPage = ref(1)
-  const totalPages = ref(1)
-  const perPage = ref(5)
-  const currentUser = ref(null)
+  const users = ref([]);
+  const currentPage = ref(1);
+  const totalPages = ref(1);
+  const perPage = ref(5);
+  const currentUser = ref(null);
 
+  // -----------------------
+  // CACHE
+  // -----------------------
   function getCacheKey(page, filters) {
-    // en caso de que los filtros vengan con grado lo guarda para crear la cache key, en otro caso se guarda como 'grado__search..'
-    const grado = filters.tipo === 'alumno' ? filters.id_grado || '' : ''
-    return `users_page_${page}_tipo_${filters.tipo || ''}_grado_${grado}_search_${filters.search || ''}`
+    const grado = filters.tipo === 'alumno' ? filters.id_grado || '' : '';
+    return `users_page_${page}_tipo_${filters.tipo || ''}_grado_${grado}_search_${filters.search || ''}`;
   }
 
-  async function fetchUsers(page = 1, filters = {}) {
-    currentPage.value = page
-    const cacheKey = getCacheKey(page, filters)
+  function removeUserFromCache(userId) {
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (!key || !key.startsWith('users_page_')) continue;
 
+      try {
+        const parsed = JSON.parse(sessionStorage.getItem(key));
+        if (parsed?.users) {
+          const filteredUsers = parsed.users.filter(u => u.id !== userId);
+          if (filteredUsers.length !== parsed.users.length) {
+            if (filteredUsers.length > 0) {
+              sessionStorage.setItem(key, JSON.stringify({ ...parsed, users: filteredUsers }));
+            } else {
+              sessionStorage.removeItem(key);
+            }
+          }
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  // -----------------------
+  // FETCH USUARIOS
+  // -----------------------
+  async function fetchUsers(page = 1, filters = {}) {
+    currentPage.value = page;
+    const cacheKey = getCacheKey(page, filters);
+
+    // Usar cache si existe
     if (sessionStorage.getItem(cacheKey)) {
-        const parsed = JSON.parse(sessionStorage.getItem(cacheKey))
-        users.value = parsed.users
-        totalPages.value = parsed.totalPages
-        return
+      const parsed = JSON.parse(sessionStorage.getItem(cacheKey));
+      users.value = parsed.users;
+      totalPages.value = parsed.totalPages;
+      return;
     }
 
-    const response = await api.get('/api/users', {  
-    //    Mira si tiene que mandar un body con id_grado o nada en base a si es alumno el usuario (ya que profe se buscan todos o x nombre)
-        params: {
-            page,
-            per_page: perPage.value,
-            tipo: filters.tipo,
-            ...(filters.tipo === 'alumno' && filters.id_grado
-            ? { id_grado: filters.id_grado }
-            : {}),
-            search: filters.search
-        }
+    // Llamada a API
+    const response = await api.get('/api/users', {
+      params: {
+        page,
+        per_page: perPage.value,
+        tipo: filters.tipo,
+        ...(filters.tipo === 'alumno' && filters.id_grado ? { id_grado: filters.id_grado } : {}),
+        search: filters.search
+      }
     });
 
     const userResponse = response.data.data.data || [];
     const lastPage = response.data.data.last_page;
 
-    users.value = userResponse
-    totalPages.value = lastPage
+    users.value = userResponse;
+    totalPages.value = lastPage;
 
+    // Guardar en cache
     sessionStorage.setItem(
-        cacheKey,
-        JSON.stringify({ users: userResponse, totalPages: lastPage })
-    )
+      cacheKey,
+      JSON.stringify({ users: userResponse, totalPages: lastPage })
+    );
   }
 
+  // -----------------------
+  // GUARDAR USUARIO
+  // -----------------------
   async function guardarUsuario(data, filters = {}) {
     try {
-        if(data.id){
-            await api.put(`/api/users/${data.id}`, data)
-                alert('Usuario actualizado correctamente')
-        } else {
-            await api.post(`/api/users`, data)
-                alert('Usuario creado correctamente')
-        }
+      if (data.id) {
+        await api.put(`/api/users/${data.id}`, data);
+        alert('Usuario actualizado correctamente');
+      } else {
+        await api.post(`/api/users`, data);
+        alert('Usuario creado correctamente');
+      }
 
-        // Limpiar cache de la página actual
-        const cacheKey = getCacheKey(currentPage.value, props.filters)
-        sessionStorage.removeItem(cacheKey)
+      // Limpiar cache del usuario modificado
+      removeUserFromCache(data.id);
 
-        // Refrescar usuarios
-        await fetchUsers(currentPage.value, props.filters)
-
-        cerrarModalUsuario()
+      // Refrescar usuarios
+      await fetchUsers(currentPage.value, filters);
     } catch (e) {
-        console.error(e)
-        alert('Error al guardar usuario')
+      console.error(e);
+      alert('Error al guardar usuario');
     }
+  }
+
+  // -----------------------
+  // ELIMINAR USUARIO
+  // -----------------------
+  async function handleConfirmDelete(confirm, filters = {}) {
+    if (!confirm || !currentUser.value) return;
+
+    try {
+      await api.delete(`/api/users/${currentUser.value.id}`);
+
+      // Limpiar cache del usuario eliminado
+      removeUserFromCache(currentUser.value.id);
+
+      await fetchUsers(currentPage.value, filters);
+
+      alert('Usuario eliminado correctamente');
+    } catch (e) {
+      console.error(e);
+      alert('Error al eliminar usuario');
+    } finally {
+      currentUser.value = null;
     }
+  }
 
-    async function handleConfirmDelete(confirm) {
-        if (!confirm || !currentUser.value) return
-        
-        console.log(currentUser.value);
-
-        try {
-            await api.delete(`/api/users/${currentUser.value.id}`)
-
-            const cacheKey = getCacheKey(currentPage.value, props.filters)
-            sessionStorage.removeItem(cacheKey)
-
-            await fetchUsers(currentPage.value, props.filters)
-
-            alert('Usuario eliminado correctamente')
-        } catch (e) {
-            console.error(e)
-            alert('Error al eliminar usuario')
-        } finally {
-            mostrarConfirmarModal.value = false
-            currentUser.value = null
-        }
-    }
-
-
-  return { users, currentPage, totalPages, perPage, currentUser, fetchUsers, guardarUsuario, handleConfirmDelete, getCacheKey };
-})
+  return { users, currentPage, totalPages, perPage, currentUser, fetchUsers, guardarUsuario, handleConfirmDelete, getCacheKey, removeUserFromCache };
+});
