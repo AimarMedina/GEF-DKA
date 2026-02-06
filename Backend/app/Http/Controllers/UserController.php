@@ -25,8 +25,11 @@ class UserController extends Controller
 
             // Añadimos la propiedad al objeto usuario para el frontend
             $user->es_tutor = $existe;
+        } else {
+            // Si no es tutor (es alumno, admin, etc), por defecto false (o lo que prefieras)
+            $user->es_tutor = false;
         }
-        return $user ?? false;
+        return $user;
     }
 
     public function auth(Request $req)

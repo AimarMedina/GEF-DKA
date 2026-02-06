@@ -1,29 +1,133 @@
+<template>
+  <div>
+    <!-- TABLA -->
+    <table class="table table-striped align-middle">
+      <thead class="d-flexk justify-content-between">
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Tipo</th>
+          <th v-if="filters?.tipo === 'instructor'">Empresa</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody v-if="users.length > 0">
+        <tr v-for="user in users" :key="user.id">
+          <td>{{ user.nombre }} {{ user.apellidos }}</td>
+          <td>{{ user.email }}</td>
+
+          <td>
+            <span class="badge bg-secondary">{{ user.tipo }}</span>
+          </td>
+
+          <td v-if="filters?.tipo === 'instructor'">
+            {{ user.instructor?.empresa?.Nombre ?? 'Sin empresa' }}
+          </td>
+
+          <td class="d-flex gap-1">
+            <button
+              class="btn btn-outline-indigo btn-sm"
+              @click="abrirEditar(user)"
+            >
+              Modificar
+            </button>
+
+            <button
+              class="btn btn-danger btn-sm"
+              @click="abrirEliminar(user)"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div v-if="users.length === 0" class="text-center text-secondary my-3">
+      No hay usuarios en el grado
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <nav v-if="totalPages > 1">
+      <ul class="pagination">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <button
+            class="page-link"
+            @click="cambiarPagina(currentPage - 1)"
+            :disabled="currentPage === 1"
+          >
+            Anterior
+          </button>
+        </li>
+
+        <li
+          class="page-item"
+          v-for="page in totalPages"
+          :key="page"
+          :class="{ active: currentPage === page }"
+        >
+          <button
+            class="page-link"
+            @click="cambiarPagina(page)"
+          >
+            {{ page }}
+          </button>
+        </li>
+
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <button
+            class="page-link"
+            @click="cambiarPagina(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+          >
+            Siguiente
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- MODALES -->
+    <ConfirmarEliminar
+      :show="mostrarConfirmarModal"
+      mensaje="¿Estás seguro de eliminar este usuario?"
+      @confirm="handleConfirmDelete"
+      @close="mostrarConfirmarModal = false"
+    />
+
+    <FormularioUsuario
+      :show="mostrarModalUsuario"
+      :tipo="tipoModal"
+      :id_grado="idGradoModal"
+      :usuario="usuarioEditar"
+      @close="cerrarModalUsuario"
+      @crear="usersStore.guardarUsuario($data, props.filters)"
+    />
+  </div>
+</template>
+
+
 <script setup>
-import { ref, watch } from "vue";
-import api from '@/services/api.js'
+import { ref, watch } from 'vue'
+import { useUsersStore } from '@/stores/users.store'
+import { storeToRefs } from 'pinia'
 import ConfirmarEliminar from './ConfirmarEliminar.vue'
 import FormularioUsuario from './FormularioUsuario.vue'
-import { useUsersStore } from "@/stores/users.store.js";
-import { storeToRefs } from "pinia";
 
 const props = defineProps({
   filters: Object
-});
+})
 
-const usersStore = useUsersStore();
-const { users, currentPage, totalPages } = storeToRefs(usersStore);
+const usersStore = useUsersStore()
 
-// Variables de modales
+const { users, currentPage, totalPages, currentUser } = storeToRefs(usersStore)
 const mostrarConfirmarModal = ref(false)
-const currentUser = ref(null)
 const mostrarModalUsuario = ref(false)
 const usuarioEditar = ref(null)
 const tipoModal = ref('')
 const idGradoModal = ref(false)
 
-// -----------------------
-// WATCHERS
-// -----------------------
+// Contruye los filtros para mandarlo como consulta a backend
 watch(
   () => props.filters,
   (newFilters) => {
@@ -36,11 +140,8 @@ watch(
     usersStore.fetchUsers(1, newFilters)
   },
   { deep: true, immediate: true }
-);
+)
 
-// -----------------------
-// FUNCIONES MODALES
-// -----------------------
 function abrirEditar(user) {
   usuarioEditar.value = user
   tipoModal.value = user.tipo
@@ -48,56 +149,27 @@ function abrirEditar(user) {
   mostrarModalUsuario.value = true
 }
 
+function abrirEliminar(user) {
+  currentUser.value = user
+  mostrarConfirmarModal.value = true
+}
+
 function cerrarModalUsuario() {
   mostrarModalUsuario.value = false
   usuarioEditar.value = null
 }
 
-// -----------------------
-// GUARDAR USUARIO
-// -----------------------
-async function guardarUsuario(data) {
-  try {
-    if(data.id){
-      await api.put(`/api/users/${data.id}`, data)
-      alert('Usuario actualizado correctamente')
-    } else {
-      await api.post(`/api/users`, data)
-      alert('Usuario creado correctamente')
-    }
-
-    // Limpiar cache de la página actual
-    const cacheKey = usersStore.getCacheKey(currentPage.value, props.filters)
-    sessionStorage.removeItem(cacheKey)
-
-    // Refrescar usuarios
-    await usersStore.fetchUsers(currentPage.value, props.filters)
-
-    cerrarModalUsuario()
-  } catch (e) {
-    console.error(e)
-    alert('Error al guardar usuario')
-  }
+function cambiarPagina(page) {
+  if (page < 1 || page > totalPages.value) return
+  usersStore.fetchUsers(page, props.filters)
 }
+
 
 async function handleConfirmDelete(confirm) {
   if (!confirm || !currentUser.value) return
 
-  try {
-    await api.delete(`/api/users/${currentUser.value.id}`)
-
-    const cacheKey = usersStore.getCacheKey(currentPage.value, props.filters)
-    sessionStorage.removeItem(cacheKey)
-
-    await usersStore.fetchUsers(currentPage.value, props.filters)
-
-    alert('Usuario eliminado correctamente')
-  } catch (e) {
-    console.error(e)
-    alert('Error al eliminar usuario')
-  } finally {
-    mostrarConfirmarModal.value = false
-    currentUser.value = null
-  }
+  await usersStore.handleConfirmDelete(currentUser.value, props.filters)
+  mostrarConfirmarModal.value = false
+  currentUser.value = null
 }
 </script>
