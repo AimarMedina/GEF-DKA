@@ -34,6 +34,29 @@ class NotasEmpresaController extends Controller
         return $alumno;
     }
 
+    public function storeUpdate(Request $request, $idAlumno, $idCompetencia) {
+        $request->validate([
+            'nota' => 'required|numeric|min:0|max:4'
+        ]);
+
+        // updateOrCreate recibe dos arrays:
+        // 1. Los campos para buscar el registro (la "clave" única)
+        // 2. Los campos que quieres actualizar o añadir si se crea de cero
+        $nota = NotaCompetencia::updateOrCreate(
+            [
+                'id_alumno' => $idAlumno,
+                'id_tecnica' => $idCompetencia // O el nombre exacto de tu columna en la BD
+            ],
+            [
+                'nota' => $request->nota
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Nota técnica procesada correctamente',
+            'data' => $nota
+        ]);
+    }
     /**
      * GET /api/alumnos/{id}/notas
      * Muestra las competencias y las notas actuales.

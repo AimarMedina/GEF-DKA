@@ -48,6 +48,7 @@ class TransversalController extends Controller
      * Actualizar nota de transversal para un alumno
      * PUT /api/alumnos/{idAlumno}/transversales/{transversalId}/nota
      */
+    
     public function actualizarNotaTransversal(Request $request, $idAlumno, $transversalId)
     {
         // Verificar autorización
