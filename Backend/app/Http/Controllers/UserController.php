@@ -25,11 +25,8 @@ class UserController extends Controller
 
             // Añadimos la propiedad al objeto usuario para el frontend
             $user->es_tutor = $existe;
-        } else {
-            // Si no es tutor (es alumno, admin, etc), por defecto false (o lo que prefieras)
-            $user->es_tutor = false;
         }
-        return $user;
+        return $user ?? false;
     }
 
     public function auth(Request $req)
@@ -48,9 +45,8 @@ class UserController extends Controller
             'user' => $userAuth
         ]);
     }
-    public function getUser($id)
-    {
-        return User::find($id);
+    public function getUser($id){
+        return User::findofFail($id);
     }
 
     public function login(Request $req)
@@ -64,7 +60,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Credenciales inválidas',
-            ], 200);
+            ], 403);
         }
 
         $user = Auth::user();
