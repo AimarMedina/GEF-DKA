@@ -43,8 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
 | Empresas
 |--------------------------------------------------------------------------
 */
-    Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
+    Route::get('/empresas', [EmpresaController::class, 'index']);
     Route::post('/empresa/create', [EmpresaController::class, 'create']);
+    Route::get('/empresa/{cif}/instructores', [EmpresaController::class, 'getInstructores']);
+
 
     /*
 |--------------------------------------------------------------------------
@@ -52,7 +54,6 @@ Route::middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
 Route::post('/empresa/instructor/create', [InstructorController::class, 'crearInstructor']);
 Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor'])->middleware('auth:sanctum');
 Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, 'asignarInstructor'])->middleware('auth:sanctum');
@@ -80,6 +81,7 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::post('/nota-cuaderno', [NotaCuadernoController::class, 'notaCuaderno']);
     Route::post('/observacionesCuadernoAlumno', [NotaCuadernoController::class, 'observacionesCuadernoAlumno']);
     Route::get('/grados', [GradoController::class, 'getGrados']);
+    Route::get('/grados2', [GradoController::class, 'getGradosSinPaginar']);
     Route::get('/alumno/entregas/descargar/{id}', [AlumnoEntregaController::class, 'descargarCuaderno']);
 
 
@@ -123,6 +125,11 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
 |--------------------------------------------------------------------------
 */
     // Notas de alumno
+    Route::get('/competencias', [CompetenciaController::class, 'index']);
+    Route::post('/alumno/{idAlumno}/notaTec/{idCompetencia}', [NotasEmpresaController::class, 'storeUpdate']);
+    Route::post('alumno/{id}/notaTrans', [TransversalController::class, 'update']);
+    Route::post('alumno/{id}/notaTec', [NotasEmpresaController::class, 'update']);
+    Route::post('alumno/{id}/notaCuad', [NotaCuadernoController::class, 'update']);
     Route::get('/alumno/{id}/mis-notas', [AlumnoController::class, 'misNotas']);
     Route::get('/alumno/{id}/mis-notasAlumno', [AlumnoController::class, 'misNotasAlumno']);
     Route::post('/alumnos/{idAlumno}/nota-egibide', [AlumnoController::class, 'guardarNotaEgibide']);
@@ -199,4 +206,5 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::post('/transversales', [TransversalController::class, 'crearTransversal']);
     Route::put('/transversales/{id}', [TransversalController::class, 'actualizarTransversal']);
     Route::delete('/transversales/{id}', [TransversalController::class, 'eliminarTransversal']);
+
 });

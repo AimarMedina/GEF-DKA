@@ -64,12 +64,22 @@ watch(() => props.show, val => {
   }
 })
 
+// Cambia esto en tu watch de CIF_Empresa
 watch(() => nuevaEstancia.value.CIF_Empresa, async cif => {
-  if(!cif) return
+  if(!cif) {
+    instructores.value = []
+    return
+  }
 
-  const res = await api.get(`/api/empresa/${cif}/instructores`)
-  instructores.value = res.data || []
-  console.log(instructores.value);
+  try {
+    const res = await api.get(`/api/empresa/${cif}/instructores`)
+    // Laravel devuelve { data: [...] }, Axios lo mete en res.data
+    // Por tanto, los instructores están en res.data.data
+    instructores.value = res.data.data || []
+  } catch (error) {
+    console.error("Error cargando instructores:", error)
+    instructores.value = []
+  }
 })
 
 async function crearEstancia(){

@@ -58,6 +58,28 @@ class NotaCuadernoController extends Controller
             'data' => $nota
         ]);
     }
+    public function update(Request $request, $id) {
+        // 1. Validamos que la nota sea numérica del 0 al 10
+        $request->validate([
+            'nota' => 'required|numeric|min:0|max:10'
+        ]);
+
+        // 2. Buscamos por ID_Alumno. 
+        // Si existe, actualiza 'Nota' y 'Fecha'.
+        // Si no existe, crea una fila nueva con todo.
+        $nota = notaCuaderno::updateOrCreate(
+            ['ID_Alumno' => $id], 
+            [
+                'Nota'  => $request->nota, // Directo, sin proporción
+                'Fecha' => now()->format('Y-m-d')
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Nota de cuaderno guardada correctamente',
+            'data' => $nota
+        ]);
+    }
 
 
     public function notasPorTutor($tutorId)
