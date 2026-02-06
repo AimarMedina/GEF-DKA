@@ -9,7 +9,7 @@
      <BuscadorSelect
         v-model="gradoSeleccionado"
         :options="grados"
-        label-key="nombre"
+        label-key="label"
         value-key="id"
         placeholder="Buscar grado..."
         @change="cargarMatriz"
@@ -58,7 +58,6 @@
 
                 <!-- Estado normal -->
                 <span v-else-if="tieneCompetencia(ra, comp.id)">
-                  ✓
                 </span>
               </td>
 
@@ -151,9 +150,13 @@ async function toggleCompRa(asig, ra, comp) {
   }
 }
 
-onMounted(async () => {
-  const { data } = await api.get('/api/grados')
-  grados.value = data.data
+  onMounted(async () => {
+  const { data } = await api.get('/api/gradosTodos')
+
+  grados.value = data.map(g => ({
+    ...g,
+    label: `${g.nombre} (${g.curso})`
+  }))
 })
 
 

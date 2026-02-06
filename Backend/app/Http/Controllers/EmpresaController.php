@@ -11,8 +11,6 @@ class EmpresaController extends Controller
     {
         $q = trim((string) $req->query('q', ''));
 
-        $perPage = $req->query('per_page', 5); 
-
         $query = Empresa::query();
 
         if ($q !== '') {
@@ -25,7 +23,7 @@ class EmpresaController extends Controller
             });
         }
         
-        $empresas = $query->paginate($perPage);
+        $empresas = $query->paginate(5);
         
         return response()->json($empresas);
     }
