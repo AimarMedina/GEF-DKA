@@ -5,9 +5,15 @@ import { useNotasStore } from "@/stores/notas.js";
 
 const notasStore = useNotasStore();
 const notaInput = ref('');
-const datosModal = ref({ idAlumno: null, titulo: '', callback: null });
-const transversalSeleccionada = ref(''); // Para guardar el ID del select
+// datosModal ahora incluye el tipo: 'tec' | 'trans' | null
+const datosModal = ref({ idAlumno: null, titulo: '', callback: null, tipo: null });
+const transversalSeleccionada = ref(''); // Para guardar el ID del select (solo para transversales)
 const listaTransversales = ref([]); // Para las opciones del select
+// Estado para competencias técnicas y modal específico
+const datosModalTecnica = ref({ idAlumno: null, titulo: '' });
+const tecnicaSeleccionada = ref('');
+const listaTecnicas = ref([]);
+const notaInputTecnica = ref('');
 // Estados
 const alumnos = ref([]);
 const asignaturas = ref([]);
@@ -65,32 +71,90 @@ const fetchDatosGrado = async (page = 1, loadingGlobal = true) => {
 };
 const cargarTransversales = async () => {
     try {
-        const response = await api.get('/api/competencias');
+        const response = await api.get('/api/transversales');
         listaTransversales.value = response.data;
     } catch (error) {
         console.error("Error cargando transversales:", error);
     }
 };
+const cargarTecnicas = async () => {
+    try {
+        const response = await api.get('/api/competencias');
+        listaTecnicas.value = response.data;
+    } catch (error) {
+        console.error("Error cargando técnicas:", error);
+    }
+};
 
 // Llamamos a la carga al iniciar
-onMounted(cargarTransversales);
+onMounted(() => {
+  cargarTransversales();
+  cargarTecnicas();
+});
 // Función genérica para abrir el Pop-up
-const mostrarModalNota = (idAlumno, titulo, funcionCallback) => {
-  datosModal.value = { idAlumno, titulo, callback: funcionCallback };
+// tipo: 'tec' | 'trans'
+const mostrarModalNota = (idAlumno, titulo, funcionCallback, tipo = null) => {
+  datosModal.value = { idAlumno, titulo, callback: funcionCallback, tipo };
   notaInput.value = ''; // Resetear el input
-  
+
+  // Si abrimos para técnica, limpiamos selección de transversal
+  if (tipo !== 'trans') transversalSeleccionada.value = '';
+
   // Esto abre el modal de Bootstrap sin importar librerías raras
   const modal = new bootstrap.Modal(document.getElementById('modalNotaBootstrap'));
   modal.show();
 };
+const mostrarModalTecnica = (idAlumno, titulo) => {
+  datosModalTecnica.value = { idAlumno, titulo };
+  notaInputTecnica.value = ''; // Resetear el input
+  tecnicaSeleccionada.value = ''; // Resetear selección de técnica
+
+  const modal = new bootstrap.Modal(document.getElementById('modalTecnicaBootstrap'));
+  modal.show();
+};
+
+
 const confirmarGuardar = async () => {
   // Cerramos el modal buscando su instancia
   const modalElement = document.getElementById('modalNotaBootstrap');
   const modal = bootstrap.Modal.getInstance(modalElement);
-  
-  // Ejecutamos tu función (actualizarNotaTec o actualizarNotaTrans)
-  await datosModal.value.callback(datosModal.value.idAlumno, notaInput.value);
-  
+
+  if (datosModal.value.tipo === 'trans') {
+    // Validación: asegurarnos de que se haya seleccionado una competencia
+    if (!transversalSeleccionada.value) {
+      alert('Selecciona una competencia antes de guardar.');
+      return;
+    }
+
+    // Guardar nota transversal con la competencia seleccionada
+    await actualizatrans(datosModal.value.idAlumno, notaInput.value, transversalSeleccionada.value);
+
+    // Reset select
+    transversalSeleccionada.value = '';
+  } else {
+    // Por defecto guardamos como técnica
+    await actualizarNotaTec(datosModal.value.idAlumno, notaInput.value);
+  }
+
+  // Resetear campo de nota y cerrar modal
+  notaInput.value = '';
+  modal.hide();
+};
+const confirmarGuardarTecnica = async () => {
+  const modalElement = document.getElementById('modalTecnicaBootstrap');
+  const modal = bootstrap.Modal.getInstance(modalElement);
+
+  // Validación: asegurarnos de que se haya seleccionado una competencia técnica
+  if (!tecnicaSeleccionada.value) {
+    alert('Selecciona una competencia técnica antes de guardar.');
+    return;
+  }
+
+  await actualizatec(datosModalTecnica.value.idAlumno, notaInputTecnica.value, tecnicaSeleccionada.value);
+
+  // Resetear campo de nota y cerrar modal
+  notaInputTecnica.value = '';
+  tecnicaSeleccionada.value = '';
   modal.hide();
 };
 
@@ -152,11 +216,44 @@ const actualizarNotacuad = async (idAlumno, nuevaNota) => {
       // Si el error es 404, es que no existe la fila en la BD para ese alumno
   }
 };
-const actualizatrans = async ()=>{
+const actualizatrans = async (idAlumno, nuevaNota, idTransversal) => {
+  if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
+    alert("Introduce una nota entre 0 y 10");
+    return;
+  }
+  // Convertimos la nota de base 10 a base 4
+  // Ejemplo: un 5 se convierte en 2, un 10 en 4.
+  const notaProporcional = (parseFloat(nuevaNota) * 4) / 10;
+  
+  try {
+      await api.post(`/api/alumnos/${idAlumno}/transversales/${idTransversal}/nota`, {
+          nota: notaProporcional
+        // Enviamos el valor ya convertido
+      });
+      await fetchDatosGrado(currentPage.value, false);
+  } catch (error) {
+      console.error("Error al guardar:", error.response?.data);
+  }
 
 }
-const actualizatec = async ()=>{
+const actualizatec = async (idAlumno, nuevaNota, idTecnica) => {
+  if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
+    alert("Introduce una nota entre 0 y 10");
+    return;
+  }
+  // Convertimos la nota de base 10 a base 4
+  // Ejemplo: un 5 se convierte en 2, un 10 en 4.
+  const notaProporcional = (parseFloat(nuevaNota) * 4) / 10;
   
+  try {
+      await api.post(`/api/alumno/${idAlumno}/notaTec/${idTecnica}`, {
+          nota: notaProporcional
+        // Enviamos el valor ya convertido
+      });
+      await fetchDatosGrado(currentPage.value, false);
+  } catch (error) {
+      console.error("Error al guardar:", error.response?.data);
+  }
 }
 
 // Función para obtener el estado de un alumno
@@ -363,13 +460,13 @@ onMounted(() => {
                             >
                           </td>
 
-                          <td class="text-center cursor-pointer" @click="mostrarModalNota(alumno.id, 'Nota Técnica', actualizarNotaTec)">
+                          <td class="text-center cursor-pointer" @click="mostrarModalTecnica(alumno.id, 'Nota Técnica')">
                             <span class="text-muted fst-italic">
                               {{ alumno.notas_calculadas?.[asig.id]?.tecnica ?? '-' }}
                             </span>
                             <i class="bi bi-pencil-square ms-1 small"></i> </td>
 
-                          <td class="text-center cursor-pointer" @click="mostrarModalNota(alumno.id, 'Nota Transversal', actualizarNotaTrans)">
+                          <td class="text-center cursor-pointer" @click="mostrarModalNota(alumno.id, 'Nota Transversal', actualizarNotaTrans, 'trans')">
                             <span class="text-muted fst-italic">
                               {{ alumno.notas_calculadas?.[asig.id]?.transversal ?? '-' }}
                             </span>
@@ -436,43 +533,57 @@ onMounted(() => {
     </div>
   </div>
   </div>
+
   <div class="modal fade" id="modalNotaBootstrap" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content shadow border-0">
-        
         <div class="modal-header bg-indigo text-white border-0">
           <h5 class="modal-title fw-bold">{{ datosModal.titulo }}</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-
         <div class="modal-body py-3">
-          <div class="mb-3">
+          <div class="mb-3" v-if="datosModal.tipo === 'trans'">
             <label class="form-label fw-semibold small">Competencia:</label>
             <select class="form-select shadow-sm" v-model="transversalSeleccionada">
               <option value="" disabled>Selecciona una...</option>
-              <option v-for="t in listaTransversales" :key="t.id" :value="t.id">
-                {{ t.descripcion }}
-              </option>
+              <option v-for="t in listaTransversales" :key="t.id" :value="t.id">{{ t.descripcion }}</option>
             </select>
           </div>
-
           <div class="mb-2 text-center">
             <label class="form-label fw-semibold small">Nota (0-10):</label>
-            <input 
-              type="text" 
-              class="form-control form-control-lg text-center shadow-sm" 
-              v-model="notaInput" 
-              placeholder="0.0"
-              @keyup.enter="confirmarGuardar"
-            >
+            <input type="number" class="form-control form-control-lg text-center" v-model="notaInput" @keyup.enter="confirmarGuardar" min="0" max="10">
           </div>
         </div>
-
         <div class="modal-footer bg-light border-0 justify-content-center">
           <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
           <button type="button" class="btn btn-indigo btn-sm px-4" @click="confirmarGuardar">Guardar</button>
         </div>
-        
+      </div>
+    </div>
+  </div> <div class="modal fade" id="modalTecnicaBootstrap" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content shadow border-0">
+        <div class="modal-header bg-indigo text-white border-0">
+          <h5 class="modal-title fw-bold">{{ datosModalTecnica.titulo }}</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Competencia técnica:</label>
+            <select class="form-select shadow-sm" v-model="tecnicaSeleccionada">
+              <option value="" disabled>Selecciona una...</option>
+              <option v-for="t in listaTecnicas" :key="t.id" :value="t.id">{{ t.descripcion }}</option>
+            </select>
+          </div>
+          <div class="mb-2 text-center">
+            <label class="form-label fw-semibold small">Nota (0-10):</label>
+            <input type="number" class="form-control form-control-lg text-center" v-model="notaInputTecnica" @keyup.enter="confirmarGuardarTecnica" min="0" max="10">
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-0 justify-content-center">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-indigo btn-sm px-4" @click="confirmarGuardarTecnica">Guardar</button>
+        </div>
       </div>
     </div>
   </div>
