@@ -203,6 +203,8 @@ Route::put('/alumnos/{idAlumno}/asignar-instructor', [AlumnoController::class, '
     Route::get('/transversales', [TransversalController::class, 'getTransversales']);
     Route::get('/transversales/alumno/{idAlumno}', [TransversalController::class, 'getTransversalesAlumno']);
     Route::put('/alumnos/{idAlumno}/transversales/{transversalId}/nota', [TransversalController::class, 'actualizarNotaTransversal']);
+    Route::post('/alumnos/{idAlumno}/transversales/{transversalId}/notaa', [TransversalController::class, 'storeUpdate']);
+
     Route::post('/transversales', [TransversalController::class, 'crearTransversal']);
     Route::put('/transversales/{id}', [TransversalController::class, 'actualizarTransversal']);
     Route::delete('/transversales/{id}', [TransversalController::class, 'eliminarTransversal']);

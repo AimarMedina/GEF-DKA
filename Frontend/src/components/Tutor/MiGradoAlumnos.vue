@@ -221,18 +221,23 @@ const actualizatrans = async (idAlumno, nuevaNota, idTransversal) => {
     alert("Introduce una nota entre 0 y 10");
     return;
   }
-  // Convertimos la nota de base 10 a base 4
-  // Ejemplo: un 5 se convierte en 2, un 10 en 4.
-  const notaProporcional = (parseFloat(nuevaNota) * 4) / 10;
-  
+
+  // Convertimos la nota de base 10 a base 4 y la redondeamos a entero (1-4)
+  const notaProporcionalFloat = (parseFloat(nuevaNota) * 4) / 10;
+  // Aseguramos entero entre 1 y 4 (si el usuario introduce 0 lo convertimos a 1 mínimamente)
+  let notaEntera = Math.round(notaProporcionalFloat);
+  if (notaEntera < 1) notaEntera = 1;
+  if (notaEntera > 4) notaEntera = 4;
+
   try {
-      await api.post(`/api/alumnos/${idAlumno}/transversales/${idTransversal}/nota`, {
-          nota: notaProporcional
-        // Enviamos el valor ya convertido
+      // El endpoint real espera PUT sobre /api/alumnos/{idAlumno}/transversales/{transversalId}/nota
+      await api.put(`/api/alumnos/${idAlumno}/transversales/${idTransversal}/nota`, {
+          nota: notaEntera
       });
+
       await fetchDatosGrado(currentPage.value, false);
   } catch (error) {
-      console.error("Error al guardar:", error.response?.data);
+      console.error("Error al guardar:", error.response?.data || error);
   }
 
 }
@@ -241,21 +246,35 @@ const actualizatec = async (idAlumno, nuevaNota, idTecnica) => {
     alert("Introduce una nota entre 0 y 10");
     return;
   }
-  // Convertimos la nota de base 10 a base 4
-  // Ejemplo: un 5 se convierte en 2, un 10 en 4.
+
   const notaProporcional = (parseFloat(nuevaNota) * 4) / 10;
   
   try {
       await api.post(`/api/alumno/${idAlumno}/notaTec/${idTecnica}`, {
           nota: notaProporcional
-        // Enviamos el valor ya convertido
       });
+
+      // --- SOLUCIÓN AL ERROR DE ACCESIBILIDAD ---
+      // Buscamos el modal por su ID y lo cerramos correctamente
+      const modalEl = document.getElementById('modalTecnicaBootstrap');
+      if (modalEl) {
+          const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+          modalInstance.hide();
+          
+          // Quitamos manualmente el "backdrop" (la capa oscura) si se queda pegada
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+          document.body.style.overflow = 'auto'; // Habilitar scroll de nuevo
+      }
+
       await fetchDatosGrado(currentPage.value, false);
+      alert("Nota guardada correctamente");
+
   } catch (error) {
-      console.error("Error al guardar:", error.response?.data);
+      console.error("Error al guardar:", error.response?.data || error);
+      alert("Error al guardar la nota en la base de datos");
   }
 }
-
 // Función para obtener el estado de un alumno
 const obtenerEstadoAlumno = (alumno) => {
   if (!alumno.notas_calculadas) {

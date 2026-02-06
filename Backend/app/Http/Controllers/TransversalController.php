@@ -50,6 +50,22 @@ class TransversalController extends Controller
      * Actualizar nota de transversal para un alumno
      * PUT /api/alumnos/{idAlumno}/transversales/{transversalId}/nota
      */
+    public function storeUpdate(Request $request, $idAlumno, $idCompetencia) {
+        $request->validate([
+            'nota' => 'required|numeric|min:0|max:10'
+        ]);
+
+        // IMPORTANTE: Las claves deben ser idénticas al $fillable del modelo
+        return NotaTransversal::updateOrCreate(
+            [
+                'ID_Alumno'      => $idAlumno,      
+                'ID_Transversal' => $idCompetencia   
+            ],
+            [
+                'Nota'           => $request->nota  
+            ]
+        );
+    }
 
     public function actualizarNotaTransversal(Request $request, $idAlumno, $transversalId)
     {
