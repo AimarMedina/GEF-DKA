@@ -9,6 +9,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\AlumnoEntregaController;
 use App\Http\Controllers\AlumnoImportController;
+use App\Http\Controllers\AsignacionImportController;
 use App\Http\Controllers\CompRaController;
 use App\Http\Controllers\EntregaCuadernoController;
 use App\Http\Controllers\EstanciaController;
@@ -210,4 +211,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/alumnos/importar', [AlumnoImportController::class, 'importar']);
     Route::post('/alumnos/vista-previa', [AlumnoImportController::class, 'vistaPrevia']);
+
+    /*
+|--------------------------------------------------------------------------
+| Admin Asignacion CSV
+|--------------------------------------------------------------------------
+*/
+
+    Route::post('/asignaciones/importar', [AsignacionImportController::class, 'importar']);
 });

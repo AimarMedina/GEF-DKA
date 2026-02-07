@@ -4,7 +4,6 @@ import UserCreationButtons from './UserCreationButtons.vue';
 import api from '@/services/api.js';
 import BuscadorSelect from './BuscadorSelect.vue';
 import Buscador from './Buscador.vue';
-import ImportarAlumnos from './Alumno/ImportarAlumnos.vue';
 const emit = defineEmits(['change']);
 
 const tipo = ref('NONE');
@@ -73,7 +72,6 @@ function actualizarBusqueda(texto) {
         <Buscador :tipo="'Buscar ' + tipo + '...'" @search="actualizarBusqueda" />
       </div>
       <UserCreationButtons :tipo="tipo" :grado="grado == '.' ? false : grado" />
-      <ImportarAlumnos v-if="tipo === 'alumno'" />
     </div>
   </div>
 </template>
