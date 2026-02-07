@@ -3,20 +3,29 @@
     <!-- Botón para abrir modal -->
     <button
       type="button"
-      class="btn btn-outline-primary"
+      class="btn p-0"
+      style="display: inline-block"
       data-bs-toggle="modal"
-      data-bs-target="#importarAlumnosModal"
+      data-bs-target="#importarAsignacionesModal"
     >
-      <i class="fas fa-file-import me-2"></i>
-      Importar Alumnos
+      <div
+        class="card h-100 border-0 shadow hover-scale overflow-hidden"
+        style="width: 350px; height: 350px"
+      >
+        <img
+          src="../../../public/images/Asignaciones.png"
+          class="card-img-top w-100 h-100 object-fit-cover"
+          alt="Asignacion"
+        />
+      </div>
     </button>
 
     <!-- Modal Bootstrap -->
     <div
       class="modal fade"
-      id="importarAlumnosModal"
+      id="importarAsignacionesModal"
       tabindex="-1"
-      aria-labelledby="importarAlumnosModalLabel"
+      aria-labelledby="importarAsignacionesModalLabel"
       aria-hidden="true"
       ref="modal"
     >
@@ -24,9 +33,9 @@
         <div class="modal-content">
           <!-- Header -->
           <div class="modal-header">
-            <h5 class="modal-title" id="importarAlumnosModalLabel">
-              <i class="fas fa-upload me-2"></i>
-              Importar Alumnos desde Excel
+            <h5 class="modal-title" id="importarAsignacionesModalLabel">
+              <i class="fas fa-file-csv me-2"></i>
+              Importar Asignaciones Profesor-Asignatura
             </h5>
             <button
               type="button"
@@ -43,12 +52,12 @@
               <input
                 type="file"
                 ref="fileInput"
-                accept=".xlsx,.xls"
+                accept=".csv"
                 @change="handleFileSelect"
                 class="form-control"
               />
               <small class="form-text text-muted">
-                Formatos aceptados: .xlsx, .xls (máx. 10MB)
+                Formato: CSV con separador punto y coma (;), encoding Latin-1
               </small>
             </div>
 
@@ -58,7 +67,7 @@
               class="alert alert-info d-flex align-items-center justify-content-between"
             >
               <div class="d-flex align-items-center">
-                <i class="fas fa-file-excel fa-2x me-3 text-success"></i>
+                <i class="fas fa-file-csv fa-2x me-3 text-primary"></i>
                 <div>
                   <strong>{{ archivo.name }}</strong>
                   <br />
@@ -74,20 +83,10 @@
             <div v-if="archivo" class="mb-4">
               <h6 class="mb-3">Opciones de Importación</h6>
 
-              <div class="form-check mb-2">
-                <input
-                  type="checkbox"
-                  id="crearGrados"
-                  v-model="opciones.crearGrados"
-                  class="form-check-input"
-                />
-                <label for="crearGrados" class="form-check-label">
-                  Crear grados automáticamente si no existen
-                </label>
-              </div>
-
               <div class="mb-3">
-                <label for="contraseñaDefecto" class="form-label">Contraseña por defecto:</label>
+                <label for="contraseñaDefecto" class="form-label">
+                  Contraseña por defecto para tutores:
+                </label>
                 <input
                   type="text"
                   id="contraseñaDefecto"
@@ -108,7 +107,9 @@
                   {{ progreso }}%
                 </div>
               </div>
-              <small class="text-muted mt-2 d-block">{{ mensajeProgreso }}</small>
+              <small class="text-muted mt-2 d-block">
+                {{ mensajeProgreso }}
+              </small>
             </div>
 
             <!-- Resultados -->
@@ -116,13 +117,28 @@
               <div class="alert" :class="alertClass">
                 <h6 class="alert-heading">
                   <i :class="alertIcon"></i>
-                  Importación {{ resultados.exito ? 'Completada' : 'Finalizada con Errores' }}
+                  Importación
+                  {{ resultados.exito ? 'Completada' : 'Finalizada con Errores' }}
                 </h6>
-                <p class="mb-0">
-                  Alumnos importados: <strong>{{ resultados.importados }}</strong>
+
+                <p class="mb-1">
+                  Registros procesados:
+                  <strong>{{ resultados.importados }}</strong>
                 </p>
-                <p v-if="resultados.errores.length > 0" class="mb-0">
-                  Errores: <strong>{{ resultados.errores.length }}</strong>
+
+                <div v-if="resultados.estadisticas" class="mt-2">
+                  <small>
+                    <strong>Creados:</strong>
+                    {{ resultados.estadisticas.tutores_creados }} tutores,
+                    {{ resultados.estadisticas.grados_creados }} grados,
+                    {{ resultados.estadisticas.asignaturas_creadas }} asignaturas,
+                    {{ resultados.estadisticas.asignaciones_creadas }} asignaciones
+                  </small>
+                </div>
+
+                <p v-if="resultados.errores.length > 0" class="mb-0 mt-2">
+                  Errores:
+                  <strong>{{ resultados.errores.length }}</strong>
                 </p>
               </div>
 
@@ -131,8 +147,9 @@
                 <h6>Detalles de Errores:</h6>
                 <ul class="mb-0" style="max-height: 200px; overflow-y: auto">
                   <li v-for="(error, index) in resultados.errores" :key="index">
-                    <strong>Fila {{ error.fila }}:</strong> {{ error.mensaje }}
-                    <small v-if="error.email" class="text-muted">({{ error.email }})</small>
+                    <strong v-if="error.fila"> Fila {{ error.fila }}: </strong>
+                    {{ error.mensaje }}
+                    <small v-if="error.profesor" class="text-muted"> ({{ error.profesor }}) </small>
                   </li>
                 </ul>
               </div>
@@ -149,6 +166,7 @@
             >
               Cerrar
             </button>
+
             <button
               v-if="archivo && !resultados"
               @click="procesarArchivo"
@@ -157,7 +175,7 @@
             >
               <span v-if="!procesando">
                 <i class="fas fa-upload me-2"></i>
-                Importar Alumnos
+                Importar Asignaciones
               </span>
               <span v-else>
                 <i class="fas fa-spinner fa-spin me-2"></i>
@@ -172,11 +190,11 @@
 </template>
 
 <script>
-import * as XLSX from 'xlsx';
 import api from '@/services/api.js';
 
 export default {
-  name: 'ImportarAlumnos',
+  name: 'ImportarAsignaciones',
+
   data() {
     return {
       archivo: null,
@@ -185,11 +203,11 @@ export default {
       mensajeProgreso: '',
       resultados: null,
       opciones: {
-        crearGrados: true,
-        contraseñaDefecto: 'Egibide2025',
+        contraseñaDefecto: '12345Abcde',
       },
     };
   },
+
   computed: {
     alertClass() {
       return this.resultados?.exito ? 'alert-success' : 'alert-warning';
@@ -200,6 +218,7 @@ export default {
         : 'fas fa-exclamation-triangle me-2';
     },
   },
+
   methods: {
     handleFileSelect(event) {
       const file = event.target.files[0];
@@ -208,22 +227,24 @@ export default {
         this.resultados = null;
       }
     },
+
     eliminarArchivo() {
       this.archivo = null;
       this.resultados = null;
       this.$refs.fileInput.value = '';
     },
+
     async procesarArchivo() {
       this.procesando = true;
       this.progreso = 0;
-      this.mensajeProgreso = 'Preparando importación...';
+      this.mensajeProgreso = 'Subiendo archivo...';
 
       const formData = new FormData();
       formData.append('archivo', this.archivo);
       formData.append('opciones', JSON.stringify(this.opciones));
 
       try {
-        const response = await api.post('/api/alumnos/importar', formData, {
+        const response = await api.post('/api/asignaciones/importar', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
           onUploadProgress: (progressEvent) => {
             this.progreso = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -232,11 +253,12 @@ export default {
 
         this.mensajeProgreso = 'Procesando datos...';
         this.progreso = 100;
-
         this.resultados = response.data;
 
         if (this.resultados.exito) {
-          this.$toast?.success(`${this.resultados.importados} alumnos importados correctamente`);
+          this.$toast?.success(
+            `${this.resultados.importados} asignaciones importadas correctamente`
+          );
         } else {
           this.$toast?.warning('Importación completada con algunos errores');
         }
@@ -251,6 +273,7 @@ export default {
         this.procesando = false;
       }
     },
+
     formatearTamaño(bytes) {
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
@@ -259,22 +282,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.table-responsive {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.table th {
-  position: sticky;
-  top: 0;
-  background: #f8f9fa;
-  z-index: 1;
-}
-
-.table-sm td,
-.table-sm th {
-  font-size: 0.875rem;
-}
-</style>
