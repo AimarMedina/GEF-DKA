@@ -7,6 +7,7 @@ use App\Models\Asignatura;
 use App\Models\NotaCuaderno;
 use App\Models\NotaEgibide;
 use App\Models\Alumno;
+use App\Models\Tutor;
 use Illuminate\Http\Request;
 
 class AlumnoController extends Controller {
@@ -108,18 +109,119 @@ class AlumnoController extends Controller {
             ];
         }
 
+    return response()->json([
+        'usuario' => $alumno->usuario,
+        'grado' => $grado,
+        'asignaturas' => $asignaturas,
+        'nota_cuaderno' => $notaCuaderno,
+        'notas_competencias' => $notasTecnicas,
+        'notas_transversales' => $notaTransversal,
+        'notas_egibide' => $notasEgibide,
+        'notas_calculadas' => $packNotas,
+    ]);
+}
+    public function alumnosSinAsignarParaTutor(Request $request)
+{
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['message' => 'No autenticado'], 401);
+    }
+
+    $tutor = Tutor::where('ID_Usuario', $user->id)->first();
+    if (!$tutor) {
+        return response()->json(['message' => 'Tutor no encontrado para este usuario'], 404);
+    }
+
+    $cursos = $tutor->grados()
+        ->select('Curso')
+        ->distinct()
+        ->pluck('Curso');
+
+    if ($cursos->isEmpty()) {
         return response()->json([
-            'usuario' => $alumno->usuario,
-            'grado' => $grado,
-            'asignaturas' => $asignaturas,
-            'nota_cuaderno' => $notaCuaderno,
-            'notas_competencias' => $notasTecnicas,
-            'notas_transversales' => $notaTransversal,
-            'notas_egibide' => $notasEgibide,
-            'notas_calculadas' => $packNotas,
+            'data' => [],
+            'current_page' => 1,
+            'last_page' => 1,
+            'per_page' => 5,
+            'total' => 0,
         ]);
     }
-    public function misNotas($id) {
+
+    $perPage = (int) $request->input('per_page', 5);
+    $perPage = max(1, min($perPage, 50));
+
+    $query = Alumno::query()
+        ->whereNull('ID_Tutor')
+        ->whereHas('grado', function ($q) use ($cursos) {
+            $q->whereIn('Curso', $cursos);
+        })
+        ->with(['usuario:id,nombre,apellidos', 'grado:id,Nombre,Curso', 'estanciaActual'])
+        ->orderBy('ID_Usuario', 'asc');
+
+    return response()->json($query->paginate($perPage));
+    }
+
+    public function asignarTutor(Request $request, $id){
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        // Verificamos que el usuario logueado es tutor (existe en tabla tutor)
+        $tutor = Tutor::where('ID_Usuario', $user->id)->first();
+        if (!$tutor) {
+            return response()->json(['message' => 'Tutor no encontrado para este usuario'], 404);
+        }
+
+        $alumno = Alumno::where('ID_Usuario', $id)->first();
+        if (!$alumno) {
+            return response()->json(['message' => 'Alumno no encontrado'], 404);
+        }
+
+        // Asignación REAL en BD
+        $alumno->ID_Tutor = $tutor->ID_Usuario;
+        $alumno->save();
+
+        // Devolvemos el alumno actualizado con relaciones para pintar bien
+        $alumno->load(['usuario:id,nombre,apellidos', 'grado:id,Nombre,Curso', 'estanciaActual']);
+
+        return response()->json($alumno);
+    }
+
+    public function desasignarTutor(Request $request, $id){
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        // Verificamos que el usuario logueado es tutor
+        $tutor = Tutor::where('ID_Usuario', $user->id)->first();
+        if (!$tutor) {
+            return response()->json(['message' => 'Tutor no encontrado para este usuario'], 404);
+        }
+
+        // Buscamos el alumno por su ID_Usuario
+        $alumno = Alumno::where('ID_Usuario', $id)->first();
+        if (!$alumno) {
+            return response()->json(['message' => 'Alumno no encontrado'], 404);
+        }
+
+        // Seguridad: solo puede desasignar si es SU alumno
+        if ((int)$alumno->ID_Tutor !== (int)$tutor->ID_Usuario) {
+            return response()->json(['message' => 'No puedes desasignar un alumno que no es tuyo'], 403);
+        }
+
+        // Desasignación REAL en BD
+        $alumno->ID_Tutor = null;
+        $alumno->save();
+
+        // Devolvemos el alumno actualizado con relaciones (para pintar bien)
+        $alumno->load(['usuario:id,nombre,apellidos', 'grado:id,Nombre,Curso', 'estanciaActual']);
+
+        return response()->json($alumno);
+    }
+    public function misNotas($id)
+    {
         if (!$id) {
             return response()->json([
                 'alumno' => null,

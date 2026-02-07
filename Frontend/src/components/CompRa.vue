@@ -58,7 +58,6 @@
 
                 <!-- Estado normal -->
                 <span v-else-if="tieneCompetencia(ra, comp.id)">
-                  ✓
                 </span>
               </td>
 

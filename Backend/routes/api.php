@@ -125,6 +125,9 @@ Route::middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
     // Notas de alumno
+    Route::put('/alumnos/{id}/desasignar-tutor', [AlumnoController::class, 'desasignarTutor']);
+    Route::put('/alumnos/{id}/asignar-tutor', [AlumnoController::class, 'asignarTutor']);
+    Route::get( '/tutor/alumnos-sin-asignar',[AlumnoController::class, 'alumnosSinAsignarParaTutor']);
     Route::get('/alumno/{id}/mis-notas', [AlumnoController::class, 'misNotas']);
     Route::get('/alumno/{id}/mis-notasAlumno', [AlumnoController::class, 'misNotasAlumno']);
     Route::post('/alumnos/{idAlumno}/nota-egibide', [AlumnoController::class, 'guardarNotaEgibide']);

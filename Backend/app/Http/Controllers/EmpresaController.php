@@ -23,7 +23,7 @@ class EmpresaController extends Controller
             });
         }
         
-        $empresas = $query->paginate($q);
+        $empresas = $query->paginate(5);
         
         return response()->json($empresas);
     }
