@@ -13,7 +13,7 @@ const id = userStore.user?.id
 const cargarNotas = async () => {
   loading.value = true
   try {
-    
+
     const res = await api.get(`/api/alumno/${id}/mis-notasAlumno`)
     notas.value = res.data || null
   } catch (err) {
