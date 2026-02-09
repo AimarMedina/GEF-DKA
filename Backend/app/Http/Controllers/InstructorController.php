@@ -7,20 +7,19 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class InstructorController extends Controller
-{
-    public function getCompanyInstructor($cif){
-        $instructores = Instructor::with('user')->where('CIF_Empresa',$cif)->get();
+class InstructorController extends Controller {
+    public function getCompanyInstructor($cif) {
+        $instructores = Instructor::with('user')->where('CIF_Empresa', $cif)->get();
         return response()->json($instructores);
     }
-     public function crearInstructor(Request $request)
-    {
+
+    public function crearInstructor(Request $request) {
         // Validamos los datos básicos
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
-            'email' => ['required','email','max:255','unique:users,email'],
-            'n_tel' => ['nullable','string','regex:/^[0-9]{9}$/','unique:users,n_tel'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/'],
             'password' => 'required|string|min:6',
             'CIF_Empresa' => 'required|string|exists:empresa,CIF',
         ], [
@@ -38,8 +37,6 @@ class InstructorController extends Controller
             'CIF_Empresa.exists' => 'La empresa seleccionada no existe.',
         ]);
 
-
-
         // Creamos el usuario
         $user = User::create([
             'nombre' => $data['nombre'],
@@ -48,6 +45,11 @@ class InstructorController extends Controller
             'n_tel' => $data['n_tel'] ?? null,
             'password' => Hash::make($data['password']),
             'tipo' => 'instructor',
+        ]);
+
+        // Creamos el instructor asociado
+        $instructor = $user->instructor()->create([
+            'CIF_Empresa' => $data['CIF_Empresa'],
         ]);
 
         $user->load('instructor');
@@ -63,7 +65,7 @@ class InstructorController extends Controller
 
         return response()->json([
             'message' => 'Instructor creado correctamente',
-            'instructor' => $user->instructor()->with('user')->first()
+            'instructor' => $user->instructor()->first()
         ], 201);
     }
 }
