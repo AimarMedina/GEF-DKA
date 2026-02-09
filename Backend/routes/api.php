@@ -20,6 +20,10 @@ use App\Http\Controllers\RaController;
 use App\Http\Controllers\CompetenciaController;
 use App\Http\Controllers\TransversalController;
 use App\Http\Controllers\UserImportController;
+use App\Http\Controllers\EmpresaImportController;
+use App\Http\Controllers\GradoImportController;
+use App\Http\Controllers\AlumnoImportController;
+use App\Http\Controllers\TeacherImportController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +51,38 @@ Route::middleware('auth:sanctum')->group(function () {
 */
     Route::get('/users/import/template', [UserImportController::class, 'downloadTemplate']);
     Route::post('/users/import', [UserImportController::class, 'import']);
+
+    /*
+|--------------------------------------------------------------------------
+| Empresa Import
+|--------------------------------------------------------------------------
+*/
+    Route::get('/empresas/import/template', [EmpresaImportController::class, 'downloadTemplate']);
+    Route::post('/empresas/import', [EmpresaImportController::class, 'import']);
+
+    /*
+|--------------------------------------------------------------------------
+| Grado Import
+|--------------------------------------------------------------------------
+*/
+    Route::get('/grados/import/template', [GradoImportController::class, 'downloadTemplate']);
+    Route::post('/grados/import', [GradoImportController::class, 'import']);
+
+    /*
+|--------------------------------------------------------------------------
+| Alumno Import
+|--------------------------------------------------------------------------
+*/
+    Route::get('/alumnos/import/template', [AlumnoImportController::class, 'downloadTemplate']);
+    Route::post('/alumnos/import', [AlumnoImportController::class, 'import']);
+
+    /*
+|--------------------------------------------------------------------------
+| Teacher (Tutor/Instructor) Import
+|--------------------------------------------------------------------------
+*/
+    Route::get('/teachers/import/template', [TeacherImportController::class, 'downloadTemplate']);
+    Route::post('/teachers/import', [TeacherImportController::class, 'import']);
 
     /*
 |--------------------------------------------------------------------------

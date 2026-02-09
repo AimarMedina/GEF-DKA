@@ -11,14 +11,13 @@ const emit = defineEmits(['close', 'success'])
 const file = ref(null)
 const loading = ref(false)
 const message = ref('')
-const messageType = ref('') // 'success' o 'error'
+const messageType = ref('')
 const importResult = ref(null)
 
-// Descargar plantilla
 async function descargarPlantilla() {
   try {
     loading.value = true
-    const response = await api.get('/api/users/import/template', {
+    const response = await api.get('/api/alumnos/import/template', {
       responseType: 'blob'
     })
     
@@ -26,7 +25,7 @@ async function descargarPlantilla() {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', `plantilla_usuarios_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `plantilla_alumnos_${new Date().toISOString().split('T')[0]}.csv`)
     document.body.appendChild(link)
     link.click()
     link.parentNode.removeChild(link)
@@ -39,13 +38,11 @@ async function descargarPlantilla() {
   }
 }
 
-// Seleccionar archivo
 function onFileSelected(event) {
   file.value = event.target.files[0]
 }
 
-// Importar usuarios
-async function importarUsuarios() {
+async function importarAlumnos() {
   if (!file.value) {
     message.value = 'Por favor selecciona un archivo CSV'
     messageType.value = 'error'
@@ -60,7 +57,7 @@ async function importarUsuarios() {
     const formData = new FormData()
     formData.append('file', file.value)
 
-    const response = await api.post('/api/users/import', formData, {
+    const response = await api.post('/api/alumnos/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -72,11 +69,9 @@ async function importarUsuarios() {
       messageType.value = 'success'
       file.value = null
       
-      // Resetear input file
-      const fileInput = document.getElementById('csvFileInput')
+      const fileInput = document.getElementById('csvFileInputAlumnos')
       if (fileInput) fileInput.value = ''
       
-      // Emitir evento de éxito para recargar tabla
       setTimeout(() => {
         emit('success')
       }, 1500)
@@ -92,27 +87,24 @@ async function importarUsuarios() {
   }
 }
 
-// Cerrar modal
 function cerrarModal() {
   file.value = null
   message.value = ''
   messageType.value = ''
   importResult.value = null
-  const fileInput = document.getElementById('csvFileInput')
+  const fileInput = document.getElementById('csvFileInputAlumnos')
   if (fileInput) fileInput.value = ''
   emit('close')
 }
 </script>
 
 <template>
-  <!-- Modal -->
   <div v-if="show" class="modal d-block" style="background-color: rgba(0, 0, 0, 0.5)">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <!-- Header -->
         <div class="modal-header">
           <h5 class="modal-title">
-            <i class="bi bi-upload"></i> Importar Usuarios
+            <i class="bi bi-people"></i> Importar Alumnos
           </h5>
           <button
             type="button"
@@ -122,9 +114,7 @@ function cerrarModal() {
           ></button>
         </div>
 
-        <!-- Body -->
         <div class="modal-body">
-          <!-- Mensaje -->
           <div
             v-if="message"
             :class="`alert alert-${messageType === 'success' ? 'success' : 'danger'} alert-dismissible fade show`"
@@ -139,20 +129,18 @@ function cerrarModal() {
             ></button>
           </div>
 
-          <!-- Resultado importación -->
           <div v-if="importResult" class="mb-3">
             <div class="alert alert-info">
               <strong>Resumen de importación:</strong>
               <ul class="mb-0 mt-2">
-                <li><strong>Total usuarios procesados:</strong> {{ importResult.created + importResult.failed }}</li>
-                <li><strong class="text-success">✓ Usuarios creados:</strong> {{ importResult.created }}</li>
+                <li><strong>Total alumnos procesados:</strong> {{ importResult.created + importResult.failed }}</li>
+                <li><strong class="text-success">✓ Alumnos creados:</strong> {{ importResult.created }}</li>
                 <li v-if="importResult.failed > 0" class="text-danger">
-                  <strong>✗ Usuarios fallidos:</strong> {{ importResult.failed }}
+                  <strong>✗ Alumnos fallidos:</strong> {{ importResult.failed }}
                 </li>
               </ul>
             </div>
 
-            <!-- Errores detallados -->
             <div v-if="importResult.errors && importResult.errors.length > 0" class="alert alert-warning">
               <strong>Errores encontrados:</strong>
               <ul class="mb-0 mt-2 small">
@@ -163,7 +151,6 @@ function cerrarModal() {
             </div>
           </div>
 
-          <!-- Sección de descarga -->
           <div class="card mb-3 bg-light">
             <div class="card-body">
               <h6 class="card-title mb-2">
@@ -180,22 +167,18 @@ function cerrarModal() {
             </div>
           </div>
 
-          <!-- Sección de carga -->
           <div class="card">
             <div class="card-body">
               <h6 class="card-title mb-2">
                 <i class="bi bi-upload"></i> 2. Subir Archivo CSV
               </h6>
               <p class="text-muted small">
-                <strong>Campos requeridos:</strong> nombre, apellidos, email, n_tel, password, tipo
-              </p>
-              <p class="text-muted small">
-                <strong>Tipos permitidos:</strong> admin, alumno, tutor, instructor
+                <strong>Campos requeridos:</strong> nombre, apellidos, email, n_tel, password
               </p>
 
               <div class="mb-3">
                 <input
-                  id="csvFileInput"
+                  id="csvFileInputAlumnos"
                   type="file"
                   class="form-control"
                   accept=".csv,.txt"
@@ -212,7 +195,6 @@ function cerrarModal() {
           </div>
         </div>
 
-        <!-- Footer -->
         <div class="modal-footer">
           <button
             type="button"
@@ -225,11 +207,11 @@ function cerrarModal() {
           <button
             type="button"
             class="btn btn-primary"
-            @click="importarUsuarios"
+            @click="importarAlumnos"
             :disabled="!file || loading"
           >
             <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ loading ? 'Importando...' : 'Importar Usuarios' }}
+            {{ loading ? 'Importando...' : 'Importar Alumnos' }}
           </button>
         </div>
       </div>
