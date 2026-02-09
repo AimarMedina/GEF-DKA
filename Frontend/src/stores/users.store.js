@@ -69,6 +69,7 @@ export const useUsersStore = defineStore('users', () => {
     }
 
     const response = await api.get('/api/users', {
+        
         params: {
             page,
             per_page: perPage.value,
