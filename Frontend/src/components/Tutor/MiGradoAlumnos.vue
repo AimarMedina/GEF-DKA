@@ -2,8 +2,14 @@
 import { ref, onMounted } from "vue";
 import api from "@/services/api.js"
 import { useNotasStore } from "@/stores/notas.js";
+import { useTransversalesStore } from '@/stores/transversales.js';
+import { useCompetenciasStore } from '@/stores/competencias.js';
+import PopupNotificacion from '@/components/PopupNotificacion.vue';
 
 const notasStore = useNotasStore();
+const transversalesStore = useTransversalesStore();
+const competenciasStore = useCompetenciasStore();
+const popupRef = ref(null);
 const notaInput = ref('');
 // datosModal ahora incluye el tipo: 'tec' | 'trans' | null
 const datosModal = ref({ idAlumno: null, titulo: '', callback: null, tipo: null });
@@ -37,50 +43,44 @@ const toggleNotas = (idAlumno) => {
 
 // Cargar datos del tutor
 // param loadingGlobal: true para mostrar el spinner grande, false para recargas silenciosas
-const fetchDatosGrado = async (page = 1, loadingGlobal = true) => {
+// param skipCache: true para forzar recarga desde servidor (después de guardar cambios)
+const fetchDatosGrado = async (page = 1, loadingGlobal = true, skipCache = false) => {
   if (loadingGlobal) loading.value = true;
   currentPage.value = page;
 
   try {
-    const res = await api.get("/api/mi-grado/gestion", {
-      params: { page, per_page: perPage.value }
-    });
+    // Use notas store with caching
+    // Si skipCache es true, notasStore.invalidateGradoCache ya fue llamado antes
+    await notasStore.fetchGrado(page, perPage.value, false);
 
-    // Guardar en los refs locales
-    alumnos.value = res.data.alumnos.data;
-    asignaturas.value = res.data.asignaturas;
-    gradoNombre.value = res.data.grado.nombre;
-    totalPages.value = res.data.alumnos.last_page;
-
-    // Guardar en Pinia
-    notasStore.setDatosGrado({
-      alumnosData: res.data.alumnos.data,
-      asignaturasData: res.data.asignaturas,
-      grado: res.data.grado
-    });
+    // Populate local refs from store
+    alumnos.value = notasStore.alumnos;
+    asignaturas.value = notasStore.asignaturas;
+    gradoNombre.value = notasStore.gradoNombre;
+    totalPages.value = notasStore.totalPages;
 
     // IMPORTANTE: No cerramos el acordeón si estamos recargando tras editar nota
     // alumnoDesplegado.value = null; 
 
   } catch (error) {
     console.error("Error cargando datos:", error);
-    alert("Error al cargar los datos del grado.");
+    popupRef.value?.mostrar('error', 'Error', 'Error al cargar los datos del grado.');
   } finally {
     loading.value = false;
   }
 };
 const cargarTransversales = async () => {
     try {
-        const response = await api.get('/api/transversales');
-        listaTransversales.value = response.data;
+        await transversalesStore.fetchAll();
+        listaTransversales.value = transversalesStore.lista;
     } catch (error) {
         console.error("Error cargando transversales:", error);
     }
 };
 const cargarTecnicas = async () => {
     try {
-        const response = await api.get('/api/competencias');
-        listaTecnicas.value = response.data;
+        await competenciasStore.fetchAll();
+        listaTecnicas.value = competenciasStore.lista;
     } catch (error) {
         console.error("Error cargando técnicas:", error);
     }
@@ -122,7 +122,7 @@ const confirmarGuardar = async () => {
   if (datosModal.value.tipo === 'trans') {
     // Validación: asegurarnos de que se haya seleccionado una competencia
     if (!transversalSeleccionada.value) {
-      alert('Selecciona una competencia antes de guardar.');
+      popupRef.value?.mostrar('warning', 'Validación', 'Selecciona una competencia antes de guardar.');
       return;
     }
 
@@ -146,7 +146,7 @@ const confirmarGuardarTecnica = async () => {
 
   // Validación: asegurarnos de que se haya seleccionado una competencia técnica
   if (!tecnicaSeleccionada.value) {
-    alert('Selecciona una competencia técnica antes de guardar.');
+    popupRef.value?.mostrar('warning', 'Validación', 'Selecciona una competencia técnica antes de guardar.');
     return;
   }
 
@@ -161,7 +161,7 @@ const confirmarGuardarTecnica = async () => {
 
 const actualizarNotaTec = async(idAlumno, nuevaNota)=>{
   if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
-    alert("Introduce una nota entre 0 y 10");
+    popupRef.value?.mostrar('warning', 'Nota inválida', 'Introduce una nota entre 0 y 10');
     return;
   }
   // Convertimos la nota de base 10 a base 4
@@ -172,6 +172,8 @@ const actualizarNotaTec = async(idAlumno, nuevaNota)=>{
           nota: notaProporcional
         // Enviamos el valor ya convertido
       });
+      // Invalidar cache antes de recargar para obtener datos frescos
+      notasStore.invalidateGradoCache(currentPage.value, perPage.value);
       await fetchDatosGrado(currentPage.value, false);
   } catch (error) {
       console.error("Error al guardar:", error.response?.data);
@@ -180,7 +182,7 @@ const actualizarNotaTec = async(idAlumno, nuevaNota)=>{
 }
 const actualizarNotaTrans = async (idAlumno, nuevaNota) => {
   if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
-    alert("Introduce una nota entre 0 y 10");
+    popupRef.value?.mostrar('warning', 'Nota inválida', 'Introduce una nota entre 0 y 10');
     return;
   }
   // Convertimos la nota de base 10 a base 4
@@ -192,6 +194,8 @@ const actualizarNotaTrans = async (idAlumno, nuevaNota) => {
           nota: notaProporcional
         // Enviamos el valor ya convertido
       });
+      // Invalidar cache antes de recargar para obtener datos frescos
+      notasStore.invalidateGradoCache(currentPage.value, perPage.value);
       await fetchDatosGrado(currentPage.value, false);
   } catch (error) {
       console.error("Error al guardar:", error.response?.data);
@@ -209,6 +213,8 @@ const actualizarNotacuad = async (idAlumno, nuevaNota) => {
           nota: nuevaNota
       });
       
+      // Invalidar cache antes de recargar para obtener datos frescos
+      notasStore.invalidateGradoCache(currentPage.value, perPage.value);
       // Recargamos para que se vean los cambios en los cálculos globales
       await fetchDatosGrado(currentPage.value, false);
   } catch (error) {
@@ -218,7 +224,7 @@ const actualizarNotacuad = async (idAlumno, nuevaNota) => {
 };
 const actualizatrans = async (idAlumno, nuevaNota, idTransversal) => {
   if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
-    alert("Introduce una nota entre 0 y 10");
+    popupRef.value?.mostrar('warning', 'Nota inválida', 'Introduce una nota entre 0 y 10');
     return;
   }
 
@@ -235,15 +241,53 @@ const actualizatrans = async (idAlumno, nuevaNota, idTransversal) => {
           nota: notaEntera
       });
 
+      // Invalidar cache antes de recargar para obtener datos frescos
+      notasStore.invalidateGradoCache(currentPage.value, perPage.value);
       await fetchDatosGrado(currentPage.value, false);
   } catch (error) {
       console.error("Error al guardar:", error.response?.data || error);
   }
 
 }
+// Guardar nota Egibide (nota del centro)
+const actualizarNotaEgibide = async (idAlumno, idAsignatura, nuevaNota) => {
+  if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
+    popupRef.value?.mostrar('warning', 'Nota inválida', 'Introduce una nota entre 0 y 10');
+    return;
+  }
+
+  try {
+    // Enviar al endpoint que espera id_asignatura y nota
+    await api.post(`/api/alumnos/${idAlumno}/nota-egibide`, {
+      id_asignatura: idAsignatura,
+      nota: parseFloat(nuevaNota)
+    });
+
+    // Marcar input como éxito temporalmente
+    inputStatus.value[`${idAlumno}-${idAsignatura}`] = 'is-valid';
+    setTimeout(() => {
+      delete inputStatus.value[`${idAlumno}-${idAsignatura}`];
+    }, 1200);
+
+    // Invalidar cache antes de recargar para obtener datos frescos
+    notasStore.invalidateGradoCache(currentPage.value, perPage.value);
+    await fetchDatosGrado(currentPage.value, false);
+  } catch (error) {
+    console.error("Error al guardar egibide:", error.response?.data || error);
+    if (error.response?.status === 403) {
+      popupRef.value?.mostrar('error', 'No autorizado', 'No tienes permisos para cambiar esta nota.');
+    } else {
+      popupRef.value?.mostrar('error', 'Error', 'Error al guardar la nota Egibide.');
+    }
+    inputStatus.value[`${idAlumno}-${idAsignatura}`] = 'is-invalid';
+    setTimeout(() => {
+      delete inputStatus.value[`${idAlumno}-${idAsignatura}`];
+    }, 2000);
+  }
+}
 const actualizatec = async (idAlumno, nuevaNota, idTecnica) => {
   if (nuevaNota === '' || nuevaNota < 0 || nuevaNota > 10) {
-    alert("Introduce una nota entre 0 y 10");
+    popupRef.value?.mostrar('warning', 'Nota inválida', 'Introduce una nota entre 0 y 10');
     return;
   }
 
@@ -267,11 +311,13 @@ const actualizatec = async (idAlumno, nuevaNota, idTecnica) => {
           document.body.style.overflow = 'auto'; // Habilitar scroll de nuevo
       }
 
+      // Invalidar cache antes de recargar para obtener datos frescos
+      notasStore.invalidateGradoCache(currentPage.value, perPage.value);
       await fetchDatosGrado(currentPage.value, false);
 
   } catch (error) {
       console.error("Error al guardar:", error.response?.data || error);
-      alert("Error al guardar la nota en la base de datos");
+      popupRef.value?.mostrar('error', 'Error', 'Error al guardar la nota en la base de datos');
   }
 }
 // Función para obtener el estado de un alumno
@@ -352,6 +398,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <div>
+    <!-- Popup de notificaciones -->
+    <PopupNotificacion ref="popupRef" />
   <div class="d-flex justify-content-center">
   <div class="card shadow-sm border-0 mt-5 col-lg-8 justify-content-center">
     <div class="card-header bg-indigo text-white py-3">
@@ -638,6 +687,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
+  </div>
   </div>
 </div>
 </template>
