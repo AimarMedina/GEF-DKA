@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useUsersStore } from '@/stores/users.store'
 import { storeToRefs } from 'pinia'
 import ConfirmarEliminar from './ConfirmarEliminar.vue'
@@ -27,26 +27,47 @@ watch(
 
 // Abrir modal para editar usuario
 function abrirEditar(user) {
-  usersStore.currentUser = { ...user }  // asignar currentUser en store
+  usersStore.initCurrentUser({ ...user })  // asignar currentUser en store
   tipoModal.value = user.tipo
   mostrarModalUsuario.value = true
 }
 
 // Abrir modal de confirmación para eliminar
 function abrirEliminar(user) {
-  usersStore.currentUser = { ...user }
+  usersStore.initCurrentUser({ ...user })
   mostrarConfirmarModal.value = true
 }
 
 function cerrarModalUsuario() {
   mostrarModalUsuario.value = false
-  usersStore.setCurrentUser(null) // limpiar currentUser
+  usersStore.initCurrentUser(null) // limpiar currentUser
 }
 
 function cambiarPagina(page) {
   if (page < 1 || page > totalPages.value) return
   usersStore.fetchUsers(page, props.filters)
 }
+
+const paginationChunkSize = 5
+
+const chunkStart = computed(() => {
+  const cp = currentPage.value || 1
+  return Math.floor((cp - 1) / paginationChunkSize) * paginationChunkSize + 1
+})
+
+const visiblePages = computed(() => {
+  const start = chunkStart.value
+  const end = Math.min(start + paginationChunkSize - 1, totalPages.value)
+  const pages = []
+  for (let p = start; p <= end; p++) pages.push(p)
+  return pages
+})
+
+const hasPrevEllipsis = computed(() => chunkStart.value > 1)
+const hasNextEllipsis = computed(() => chunkStart.value + paginationChunkSize <= totalPages.value)
+
+const prevEllipsisTarget = computed(() => Math.max(1, chunkStart.value - paginationChunkSize))
+const nextEllipsisTarget = computed(() => Math.min(totalPages.value, chunkStart.value + paginationChunkSize))
 
 async function handleConfirmDelete(confirm) {
   if (!confirm || !currentUser.value) return
@@ -98,22 +119,32 @@ async function handleConfirmDelete(confirm) {
 
     <!-- PAGINACIÓN -->
     <nav v-if="totalPages > 1">
-      <ul class="pagination">
-        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <button class="page-link" @click="cambiarPagina(currentPage - 1)">Anterior</button>
-        </li>
-        <li
-          class="page-item"
-          v-for="page in totalPages"
-          :key="page"
-          :class="{ active: currentPage === page }"
-        >
-          <button class="page-link" @click="cambiarPagina(page)">{{ page }}</button>
-        </li>
-        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-          <button class="page-link" @click="cambiarPagina(currentPage + 1)">Siguiente</button>
-        </li>
-      </ul>
+        <ul class="pagination">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <button class="page-link" @click="cambiarPagina(currentPage - 1)">Anterior</button>
+          </li>
+
+          <li v-if="hasPrevEllipsis" class="page-item">
+            <button class="page-link" @click="cambiarPagina(prevEllipsisTarget)">...</button>
+          </li>
+
+          <li
+            class="page-item"
+            v-for="page in visiblePages"
+            :key="page"
+            :class="{ active: currentPage === page }"
+          >
+            <button class="page-link" @click="cambiarPagina(page)">{{ page }}</button>
+          </li>
+
+          <li v-if="hasNextEllipsis" class="page-item">
+            <button class="page-link" @click="cambiarPagina(nextEllipsisTarget)">...</button>
+          </li>
+
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <button class="page-link" @click="cambiarPagina(currentPage + 1)">Siguiente</button>
+          </li>
+        </ul>
     </nav>
 
     <!-- MODALES -->
