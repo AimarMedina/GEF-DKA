@@ -91,6 +91,12 @@ const router = createRouter({
         meta: { requiresAuth: true }
       },
       {
+        path: '/tutores/:id/alumnos-clases',
+        name: 'alumnosClases',
+        component: () => import('../views/tutor/AlumnosClasesView.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
         path: '/:pathMatch(.*)*',
         redirect: '/home',
       }

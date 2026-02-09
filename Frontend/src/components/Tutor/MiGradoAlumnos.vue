@@ -268,7 +268,6 @@ const actualizatec = async (idAlumno, nuevaNota, idTecnica) => {
       }
 
       await fetchDatosGrado(currentPage.value, false);
-      alert("Nota guardada correctamente");
 
   } catch (error) {
       console.error("Error al guardar:", error.response?.data || error);
@@ -553,59 +552,94 @@ onMounted(() => {
   </div>
   </div>
 
-  <div class="modal fade" id="modalNotaBootstrap" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content shadow border-0">
-        <div class="modal-header bg-indigo text-white border-0">
-          <h5 class="modal-title fw-bold">{{ datosModal.titulo }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="modalNotaBootstrap" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content shadow-lg border-0 rounded-4">
+      <div class="modal-header bg-indigo text-white border-0 py-3">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-pencil-square me-2"></i>{{ datosModal.titulo }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body py-4 px-4">
+        
+        <div class="form-floating mb-4" v-if="datosModal.tipo === 'trans'">
+          <select class="form-select border-2 border-indigo-subtle rounded-3 shadow-sm" 
+                  id="selectTrans" 
+                  v-model="transversalSeleccionada"
+                  style="height: 60px; pt: 1.5rem;">
+            <option value="" disabled selected>Selecciona una competencia</option>
+            <option v-for="t in listaTransversales" :key="t.id" :value="t.id" class="py-2">
+              {{ t.descripcion }}
+            </option>
+          </select>
+          <label for="selectTrans" class="text-indigo fw-bold">Competencia Transversal</label>
         </div>
-        <div class="modal-body py-3">
-          <div class="mb-3" v-if="datosModal.tipo === 'trans'">
-            <label class="form-label fw-semibold small">Competencia:</label>
-            <select class="form-select shadow-sm" v-model="transversalSeleccionada">
-              <option value="" disabled>Selecciona una...</option>
-              <option v-for="t in listaTransversales" :key="t.id" :value="t.id">{{ t.descripcion }}</option>
-            </select>
-          </div>
-          <div class="mb-2 text-center">
-            <label class="form-label fw-semibold small">Nota (0-10):</label>
-            <input type="number" class="form-control form-control-lg text-center" v-model="notaInput" @keyup.enter="confirmarGuardar" min="0" max="10">
-          </div>
-        </div>
-        <div class="modal-footer bg-light border-0 justify-content-center">
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-indigo btn-sm px-4" @click="confirmarGuardar">Guardar</button>
+
+        <div class="text-center">
+          <p class="small text-muted mb-2 fw-bold text-uppercase">Calificación</p>
+          <input type="number" 
+                 class="form-control form-control-lg text-center fw-bold border-2 border-indigo rounded-3" 
+                 v-model="notaInput" 
+                 @keyup.enter="confirmarGuardar" 
+                 min="0" max="10" 
+                 placeholder="0.0"
+                 style="font-size: 1.8rem; color: #6610f2;">
         </div>
       </div>
-    </div>
-  </div> <div class="modal fade" id="modalTecnicaBootstrap" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content shadow border-0">
-        <div class="modal-header bg-indigo text-white border-0">
-          <h5 class="modal-title fw-bold">{{ datosModalTecnica.titulo }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body py-3">
-          <div class="mb-3">
-            <label class="form-label fw-semibold small">Competencia técnica:</label>
-            <select class="form-select shadow-sm" v-model="tecnicaSeleccionada">
-              <option value="" disabled>Selecciona una...</option>
-              <option v-for="t in listaTecnicas" :key="t.id" :value="t.id">{{ t.descripcion }}</option>
-            </select>
-          </div>
-          <div class="mb-2 text-center">
-            <label class="form-label fw-semibold small">Nota (0-10):</label>
-            <input type="number" class="form-control form-control-lg text-center" v-model="notaInputTecnica" @keyup.enter="confirmarGuardarTecnica" min="0" max="10">
-          </div>
-        </div>
-        <div class="modal-footer bg-light border-0 justify-content-center">
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-indigo btn-sm px-4" @click="confirmarGuardarTecnica">Guardar</button>
-        </div>
+      <div class="modal-footer border-0 justify-content-center pt-0 pb-4">
+        <button type="button" class="btn btn-light px-3 fw-semibold text-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-indigo px-4 py-2 rounded-3 shadow" @click="confirmarGuardar">
+          Guardar Nota
+        </button>
       </div>
     </div>
   </div>
+</div>
+  <div class="modal fade" id="modalTecnicaBootstrap" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content shadow-lg border-0 rounded-4">
+      <div class="modal-header bg-indigo text-white border-0 py-3">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-gear-wide-connected me-2"></i>{{ datosModalTecnica.titulo }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body py-4 px-4">
+        
+        <div class="form-floating mb-4">
+          <select class="form-select border-2 border-indigo-subtle rounded-3 shadow-sm" 
+                  id="selectTec" 
+                  v-model="tecnicaSeleccionada"
+                  style="height: 60px;">
+            <option value="" disabled selected>Selecciona técnica</option>
+            <option v-for="t in listaTecnicas" :key="t.id" :value="t.id">
+              {{ t.descripcion }}
+            </option>
+          </select>
+          <label for="selectTec" class="text-indigo fw-bold">Competencia Técnica</label>
+        </div>
+
+        <div class="text-center">
+          <p class="small text-muted mb-2 fw-bold text-uppercase">Nota Final</p>
+          <input type="number" 
+                 class="form-control form-control-lg text-center fw-bold border-2 border-indigo rounded-3" 
+                 v-model="notaInputTecnica" 
+                 @keyup.enter="confirmarGuardarTecnica" 
+                 min="0" max="10" 
+                 placeholder="0.0"
+                 style="font-size: 1.8rem; color: #6610f2;">
+        </div>
+      </div>
+      <div class="modal-footer border-0 justify-content-center pt-0 pb-4">
+        <button type="button" class="btn btn-light px-3 fw-semibold text-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-indigo px-4 py-2 rounded-3 shadow" @click="confirmarGuardarTecnica">
+          Guardar Nota
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <style scoped>
