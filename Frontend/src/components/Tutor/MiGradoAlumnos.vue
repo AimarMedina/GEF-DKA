@@ -567,7 +567,7 @@ onMounted(() => {
           <select class="form-select border-2 border-indigo-subtle rounded-3 shadow-sm" 
                   id="selectTrans" 
                   v-model="transversalSeleccionada"
-                  style="height: 60px; pt: 1.5rem;">
+                  style="height: 60px;">
             <option value="" disabled selected>Selecciona una competencia</option>
             <option v-for="t in listaTransversales" :key="t.id" :value="t.id" class="py-2">
               {{ t.descripcion }}
