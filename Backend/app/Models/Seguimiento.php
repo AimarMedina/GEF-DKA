@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Seguimiento extends Model
-{
-    protected $table = 'Seguimiento';
+class Seguimiento extends Model {
+    protected $table = 'seguimiento';
 
     protected $fillable = [
         'ID_Estancia',
@@ -16,7 +15,7 @@ class Seguimiento extends Model
         'Seguimiento_actividad'
     ];
 
-    public function estancia(){
+    public function estancia() {
         return $this->belongsTo(EstanciaAlumno::class, 'ID_Estancia', 'id');
     }
 }

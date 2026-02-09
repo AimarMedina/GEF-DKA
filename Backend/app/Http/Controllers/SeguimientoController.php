@@ -1,15 +1,14 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Seguimiento;
 use App\Models\EstanciaAlumno;
 use Illuminate\Http\Request;
 
-class SeguimientoController extends Controller
-{
+class SeguimientoController extends Controller {
     // Obtener todos los seguimientos de un alumno por ID_Alumno
-    public function index($idEstancia)
-    {
+    public function index($idEstancia) {
         // Buscar la estancia directamente
         $estancia = EstanciaAlumno::find($idEstancia);
 
@@ -20,7 +19,7 @@ class SeguimientoController extends Controller
         // Traer seguimientos de esa estancia
         $seguimientos = Seguimiento::where('ID_Estancia', $idEstancia)->get();
 
-        $seguimientos = $seguimientos->map(function($s){
+        $seguimientos = $seguimientos->map(function ($s) {
             return [
                 'id' => $s->id,
                 'ID_Estancia' => $s->ID_Estancia,
@@ -37,10 +36,9 @@ class SeguimientoController extends Controller
 
 
     // Crear nuevo seguimiento
-    public function crearSeguimiento(Request $request)
-    {
+    public function crearSeguimiento(Request $request) {
         $data = $request->validate([
-            'ID_Estancia' => 'required|exists:Estancia_alumno,ID',
+            'ID_Estancia' => 'required|exists:estancia_alumno,ID',
             'Fecha' => 'required|date',
             'Hora' => 'required',
             'Accion_seguimiento' => 'required|string',
@@ -52,8 +50,7 @@ class SeguimientoController extends Controller
     }
 
     // Actualizar seguimiento
-    public function ModificarSeguimiento(Request $request, $id)
-    {
+    public function ModificarSeguimiento(Request $request, $id) {
         $seguimiento = Seguimiento::findOrFail($id);
 
         $data = $request->validate([
@@ -67,22 +64,20 @@ class SeguimientoController extends Controller
         return response()->json($seguimiento);
     }
 
-    public function eliminarSeguimiento($id)
-{
-    $seguimiento = Seguimiento::find($id);
+    public function eliminarSeguimiento($id) {
+        $seguimiento = Seguimiento::find($id);
 
-    if (!$seguimiento) {
+        if (!$seguimiento) {
+            return response()->json([
+                'message' => 'Seguimiento no encontrado'
+            ], 404);
+        }
+
+        $seguimiento->delete();
+
         return response()->json([
-            'message' => 'Seguimiento no encontrado'
-        ], 404);
+            'message' => 'Seguimiento eliminado',
+            'seguimientio' => $seguimiento
+        ], 200);
     }
-
-    $seguimiento->delete();
-
-    return response()->json([
-        'message' => 'Seguimiento eliminado',
-        'seguimientio' => $seguimiento
-    ], 200);
-}
-
 }
