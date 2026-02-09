@@ -1,0 +1,14 @@
+// custom-bootstrap.scss
+// Sobrescribe variables de Bootstrap antes de importar el resto.
+// Pon aquí tus overrides (por ejemplo color primary) y luego importa Bootstrap.
+// Instrucciones: incluye/compila este archivo en lugar de importar Bootstrap directamente.
+
+// Cambia el color primary globalmente
+$primary: #7B1F6A !default;
+
+// Puedes sobreescribir más variables aquí si quieres, por ejemplo:
+// $body-color: #222;
+// $link-color: $primary;
+
+// Finalmente, importa Bootstrap (resuelve a bootstrap.scss en este mismo directorio)
+@import "bootstrap";

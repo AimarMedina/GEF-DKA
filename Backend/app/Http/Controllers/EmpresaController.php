@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Empresa;
 use Illuminate\Http\Request;
 
-class EmpresaController extends Controller
-{
-
+class EmpresaController extends Controller{
     private function validateRequest(Request $req) {
 
         return $req->validate([
@@ -30,8 +28,41 @@ class EmpresaController extends Controller
         ]);
     }
 
+    public function getInstructores($cif){
+        $empresa = Empresa::where('CIF', $cif)->firstOrFail();
+
+        $instructores = $empresa->instructores()
+            ->whereNotNull('ID_Usuario') // asegurarse de que tengan usuario
+            ->with('user:id,nombre,apellidos') // carga el usuario
+            ->get()
+            ->filter(fn($i) => $i->user !== null); // opcional, por seguridad
+
+        return response()->json([
+            'data' => $instructores
+        ]);
+    }
+
+
+
+
+
+    public function index(){
+        // Traemos todas las empresas con solo los campos necesarios
+        $empresas = Empresa::all(['CIF', 'Nombre']);
+
+        // Retornamos en formato JSON
+        return response()->json([
+            'data' => $empresas
+        ]);
+    }
+
+
+
+
+
+
    public function getCompanys(Request $req)
-    {
+{
         $q = trim((string) $req->query('q', ''));
 
         $perPage = $req->query('per_page', 5);
@@ -52,8 +83,7 @@ class EmpresaController extends Controller
 
         return response()->json($empresas);
     }
-    public function create(Request $req)
-    {
+    public function create(Request $req){
         $data = $this->validateRequest($req);
 
         Empresa::create([
