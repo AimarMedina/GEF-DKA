@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import api from "@/services/api.js"
-import { useNotasStore } from "@/stores/notas.js";
-import { useTransversalesStore } from '@/stores/transversales.js';
-import { useCompetenciasStore } from '@/stores/competencias.js';
+import api from "@/services/api"
+import { useNotasStore } from "@/stores/notas.store";
+import { useTransversalesStore } from '@/stores/transversales.store';
+import { useCompetenciasStore } from '@/stores/competencias.store';
 import PopupNotificacion from '@/components/PopupNotificacion.vue';
 
 const notasStore = useNotasStore();

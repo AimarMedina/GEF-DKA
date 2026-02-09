@@ -1,12 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useTutoresStore } from '@/stores/tutores.store'
 import Navbar from '@/components/Navbar.vue'
 import AlumnosList from '@/components/AlumnosList.vue'
 import AlumnoDatos from '@/components/Tutor/AlumnoDatos.vue'
 
 const route = useRoute()
 const tutorId = route.params.id
+const tutoresStore = useTutoresStore()
 const alumnosListRef = ref(null)
 const alumnoSeleccionado = ref(null)
 
@@ -18,7 +20,7 @@ const modoVista = ref('tutor')
 const currentEndpoint = computed(() => {
   return modoVista.value === 'tutor' 
     ? `/api/tutores/${tutorId}/alumnos` 
-    : `/api/tutores/${tutorId}/alumnos-clases` // Asegúrate de que este sea tu endpoint de clases
+    : `/api/tutores/${tutorId}/alumnos-clases`
 })
 
 const titulo = computed(() => {
@@ -30,10 +32,13 @@ const titulo = computed(() => {
 function cambiarModo(nuevoModo) {
   modoVista.value = nuevoModo
   alumnoSeleccionado.value = null // Limpiamos la selección al cambiar de lista
+  // El watch en AlumnosList detectará cambio de endpoint y recargará automáticamente
 }
 
-function recargarAlumnos() {
-  alumnosListRef.value?.recargar()
+function estanciaCreada() {
+  // Invalidar cache de ambos modos al crear una estancia
+  tutoresStore.invalidateAllCache(tutorId)
+  alumnosListRef.value?.recargarForzado()
 }
 </script>
 
@@ -55,7 +60,7 @@ function recargarAlumnos() {
 
       <AlumnoDatos 
         :alumno="alumnoSeleccionado" 
-        @estanciaCreada="recargarAlumnos" 
+        @estanciaCreada="estanciaCreada" 
       />
     </div>
 

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import BuscadorSelect from './BuscadorSelect.vue'
-import { useUsersStore } from '@/stores/users.store.js'
+import { useUsersStore } from '@/stores/users.store'
 import api from '@/services/api.js'
 
 const props = defineProps({
