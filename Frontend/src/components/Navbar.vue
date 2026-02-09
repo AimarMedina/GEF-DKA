@@ -38,9 +38,6 @@
                   <a class="dropdown-item">
                     <RouterLink to="/users">Usuarios</RouterLink>
                   </a>
-                  <button class="dropdown-item" @click="mostrarImportModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
-                    <i class="bi bi-upload me-2"></i> Importar Usuarios
-                  </button>
                   <a class="dropdown-item">
                     <RouterLink to="/competenciasXra">Competencias y RAs</RouterLink>
                   </a>
@@ -50,6 +47,23 @@
                   <a class="dropdown-item">
                     <RouterLink to="/empresa">Empresas</RouterLink>
                   </a>
+                  <hr class="dropdown-divider">
+                  <li class="dropdown-header"><b>Importaciones</b></li>
+                  <!-- <button class="dropdown-item" @click="mostrarImportUsuariosModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
+                    <i class="bi bi-person-plus me-2"></i> Usuarios
+                  </button> -->
+                  <button class="dropdown-item" @click="mostrarImportEmpresasModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
+                    <i class="bi bi-building me-2"></i> Empresas
+                  <!-- </button>
+                  <button class="dropdown-item" @click="mostrarImportGradosModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
+                    <i class="bi bi-mortarboard me-2"></i> Cursos -->
+                  </button>
+                  <button class="dropdown-item" @click="mostrarImportAlumnosModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
+                    <i class="bi bi-people me-2"></i> Alumnos
+                  </button>
+                  <button class="dropdown-item" @click="mostrarImportTeachersModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
+                    <i class="bi bi-person-badge me-2"></i> Profesorado
+                  </button>
                 </li>
               </ul>
             </li>
@@ -131,11 +145,31 @@
     </div>
   </nav>
 
-  <!-- Modal de importación -->
+  <!-- Modales de importación -->
   <ImportUsuariosModal 
-    :show="mostrarImportModal"
-    @close="mostrarImportModal = false"
-    @success="mostrarImportModal = false"
+    :show="mostrarImportUsuariosModal"
+    @close="mostrarImportUsuariosModal = false"
+    @success="mostrarImportUsuariosModal = false"
+  />
+  <ImportEmpresasModal 
+    :show="mostrarImportEmpresasModal"
+    @close="mostrarImportEmpresasModal = false"
+    @success="mostrarImportEmpresasModal = false"
+  />
+  <ImportGradosModal 
+    :show="mostrarImportGradosModal"
+    @close="mostrarImportGradosModal = false"
+    @success="mostrarImportGradosModal = false"
+  />
+  <ImportAlumnosModal 
+    :show="mostrarImportAlumnosModal"
+    @close="mostrarImportAlumnosModal = false"
+    @success="mostrarImportAlumnosModal = false"
+  />
+  <ImportTeachersModal 
+    :show="mostrarImportTeachersModal"
+    @close="mostrarImportTeachersModal = false"
+    @success="mostrarImportTeachersModal = false"
   />
 </template>
 
@@ -157,10 +191,18 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
 import ImportUsuariosModal from "@/components/ImportUsuariosModal.vue";
+import ImportEmpresasModal from "@/components/ImportEmpresasModal.vue";
+import ImportGradosModal from "@/components/ImportGradosModal.vue";
+import ImportAlumnosModal from "@/components/ImportAlumnosModal.vue";
+import ImportTeachersModal from "@/components/ImportTeachersModal.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
-const mostrarImportModal = ref(false);
+const mostrarImportUsuariosModal = ref(false);
+const mostrarImportEmpresasModal = ref(false);
+const mostrarImportGradosModal = ref(false);
+const mostrarImportAlumnosModal = ref(false);
+const mostrarImportTeachersModal = ref(false);
 import api from "@/services/api.js";
 
 let message = ref();

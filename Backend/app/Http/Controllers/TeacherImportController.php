@@ -3,22 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Alumno;
 use App\Models\Tutor;
 use App\Models\Instructor;
-use App\Models\UserImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class UserImportController extends Controller
+class TeacherImportController extends Controller
 {
     /**
-     * Le da nombre al csv con plantillas_uusarios y la fecha + .csv
+     * Descargar plantilla CSV para profesorado
      */
     public function downloadTemplate()
     {
-        $fileName = 'plantilla_usuarios_' . now()->format('Y-m-d_His') . '.csv';
+        $fileName = 'plantilla_profesorado_' . now()->format('Y-m-d_His') . '.csv';
 
         $headers = array(
             "Content-type" => "text/csv; charset=UTF-8",
@@ -30,27 +28,12 @@ class UserImportController extends Controller
 
         $data = fopen('php://memory', 'r+');
 
-        // cabeceros del csv
-        $headers_row = [
-            'nombre',
-            'apellidos',
-            'email',
-            'n_tel',
-            'password',
-            'tipo'
-        ];
-
+        $headers_row = ['nombre', 'apellidos', 'email', 'n_tel', 'password', 'tipo', 'cif_empresa'];
         fputcsv($data, $headers_row, ',', '"');
 
-        // filas de ejemplo para escribir
-        fputcsv($data, [
-            'Juan',
-            'García López',
-            'juan.garcia@centro.local',
-            '600123456',
-            'password123',
-            'alumno'
-        ], ',', '"');
+        fputcsv($data, ['Pedro', 'García López', 'pedro.tutor@centro.local', '600123456', 'password123', 'tutor', ''], ',', '"');
+        fputcsv($data, ['Laura', 'Martínez Ruiz', 'laura.instructor@empresa.local', '610234567', 'password456', 'instructor', 'B12345678'], ',', '"');
+        fputcsv($data, ['Carlos', 'López Pérez', 'carlos.tutor@centro.local', '600345678', 'password789', 'tutor', ''], ',', '"');
 
         rewind($data);
 
@@ -64,22 +47,22 @@ class UserImportController extends Controller
     }
 
     /**
-     * Importar usuarios desde CSV
+     * Importar profesorado desde CSV
      */
-    public function import(Request $request){
+    public function import(Request $request)
+    {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt|max:10240', // máx 10MB
+            'file' => 'required|file|mimes:csv,txt|max:5120',
         ], [
             'file.required' => 'El archivo es obligatorio.',
             'file.mimes' => 'El archivo debe ser CSV o TXT.',
-            'file.max' => 'El archivo no puede exceder 10MB.',
+            'file.max' => 'El archivo no puede exceder 5MB.',
         ]);
 
         try {
             $file = $request->file('file');
             $filePath = $file->getRealPath();
 
-            // Obre el contenido del archivo CSV en modo read
             $file_handle = fopen($filePath, 'r');
             $headers = fgetcsv($file_handle);
 
@@ -90,11 +73,9 @@ class UserImportController extends Controller
                 ], 400);
             }
 
-            // Limpiar headers (trim de espacios y convertir a minúsculas) para insert
             $headers = array_map('trim', $headers);
             $headers = array_map('strtolower', $headers);
 
-            // Validar que tenga los campos necesarios
             $required_fields = ['nombre', 'apellidos', 'email', 'n_tel', 'password', 'tipo'];
             $missing_fields = array_diff($required_fields, $headers);
 
@@ -105,19 +86,16 @@ class UserImportController extends Controller
                 ], 400);
             }
 
-            $users_created = 0;
-            $users_failed = 0;
+            $created = 0;
+            $failed = 0;
             $errors = [];
-
-            // Procesar cada fila
-            $row_number = 2; // Primera fila de datos (después del header)
+            $row_number = 2;
 
             while (($row = fgetcsv($file_handle)) !== false) {
                 if (count($row) === 1 && $row[0] === '' || count($row) === 0) {
-                    continue;  //esto sirve para filas vaicas, para saltarlas
+                    continue;
                 }
 
-                // Limpiar espacios en blanco de cada celda
                 $row = array_map('trim', $row);
 
                 // Verificar si la fila está completamente vacía después del trim
@@ -125,9 +103,6 @@ class UserImportController extends Controller
                     continue;
                 }
 
-                // Alinear número de elementos entre headers y row
-                // Si la fila tiene menos columnas, rellenar con valores vacíos
-                // Si tiene más, truncar
                 if (count($row) < count($headers)) {
                     $row = array_pad($row, count($headers), '');
                 } elseif (count($row) > count($headers)) {
@@ -149,15 +124,35 @@ class UserImportController extends Controller
                         continue;
                     }
 
-                    // Validar datos
-                    $this->validateUserRow($row_data, $row_number);
+                    $this->validateTeacherRow($row_data, $row_number);
 
-                    // Crear usuario
-                    $this->createUserFromRow($row_data);
-                    $users_created++;
+                    DB::transaction(function () use ($row_data) {
+                        $user = User::create([
+                            'nombre' => $row_data['nombre'],
+                            'apellidos' => $row_data['apellidos'],
+                            'email' => $row_data['email'],
+                            'n_tel' => $row_data['n_tel'],
+                            'password' => Hash::make($row_data['password']),
+                            'tipo' => strtolower($row_data['tipo']),
+                        ]);
+
+                        $tipo = strtolower($row_data['tipo']);
+
+                        if ($tipo === 'tutor') {
+                            Tutor::create(['ID_Usuario' => $user->id]);
+                        } elseif ($tipo === 'instructor') {
+                            $cif_empresa = trim($row_data['cif_empresa'] ?? '');
+                            Instructor::create([
+                                'ID_Usuario' => $user->id,
+                                'CIF_Empresa' => !empty($cif_empresa) ? $cif_empresa : null,
+                            ]);
+                        }
+                    });
+
+                    $created++;
 
                 } catch (\Exception $e) {
-                    $users_failed++;
+                    $failed++;
                     $errors[] = "Fila $row_number: " . $e->getMessage();
                 }
 
@@ -166,22 +161,12 @@ class UserImportController extends Controller
 
             fclose($file_handle);
 
-            // Registrar la importación
-            UserImport::create([
-                'user_id' => $request->user()->id,
-                'total_users' => $row_number - 2, // Restar 2: la fila del header y el contador que empieza en 2
-                'successful_users' => $users_created,
-                'failed_users' => $users_failed,
-                'errors' => !empty($errors) ? $errors : null,
-                'original_filename' => $file->getClientOriginalName(),
-            ]);
-
             return response()->json([
                 'status' => 'success',
-                'message' => "Se han importado $users_created usuarios correctamente.",
+                'message' => "Se han importado $created profesores correctamente.",
                 'data' => [
-                    'created' => $users_created,
-                    'failed' => $users_failed,
+                    'created' => $created,
+                    'failed' => $failed,
                     'errors' => $errors
                 ]
             ], 200);
@@ -195,11 +180,10 @@ class UserImportController extends Controller
     }
 
     /**
-     * Validar fila del CSV
+     * Validar fila de profesorado
      */
-    private function validateUserRow(array $row)
+    private function validateTeacherRow(array $row, int $row_number)
     {
-        // Campos requeridos
         $required = ['nombre', 'apellidos', 'email', 'n_tel', 'password', 'tipo'];
 
         foreach ($required as $field) {
@@ -208,67 +192,37 @@ class UserImportController extends Controller
             }
         }
 
-        // Validar email único
+        // Email único
         if (User::where('email', $row['email'])->exists()) {
             throw new \Exception("El email '{$row['email']}' ya está registrado.");
         }
 
-        // Validar n_tel único
+        // Teléfono único
         if (User::where('n_tel', $row['n_tel'])->exists()) {
             throw new \Exception("El teléfono '{$row['n_tel']}' ya está registrado.");
         }
 
-        // Validar formato email
+        // Email válido
         if (!filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
             throw new \Exception("El email '{$row['email']}' no tiene un formato válido.");
         }
 
-        // Validar teléfono (9 dígitos)
+        // Teléfono válido
         if (!preg_match('/^[0-9]{9}$/', $row['n_tel'])) {
             throw new \Exception("El teléfono '{$row['n_tel']}' debe tener exactamente 9 dígitos.");
         }
 
-        // Validar tipo
-        $tipos_validos = ['admin', 'alumno', 'tutor', 'instructor'];
-        if (!in_array($row['tipo'], $tipos_validos)) {
-            throw new \Exception("El tipo '{$row['tipo']}' no es válido. Tipos permitidos: " . implode(', ', $tipos_validos));
+        // Tipo válido
+        $tipo = trim(strtolower($row['tipo']));
+        if (!in_array($tipo, ['tutor', 'instructor'])) {
+            throw new \Exception("El tipo '$tipo' no es válido. Debe ser 'tutor' o 'instructor'.");
         }
 
-        // Validar longitud de nombre y apellido
-        if (strlen($row['nombre']) > 255) {
-            throw new \Exception("El nombre no puede superar 255 caracteres.");
+        // Si es instructor y tiene CIF, validar que exista
+        if ($tipo === 'instructor' && !empty($row['cif_empresa'] ?? null)) {
+            if (!DB::table('empresa')->where('CIF', trim($row['cif_empresa']))->exists()) {
+                throw new \Exception("La empresa con CIF '{$row['cif_empresa']}' no existe.");
+            }
         }
-
-        if (strlen($row['apellidos']) > 255) {
-            throw new \Exception("Los apellidos no pueden superar 255 caracteres.");
-        }
-    }
-
-    /**
-     * Crear usuario desde fila del CSV
-     */
-    private function createUserFromRow(array $row): User
-    {
-        return DB::transaction(function () use ($row) {
-            // Crear usuario
-            $user = User::create([
-                'nombre' => trim($row['nombre']),
-                'apellidos' => trim($row['apellidos']),
-                'email' => trim($row['email']),
-                'n_tel' => trim($row['n_tel']),
-                'password' => Hash::make($row['password']),
-                'tipo' => trim($row['tipo']),
-            ]);
-
-            // Crear registros relacionados según el tipo
-            match ($user->tipo) {
-                'alumno' => Alumno::create(['ID_Usuario' => $user->id]),
-                'tutor' => Tutor::create(['ID_Usuario' => $user->id]),
-                'instructor' => Instructor::create(['ID_Usuario' => $user->id]),
-                default => null,
-            };
-
-            return $user;
-        });
     }
 }
