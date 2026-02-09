@@ -5,11 +5,7 @@ import EmpresaAlumnos from './EmpresaAlumnos.vue';
 const props = defineProps({
     empresa: Object
 })
-
-
-
 </script>
-
 <template>
     <div class="col-md-9">
         <EmpresaInfo v-if="empresa" :empresa="empresa" />

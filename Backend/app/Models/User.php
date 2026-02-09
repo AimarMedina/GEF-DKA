@@ -66,14 +66,14 @@ class User extends Authenticatable
         });
 
 
-        //  static::created(function ($user) {
-        //      match ($user->tipo) {
-        //          'alumno'     => Alumno::create(['ID_Usuario' => $user->id]),
-        //          'instructor' => Instructor::create(['ID_Usuario' => $user->id]),
-        //          'tutor'      => Tutor::create(['ID_Usuario' => $user->id]),
-        //          default      => null,
-        //      };
-        //  });
+         static::created(function ($user) {
+             match ($user->tipo) {
+                 'alumno'     => Alumno::create(['ID_Usuario' => $user->id]),
+                 'instructor' => Instructor::create(['ID_Usuario' => $user->id]),
+                 'tutor'      => Tutor::create(['ID_Usuario' => $user->id]),
+                 default      => null,
+             };
+         });
     }
 
     public function alumno(){
