@@ -19,6 +19,7 @@ use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\RaController;
 use App\Http\Controllers\CompetenciaController;
 use App\Http\Controllers\TransversalController;
+use App\Http\Controllers\UserImportController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getUsers']);
     Route::post('/user/create', [UserController::class, 'create']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
+
+    /*
+|--------------------------------------------------------------------------
+| User Import
+|--------------------------------------------------------------------------
+*/
+    Route::get('/users/import/template', [UserImportController::class, 'downloadTemplate']);
+    Route::post('/users/import', [UserImportController::class, 'import']);
+
     /*
 |--------------------------------------------------------------------------
 | Empresas
