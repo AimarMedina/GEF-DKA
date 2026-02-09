@@ -33,7 +33,8 @@ class EmpresaController extends Controller{
 
         $instructores = $empresa->instructores()
             ->whereNotNull('ID_Usuario') // asegurarse de que tengan usuario
-            ->with('user:id,nombre,apellidos') // carga el usuario
+            // Cargar campos necesarios del usuario para la vista (nombre, apellidos, email, telefono)
+            ->with('user:id,nombre,apellidos,email,n_tel') // carga el usuario con más campos
             ->get()
             ->filter(fn($i) => $i->user !== null); // opcional, por seguridad
 

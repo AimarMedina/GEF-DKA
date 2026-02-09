@@ -12,15 +12,16 @@ const showModal = ref(false)
 const errorMessage = ref(null)
 
 async function cargarInstructores(cif) {
-    if (cache.value[cif]) {
-        instructores.value = cache.value[cif]
-        return
-    }
+    // COMENTA ESTA LÍNEA temporalmente para forzar la carga real
+    // if (cache.value[cif]) { ... } 
+    
     loading.value = true
     try {
         const response = await api.get(`/api/empresa/${cif}/instructores`)
-        cache.value[cif] = response.data
-        instructores.value = response.data
+        // Asegúrate de que estás guardando lo que viene en 'data'
+        const lista = response.data.data || response.data
+        instructores.value = lista
+        console.log("Lo que llega al front:", lista[0].user) // Mira la consola aquí
     } catch (e) {
         instructores.value = []
     } finally {
@@ -87,11 +88,13 @@ async function crearUsuario(instructorData) {
                         </td>
                     </tr>
 
-                    <tr v-for="instructor in instructores" :key="instructor.ID_Usuario">
-                        <td>{{ instructor.user?.nombre }}</td>
-                        <td>{{ instructor.user?.email }}</td>
-                        <td>{{ instructor.user?.n_tel }}</td>
-                    </tr>
+<tr v-for="instructor in instructores" :key="instructor.ID_Usuario">
+    <td>{{ instructor.user?.nombre }} {{ instructor.user?.apellidos }}</td>
+
+    <td>{{ instructor.user?.email ?? '-' }}</td>
+    
+    <td>{{ instructor.user?.n_tel ?? '-' }}</td>
+</tr>
 
                     <tr v-if="!loading && !instructores.length">
                         <td colspan="3" class="text-center text-muted">No hay instructores</td>
@@ -101,5 +104,6 @@ async function crearUsuario(instructorData) {
             </table>
         </div>
     </div>
+
     <FormularioUsuario :show="showModal" :errorMessage="errorMessage" :tipo="'Instructor'" @close="showModal=false, errorMessage = null" @crear="crearUsuario" />
 </template>
