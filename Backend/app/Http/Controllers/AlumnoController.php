@@ -211,4 +211,31 @@ class AlumnoController extends Controller
             'alumno' => $alumno->load(['instructor.user'])
         ]);
     }
+    public function alumnosDeTutorClases($idTutor)
+    {
+        // 1. Obtenemos los IDs de los grados donde imparte clase el tutor
+        // Nota: Asegúrate de que los nombres de las columnas 'ID_Tutor' e 'ID_Grado' 
+        // sean exactos a tu base de datos (a veces son id_tutor/id_grado)
+        $gradosIds = \DB::table('tutor_grado')
+            ->where('ID_Tutor', $idTutor)
+            ->pluck('ID_Grado');
+
+        // 2. Buscamos los alumnos con las MISMAS relaciones que la función 1
+        $alumnos = Alumno::whereIn('ID_Grado', $gradosIds)
+            ->with([
+                'usuario:id,nombre,apellidos,email,tipo',
+                'grado:id,nombre',
+                'estanciaActual.empresa', // <--- El nombre correcto es este
+                'instructor.user'
+            ])
+            ->get();
+
+        // 3. Mapeo para compatibilidad con tu Frontend
+        // Como en tu Vue buscas "estancia_actual" pero Laravel devuelve "estanciaActual"
+        $alumnos->each(function($alumno) {
+            $alumno->estancia_actual = $alumno->estanciaActual;
+        });
+
+        return response()->json($alumnos);
+    }
 }

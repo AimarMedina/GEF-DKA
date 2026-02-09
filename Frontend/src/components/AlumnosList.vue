@@ -1,43 +1,31 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import Buscador from '@/components/Buscador.vue'
 import { useUserStore } from '@/stores/userStore'
 import api from '@/services/api.js'
 
-const prop = defineProps({
+const props = defineProps({
   endpoint: String
 })
-defineExpose({
-  recargar: cargarAlumnos
-})
+
+const emit = defineEmits(['seleccionarAlumno'])
 
 const userStore = useUserStore()
-const tutorId = userStore.user.id
-const rol=userStore.user.tipo
+const rol = userStore.user.tipo
 
 const alumnos = ref([])
 const cargando = ref(false)
 const alumnoSeleccionado = ref(null)
-const emit = defineEmits(['seleccionarAlumno'])
 
-const alumnosConEstancia = computed(() => {
-  if (rol === 'tutor') return alumnos.value.filter(a => a.estancia_actual?.id)
-  if (rol === 'instructor') return alumnos.value // Instructor ve solo los suyos
-  return alumnos.value
-})
-
-const alumnosSinEstancia = computed(() => {
-  if (rol === 'tutor') return alumnos.value.filter(a => !a.estancia_actual?.id)
-  return [] // Instructor no necesita esta lista
-})
-
-
+// Función de carga
 async function cargarAlumnos() {
+  if (!props.endpoint) return // Evitar llamadas si el endpoint no existe
+  
   cargando.value = true
   try {
-    
-    const res = await api.get(prop.endpoint)
+    const res = await api.get(props.endpoint)
     alumnos.value = res.data
+    // Limpiar selección al cargar nuevos datos
+    alumnoSeleccionado.value = null 
   } catch (e) {
     console.error('Error cargando alumnos', e)
     alumnos.value = []
@@ -46,12 +34,32 @@ async function cargarAlumnos() {
   }
 }
 
+// IMPORTANTE: Vigilar cambios en el endpoint para recargar
+watch(() => props.endpoint, () => {
+  cargarAlumnos()
+})
+
 function seleccionarAlumno(a) {
   alumnoSeleccionado.value = a
   emit('seleccionarAlumno', a)
 }
 
+defineExpose({
+  recargar: cargarAlumnos
+})
+
 onMounted(cargarAlumnos)
+
+// --- Computeds (se mantienen igual) ---
+const alumnosConEstancia = computed(() => {
+  if (rol === 'tutor') return alumnos.value.filter(a => a.estancia_actual?.id)
+  return alumnos.value
+})
+
+const alumnosSinEstancia = computed(() => {
+  if (rol === 'tutor') return alumnos.value.filter(a => !a.estancia_actual?.id)
+  return []
+})
 </script>
 
 <template>
