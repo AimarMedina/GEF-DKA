@@ -50,11 +50,15 @@ class InstructorController extends Controller
             'password' => $data['password'],
             'tipo' => 'instructor',
         ]);
+        $instructor = $user->instructor()->create([
+            'CIF_Empresa' => $data['CIF_Empresa'],
+        ]);
 
         $user->load('instructor');
 
         // Asignamos la empresa al instructor recién creado
         $instructor = $user->instructor;
+
 
         if ($instructor) {
             $instructor->CIF_Empresa = $data['CIF_Empresa'];

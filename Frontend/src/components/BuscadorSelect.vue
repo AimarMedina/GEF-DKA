@@ -19,16 +19,29 @@
         <span class="dropdown-item disabled">No hay coincidencias</span>
       </li>
       
-      <li v-for="opcion in opcionesFiltradas" :key="opcion[valueKey]">
+      <li v-for="(opcion, index) in opcionesFiltradas" :key="opcion[valueKey]">
         <button 
-          class="dropdown-item" 
+          class="dropdown-item d-flex justify-content-between align-items-center"
           :class="{ active: modelValue === opcion[valueKey] }"
           @click="seleccionarOpcion(opcion)"
           type="button"
         >
-          {{ opcion[labelKey] }}
+          <span>
+            {{ opcion[labelKey] }}
+          </span>
+
+          <span 
+            v-if="opcion.curso_texto"
+            class="badge ms-2"
+            :class="opcion.curso_texto === '1º' ? 'bg-primary' 
+                  : opcion.curso_texto === '2º' ? 'bg-success' 
+                  : 'bg-secondary'"
+          >
+            {{ opcion.curso_texto }}
+          </span>
         </button>
       </li>
+
     </ul>
   </div>
 </template>
