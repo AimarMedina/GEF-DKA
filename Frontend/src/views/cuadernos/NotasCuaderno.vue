@@ -1,42 +1,59 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
-import api from '@/services/api.js'
+import { useCuadernosStore } from '@/stores/cuadernos.store'
+
+const emit = defineEmits(['notify'])
 
 const userStore = useUserStore()
 const tutorId = userStore.user?.id
 
-const alumnos = ref([])
-const mensaje = ref('')
+const cuadernosStore = useCuadernosStore()
+const alumnos = cuadernosStore.alumnos
+const mensaje = cuadernosStore.mensaje
+const savingId = cuadernosStore.savingId
 
 async function fetchNotas() {
   try {
-    const res = await api.get(
-      `/api/tutor/${tutorId}/notas-cuaderno`
-    )
-
-    // Inicializar nota_cuaderno si es null
-    alumnos.value = res.data.map(alumno => ({
-      ...alumno,
-      nota_cuaderno: alumno.nota_cuaderno ?? { Nota: null }
-    }))
-
+    await cuadernosStore.fetchNotasCuaderno(tutorId)
   } catch (err) {
     console.error(err)
-    mensaje.value = 'Error cargando notas'
+    emit('notify', 'error', 'Error', 'Error cargando notas')
   }
 }
 
-
 async function guardarNota(alumno) {
+  // Validaciones: nota debe existir y estar entre 0 y 10
+  const nota = alumno?.nota_cuaderno?.Nota
+  if (nota === null || nota === undefined || nota === '') {
+    emit('notify', 'warning', 'Validación', 'Introduce una nota antes de guardar')
+    return
+  }
+  const valor = Number(nota)
+  if (Number.isNaN(valor) || valor < 0 || valor > 10) {
+    emit('notify', 'warning', 'Validación', 'La nota debe ser un número entre 0 y 10')
+    return
+  }
+
   try {
-    await api.post('/api/nota-cuaderno', {
-      ID_Alumno: alumno.ID_Usuario,
-      Nota: alumno.nota_cuaderno.Nota,
-    })
+    const resp = await cuadernosStore.guardarNotaCuaderno(alumno.ID_Usuario, valor)
+    emit('notify', 'success', 'Éxito', 'Nota guardada correctamente')
+    // store may merge response into alumnos
   } catch (err) {
-    console.error(err)
-    alert('Error al guardar la nota')
+    console.error('AxiosError', err)
+    // Handle validation errors from backend (422)
+    if (err.response && err.response.status === 422) {
+      const data = err.response.data
+      let detalle = ''
+      if (data && data.errors) detalle = Object.values(data.errors).flat().join('; ')
+      else if (data && data.message) detalle = data.message
+      else detalle = 'Datos inválidos'
+      emit('notify', 'error', 'Error de validación', detalle)
+    } else if (err.response && err.response.data && err.response.data.message) {
+      emit('notify', 'error', 'Error', err.response.data.message)
+    } else {
+      emit('notify', 'error', 'Error', 'Error al guardar la nota')
+    }
   }
 }
 
@@ -63,7 +80,7 @@ onMounted(fetchNotas)
           </thead>
 
           <tbody>
-            <tr v-for="alumno in alumnos" :key="alumno.id">
+            <tr v-for="alumno in alumnos" :key="alumno.id || alumno.ID_Usuario">
               <td>
                 {{ alumno.usuario?.nombre ?? '—' }}
               </td>
@@ -82,7 +99,9 @@ onMounted(fetchNotas)
               <td class="text-center">
                 <button
                   class="btn btn-outline-primary btn-sm"
+                  :disabled="savingId === (alumno.ID_Usuario || alumno.id)"
                   @click="guardarNota(alumno)">
+                  <span v-if="savingId === (alumno.ID_Usuario || alumno.id)" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                   Guardar
                 </button>
               </td>

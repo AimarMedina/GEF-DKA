@@ -3,7 +3,9 @@ import { ref, onMounted, reactive } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import FormEntregaModal from './FormEntregaModal.vue'
 import ConfirmarEliminar from '../ConfirmarEliminar.vue'
-import api from '@/services/api.js'
+import api from '@/services/api'
+
+const emit = defineEmits(['notify'])
 
 const userStore = useUserStore()
 const tutorId = userStore.user?.id
@@ -20,7 +22,6 @@ const eliminarModalVisible = ref(false)
 const entregaEliminar = ref(null)
 
 function abrirCrearEntregaModal(grado) {
-  console.log('Abriendo modal para grado:', grado)
   gradoSeleccionado.value = grado
   crearModalVisible.value = true
 }
@@ -42,7 +43,6 @@ function confirmarEliminar(confirmado) {
 
 // Manejar cuando se guarda una nueva entrega
 function onEntregaGuardada(nuevaEntrega) {
-  console.log('Nueva entrega guardada:', nuevaEntrega)
   
   // Encontrar el bloque del grado y agregar la entrega
   const bloque = entregasPorGrado.value.find(b => b.grado.id === nuevaEntrega.id_grado)
@@ -53,7 +53,6 @@ function onEntregaGuardada(nuevaEntrega) {
       alumno_entrega: nuevaEntrega.alumno_entrega || []
     }
     bloque.entregas.push(entregaCompleta)
-    console.log('Entrega agregada al bloque:', bloque)
   } else {
     console.error('No se encontró el bloque para el grado:', nuevaEntrega.id_grado)
   }
@@ -81,26 +80,33 @@ async function fetchEntregas() {
       })
       
     }
-    console.log('Entregas cargadas:', entregasPorGrado.value)
   } catch (err) {
     console.error(err)
     mensaje.value = 'Error cargando entregas'
+    emit('notify', 'error', 'Error', 'Error cargando entregas')
   }
 }
 
 // Guardar observaciones y feedback
 async function guardarObservacionYFeedback(alumnoEntrega) {
+  // Validación: al menos Observaciones o Feedback deben tener datos
+  const obs = (alumnoEntrega.Observaciones || '').toString().trim()
+  const fb = (alumnoEntrega.Feedback || '').toString().trim()
+  if (!obs && !fb) {
+    emit('notify', 'warning', 'Validación', 'Introduce observaciones o feedback antes de guardar')
+    return
+  }
+
   try {
     await api.post('/api/observacionesCuadernoAlumno', {
       ID_Cuaderno: alumnoEntrega.id,
       Observaciones: alumnoEntrega.Observaciones ?? '',
       Feedback: alumnoEntrega.Feedback ?? null,
     })
-    // Puedes mostrar un mensaje de éxito temporal aquí si lo deseas
-    console.log('Observaciones y Feedback guardados correctamente')
+    emit('notify', 'success', 'Éxito', 'Observaciones guardadas correctamente')
   } catch (err) {
     console.error(err)
-    mensaje.value = 'Error al guardar observaciones y feedback'
+    emit('notify', 'error', 'Error', 'Error al guardar observaciones y feedback')
   }
 }
 
@@ -110,10 +116,11 @@ async function eliminarEntrega(entregaId, gradoId) {
     await api.delete(`/api/grado/${gradoId}/entregas/${entregaId}`)
     const bloque = entregasPorGrado.value.find(b => b.grado.id === gradoId)
     if (bloque) bloque.entregas = bloque.entregas.filter(e => e.id !== entregaId)
-    console.log('Entrega eliminada correctamente')
+    emit('notify', 'success', 'Éxito', 'Entrega eliminada correctamente')
   } catch (err) {
     console.error(err)
     mensaje.value = 'Error al eliminar la entrega'
+    emit('notify', 'error', 'Error', 'Error al eliminar la entrega')
   }
 }
 

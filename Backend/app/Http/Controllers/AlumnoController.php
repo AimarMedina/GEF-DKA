@@ -151,8 +151,8 @@ class AlumnoController extends Controller
         return response()->json($alumno);
     }
 
-    public function guardarNotaEgibide(Request $request, $idAlumno)
-    {
+    public function guardarNotaEgibide(Request $request, $idAlumno){
+
         $request->validate([
             'id_asignatura' => 'required|integer|exists:asignatura,id',
             'nota' => 'required|numeric|min:0|max:10',
@@ -162,16 +162,20 @@ class AlumnoController extends Controller
         $alumno = Alumno::findOrFail($idAlumno);
         $user = $request->user();
 
-        if (
-            $user->tipo !== 'admin' &&
-            $user->id != $alumno->ID_Tutor
-        ) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ( $user->tipo !== 'admin' && $user->id != $alumno->ID_Tutor ) {
+            return response()->json(
+                [
+                    'message' => 'No autorizado',
+                    'tipo-Usuario' => $user->tipo,
+                    'ID-Usuario' => $user->id,
+                    'ID-Alumno' => $idAlumno,
+                    'user' => $user
+                ]
+                , 403);
         }
 
         // updateOrCreate
-        $nota = NotaEgibide::updateOrCreate(
-            [
+        $nota = NotaEgibide::updateOrCreate([
                 'ID_Alumno' => $idAlumno,
                 'ID_Asignatura' => $request->id_asignatura,
             ],
@@ -214,7 +218,7 @@ class AlumnoController extends Controller
     public function alumnosDeTutorClases($idTutor)
     {
         // 1. Obtenemos los IDs de los grados donde imparte clase el tutor
-        // Nota: Asegúrate de que los nombres de las columnas 'ID_Tutor' e 'ID_Grado' 
+        // Nota: Asegúrate de que los nombres de las columnas 'ID_Tutor' e 'ID_Grado'
         // sean exactos a tu base de datos (a veces son id_tutor/id_grado)
         $gradosIds = \DB::table('tutor_grado')
             ->where('ID_Tutor', $idTutor)
