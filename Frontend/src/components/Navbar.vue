@@ -38,6 +38,9 @@
                   <a class="dropdown-item">
                     <RouterLink to="/users">Usuarios</RouterLink>
                   </a>
+                  <button class="dropdown-item" @click="mostrarImportModal = true" style="border: none; background: none; text-align: left; cursor: pointer; padding: 0.5rem 1rem;">
+                    <i class="bi bi-upload me-2"></i> Importar Usuarios
+                  </button>
                   <a class="dropdown-item">
                     <RouterLink to="/competenciasXra">Competencias y RAs</RouterLink>
                   </a>
@@ -127,6 +130,13 @@
       </div>
     </div>
   </nav>
+
+  <!-- Modal de importación -->
+  <ImportUsuariosModal 
+    :show="mostrarImportModal"
+    @close="mostrarImportModal = false"
+    @success="mostrarImportModal = false"
+  />
 </template>
 
 <style scoped>
@@ -146,8 +156,11 @@ import { useUserStore } from "@/stores/userStore";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
+import ImportUsuariosModal from "@/components/ImportUsuariosModal.vue";
+
 const router = useRouter();
 const userStore = useUserStore();
+const mostrarImportModal = ref(false);
 import api from "@/services/api.js";
 
 let message = ref();

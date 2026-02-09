@@ -59,7 +59,7 @@ class EmpresaController extends Controller{
 
 
 
-    
+
 
    public function getCompanys(Request $req)
 {
