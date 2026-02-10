@@ -46,10 +46,11 @@ class UserController extends Controller
             'status' => 'success',
             'message' => 'Autenticado',
             'user' => $userAuth
-        ]);
+        ], 200);
     }
+
     public function getUser($id){
-        return User::findofFail($id);
+        return User::findOrFail($id);
     }
 
     public function login(Request $req)

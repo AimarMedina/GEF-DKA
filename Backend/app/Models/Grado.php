@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Grado extends Model
 {
+    use HasFactory;
+
     protected $table = 'grado';
 
     protected $fillable = [
@@ -26,4 +29,4 @@ class Grado extends Model
     public function alumnos(){
         return $this->hasMany(Alumno::class, 'ID_Grado', 'id');
     }
-} 
+}
