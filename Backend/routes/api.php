@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
     Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
+    Route::get('/allempresas', [EmpresaController::class, 'getAllCompanys']);
     Route::post('/empresa/create', [EmpresaController::class, 'create']);
 
     /*

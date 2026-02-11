@@ -27,6 +27,13 @@ class EmpresaController extends Controller
         
         return response()->json($empresas);
     }
+
+    public function getAllCompanys(){
+        $empresas = Empresa::all();
+        return response()->json(['data' => $empresas]);
+    }
+    
+
     public function create(Request $req)
     {
         $data = $req->validate([
