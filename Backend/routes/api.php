@@ -24,7 +24,7 @@ use App\Http\Controllers\TransversalController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Gate; 
+use Illuminate\Support\Facades\Gate;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +34,9 @@ use Illuminate\Support\Facades\Gate;
 
 Route::post('/login', [UserController::class, 'login']);
 
-Route::middleware('auth:sanctum')->get('/test-gates', function(Request $request) {
+Route::middleware('auth:sanctum')->get('/test-gates', function (Request $request) {
     $user = $request->user();
-    
+
     return response()->json([
         'user_id' => $user->id,
         'user_tipo' => $user->tipo,
@@ -66,13 +66,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/user/create', [UserController::class, 'create']);
         Route::put('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{id}', [UserController::class, 'delete']);
-        
+
         // Gestión de empresas
         Route::post('/empresa/create', [EmpresaController::class, 'create']);
-        
+
         // Gestión de instructores
         Route::post('/empresa/instructor/create', [InstructorController::class, 'crearInstructor']);
-        
+
         // Gestión de grados
         Route::post('/grados', [GradoController::class, 'crearGrado']);
         Route::delete('/grados/{id}', [GradoController::class, 'eliminarGrado']);
@@ -82,17 +82,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/competencias/{id}', [CompetenciaController::class, 'destroy']);
         Route::post('/ras', [RaController::class, 'store']);
         Route::delete('/ras/{id}', [RaController::class, 'destroy']);
-        
+
         // Transversales
         Route::post('/transversales', [TransversalController::class, 'crearTransversal']);
         Route::put('/transversales/{id}', [TransversalController::class, 'actualizarTransversal']);
         Route::delete('/transversales/{id}', [TransversalController::class, 'eliminarTransversal']);
-        
+
         Route::get('/users', [UserController::class, 'getUsers']);
         Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
         Route::get('/tutores/disponibles', [TutorController::class, 'getTutoresDisponibles']);
         Route::get('/grados', [GradoController::class, 'getGrados']);
         Route::get('/gradosTodos', [GradoController::class, 'getTodosGrados']);
+
+        // Gestión de instructores y alumnos
+        Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']);
+        Route::get('/alumno/{id}', [AlumnoController::class, 'getGrado']);
     });
 
     // ========================================
@@ -119,7 +123,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // RUTAS SOLO INSTRUCTOR
     // ========================================
     Route::middleware('can:es-instructor')->group(function () {
-        Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']);
         Route::post('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'store']);
         Route::get('/alumnos/{idAlumno}/notas', [NotasEmpresaController::class, 'show']);
         Route::post('/seguimiento', [SeguimientoController::class, 'crearSeguimiento']);
@@ -136,7 +139,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ========================================
     Route::middleware('can:es-alumno')->group(function () {
         Route::get('/alumno/{id}/estancia', [EstanciaController::class, 'getEstanciaActual']);
-        Route::get('/alumno/{id}', [AlumnoController::class, 'getGrado']);
         Route::get('/entregas/alumno/{id}', [EntregaCuadernoController::class, 'entregasAlumno']);
         Route::post('/entregarCuaderno/alumno/{id}', [AlumnoEntregaController::class, 'entregarCuaderno']);
         Route::get('/alumno/entregas/descargar/{id}', [AlumnoEntregaController::class, 'descargarCuaderno']);
@@ -147,7 +149,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ========================================
     // RUTAS COMPARTIDAS (múltiples roles)
     // ========================================
-    
+
     Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
     Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
     Route::get('/tutores/{id}/alumnos', [AlumnoController::class, 'alumnosDeTutor']);
