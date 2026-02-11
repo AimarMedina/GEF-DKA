@@ -33,7 +33,7 @@ class User extends Authenticatable {
      * @var list<string>
      */
     protected $hidden = [
-        'contrasenna',
+        'password',
         'remember_token',
     ];
 

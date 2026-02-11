@@ -23,12 +23,12 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import api from '@/services/api.js'
 
 const email = ref('');
 const password = ref('');
 const errorMessage = ref('');
 const router = useRouter();
-import api from '@/services/api.js'
 
 const login = async () => {
   try {
@@ -37,23 +37,28 @@ const login = async () => {
       password: password.value
     });
 
+    console.log('Respuesta del login:', response.data); // ← AÑADE ESTO PARA DEBUG
+
     if (response.data.status === 'success') {
       errorMessage.value = '';
-      let token = response.data.token
-      localStorage.setItem('token', token);
-      localStorage.setItem('user',response.data.user.id)
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      // Guarda el token y el usuario completo
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Verifica que se guardó
+      console.log('Token guardado:', localStorage.getItem('token')); // ← DEBUG
+      console.log('User guardado:', localStorage.getItem('user')); // ← DEBUG
+      
       router.push('/home');
     } else {
       errorMessage.value = response.data.message;
     }
   } catch (error) {
-    console.error(error);
+    console.error('Error en login:', error);
     errorMessage.value = 'Ocurrió un error al iniciar sesión';
   }
 };
-
 </script>
 
 <style scoped>
