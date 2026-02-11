@@ -47,7 +47,7 @@ function resetHorarios(){
 
 onMounted(async () => {
 
-  const res = await api.get('/api/empresas')
+  const res = await api.get('/api/allempresas')
   empresas.value = res.data.data || []
 
 })
@@ -157,15 +157,15 @@ function cerrarModal(){
       </div>
 
       <!-- Instructor Opcional -->
-<div class="mb-2">
-  <label>Instructor (opcional)</label>
-  <select v-model.number="nuevaEstancia.ID_Instructor" class="form-control">
-    <option :value="null">No asignar</option>
-    <option v-for="i in instructores" :key="i.user.id" :value="i.user.id">
-      {{ i.user.nombre }} {{ i.user.apellidos }}
-    </option>
-  </select>
-</div>
+      <div class="mb-2">
+        <label>Instructor (opcional)</label>
+        <select v-model.number="nuevaEstancia.ID_Instructor" class="form-control">
+          <option :value="null">No asignar</option>
+          <option v-for="i in instructores" :key="i.user.id" :value="i.user.id">
+            {{ i.user.nombre }} {{ i.user.apellidos }}
+          </option>
+        </select>
+      </div>
 
 
       <!-- Fechas -->

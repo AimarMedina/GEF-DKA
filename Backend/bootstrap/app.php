@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,8 +14,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('api/*')) {
+                abort(response()->json(['message' => 'Unauthenticated.'], 401));
+            }
+            return redirect('/login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (ValidationException $exception, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $exception->errors()
+                ], 422);
+            }
+        });
+
+        // Convert redirects to 401 for API requests
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $exception, Request $request) {
+            if ($request->is('api/*') && $exception->getStatusCode() === 302) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+        });
     })->create();

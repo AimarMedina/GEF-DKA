@@ -58,7 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
     Route::get('/auth', [UserController::class, 'auth']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
-
     // ========================================
     // RUTAS SOLO ADMIN
     // ========================================
