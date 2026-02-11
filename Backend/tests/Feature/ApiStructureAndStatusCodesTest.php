@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 describe('Status Codes HTTP', function () {
     it('[200] GET exitoso retorna 200 o 404', function () {
         $response = $this->getJson('/api/alumnos');
@@ -67,7 +69,7 @@ describe('Endpoints Públicos vs Privados', function () {
     });
 
     it('GET /api/user requiere autenticación', function () {
-        $response = $this->getJson('/api/user');
+        $response = $this->getJson('/api/auth');
 
         expect($response->status())->toBe(401);
     });
@@ -107,8 +109,10 @@ describe('Métodos HTTP', function () {
 });
 
 describe('Rutas API', function () {
-    it('ruta /api/alumnos existe', function () {
-        $response = $this->getJson('/api/alumnos');
+    it('ruta /api/tutores/{id}/alumnos existe', function () {
+        $tutor = User::factory()->create(['tipo' => 'tutor']);
+
+        $response = $this->getJson("/api/{$tutor->id}/alumnos");
 
         expect($response->status())->not->toBe(404);
     });
