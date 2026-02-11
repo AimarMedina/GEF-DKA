@@ -41,28 +41,30 @@ class InstructorController extends Controller
         // Validamos los datos básicos
         $data = $this->validarReq($request);
 
-        // Creamos el usuario
+        // Creamos el usuario (asegurando hash de la contraseña)
         $user = User::create([
             'nombre' => $data['nombre'],
             'apellidos' => $data['apellidos'] ?? null,
             'email' => $data['email'],
             'n_tel' => $data['n_tel'] ?? null,
-            'password' => $data['password'],
+            'password' => bcrypt($data['password']),
             'tipo' => 'instructor',
         ]);
-        $instructor = $user->instructor()->create([
-            'CIF_Empresa' => $data['CIF_Empresa'],
-        ]);
 
+        // Si el hook de User ya creó una fila en instructor (por el created hook),
+        // actualizamos esa fila en lugar de intentar crearla de nuevo.
         $user->load('instructor');
 
-        // Asignamos la empresa al instructor recién creado
         $instructor = $user->instructor;
-
-
         if ($instructor) {
             $instructor->CIF_Empresa = $data['CIF_Empresa'];
             $instructor->save();
+        } else {
+            $user->instructor()->create([
+                'CIF_Empresa' => $data['CIF_Empresa'],
+            ]);
+            $user->load('instructor');
+            $instructor = $user->instructor;
         }
 
         return response()->json([
