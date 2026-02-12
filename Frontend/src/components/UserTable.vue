@@ -1,47 +1,51 @@
 <template>
   <div>
-    <table class="table table-striped align-middle">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Email</th>
-          <th>Tipo</th>
-          <th v-if="filters?.tipo === 'instructor'">Empresa</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.nombre }} {{ user.apellidos }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            <span class="badge bg-secondary">{{ user.tipo }}</span>
-          </td>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th v-if="filters?.tipo === 'instructor'">Empresa</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users" :key="user.id">
+            <td>{{ user.id }}</td>
+            <td>{{ user.nombre }} {{ user.apellidos }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge bg-secondary">{{ user.tipo }}</span>
+            </td>
 
-          <td v-if="filters?.tipo === 'instructor'">
-            {{ user.instructor?.empresa?.Nombre || 'Sin empresa' }}
-          </td>
+            <td v-if="filters?.tipo === 'instructor'">
+              {{ user.instructor?.empresa?.Nombre || 'Sin empresa' }}
+            </td>
 
-          <td class="d-flex gap-1">
-            <button class="btn btn-outline-indigo btn-sm" @click="abrirEditar(user)">
-              Modificar
-            </button>
-            <button
-              class="btn btn-danger btn-sm"
-              @click="
-                mostrarConfirmarModal = true;
-                currentUser = user;
-              "
-            >
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <td class="text-end">
+              <div class="acciones d-flex flex-column flex-md-row gap-1 justify-content-md-end">
+                <button class="btn btn-outline-indigo btn-sm w-100 w-md-auto" @click="abrirEditar(user)">
+                  Modificar
+                </button>
 
+                <button
+                  class="btn btn-danger btn-sm w-100 w-md-auto"
+                  @click="
+                    mostrarConfirmarModal = true;
+                    currentUser = user;
+                  "
+                >
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <nav v-if="totalPages > 1">
       <ul class="pagination">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
