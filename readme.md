@@ -1,117 +1,27 @@
-# Gestor de Estancias Formativas
+# 🎓 Dual Kudeatzailea · Egibide
 
-Proyecto desarrollado dentro del **Reto 2** del CFGS **Desarrollo de Aplicaciones Web (DAW)** para el curso **2025–2026**, propuesto por **Egibide**.
-
-La aplicación tiene como objetivo sustituir y mejorar la gestión actual basada en ficheros Excel (DKF), proporcionando una **plataforma web centralizada**, segura y escalable para la gestión de estancias formativas del alumnado en empresas.
-
----
-
-## 📌 Objetivo del proyecto
-
-Desarrollar una aplicación web que permita:
-
-* Gestionar las **estancias formativas** del alumnado.
-* Centralizar la información de **alumnos, empresas y tutores**.
-* Registrar el **seguimiento**, comunicaciones e incidencias.
-* Gestionar **competencias, rúbricas y evaluaciones**.
-* Automatizar la **generación de documentación** (PRL, informes, etc.).
-* Calcular de forma automática las **calificaciones finales**.
+Aplicación web para la **gestión y seguimiento de la Formación Dual** en Egibide.  
+Facilita la coordinación entre **alumnado, empresas y profesorado**, ofreciendo un control claro, estructurado y transparente del proceso formativo y evaluativo.
 
 ---
 
-## 👥 Tipos de usuarios
+## 🏁 Contexto del proyecto
 
-La aplicación contempla distintos roles con permisos diferenciados:
+Este proyecto ha consistido en la **mejora y evolución de un desarrollo previo**, utilizando como base el proyecto del equipo opuesto seleccionado.
 
-* **Administrador/a**: gestión global del sistema.
-* **Tutor/a de centro**: seguimiento académico, validaciones y evaluaciones.
-* **Tutor/a de empresa**: seguimiento del alumno y evaluación en empresa.
-* **Alumno/a**: consulta de su información, planificación y evaluaciones.
+[![GitHub Repository](https://img.shields.io/badge/Repositorio_GitHub-81045F?logo=github&logoColor=white&style=for-the-badge)](https://github.com/AimarMedina/GEF-DKA)
 
----
+El objetivo principal ha sido **trabajar sobre código desarrollado por otros**, simulando un entorno real de mantenimiento y mejora de software.
 
-## 🧩 Funcionalidades principales
+Durante el desarrollo hemos realizado:
 
-* Gestión de alumnos y empresas.
-* Asignación de estancias formativas.
-* Planificación dual (tareas, objetivos, horarios).
-* Registro de seguimiento y comunicaciones.
-* Gestión de competencias y rúbricas.
-* Evaluación por competencias y cálculo de notas.
-* Gestión del cuaderno de prácticas.
-* Gestión de PRL y documentación asociada.
-* Control de acceso por roles.
-
----
-
-## 🗄️ Modelo de datos
-
-La base de datos está diseñada de forma relacional e incluye, entre otras, las siguientes entidades:
-
-* Alumnos
-* Empresas
-* Tutores
-* Estancias formativas
-* Competencias
-* Evaluaciones
-* Seguimiento
-* Planificación
-* PRL
-
-El diseño permite mantener **histórico de datos** por curso académico y facilita la escalabilidad futura.
-
----
-
-## 🛠️ Tecnologías
-
-> Las tecnologías concretas podrán adaptarse según las decisiones del equipo.
-
-* **Frontend**: HTML5, CSS3, JavaScript (framework a definir)
-* **Backend**: Tecnología de servidor a definir
-* **Base de datos**: Sistema relacional (MySQL / PostgreSQL / similar)
-* **Despliegue**: Servidor web
-
----
-
-## 🔐 Seguridad y datos
-
-* Control de acceso mediante autenticación.
-* Permisos basados en roles.
-* Protección de datos personales conforme a RGPD.
-* Integridad y consistencia de la información.
-
----
-
-## 📅 Organización del proyecto
-
-* Trabajo en equipos de **3 personas**.
-* Desarrollo basado en **aprendizaje colaborativo por retos**.
-* Planificación ajustada a las **49 jornadas** del reto.
-
----
-
-## 📄 Documentación
-
-El proyecto incluye:
-
-* Análisis de requisitos.
-* Diseño de base de datos.
-* Diseño de interfaces (UX/UI).
-* Documentación técnica.
-* Manual básico de uso.
-
----
-
-## 🎓 Contexto académico
-
-Proyecto correspondiente al **Reto 2: Gestor de Estancias Formativas**, dentro de los módulos:
-
-* Desarrollo web en entorno cliente
-* Desarrollo web en entorno servidor
-* Diseño de interfaces web
-* Despliegue de aplicaciones web
-* Desarrollo back-end avanzado
-* Desarrollo de aplicaciones full stack
+-  Corrección de errores
+-  Testing funcional 
+-  Mejora de la UX  
+-  Implementación de nuevas funcionalidades  
+-  Añadir el sistema de importación de datos  
+-  Adaptar la documentación   
+-  Preparación y presentación del proyecto  
 
 ---
 
@@ -123,34 +33,54 @@ La aplicación es accesible desde la siguiente dirección:
 
 Credenciales disponibles para la demostración según el rol:
 
-* **Administrador**
-  Usuario: `admin@tes.com`
-  Contraseña: `admin`
-
-* **Alumno**
-  Usuario: `unai.alumno@centro.local`
-  Contraseña: `alumno`
-
-* **Tutor/a de centro**
-  Usuario: `maite.tutor@centro.local`
-  Contraseña: `tutor`
-
-* **Tutor/a de empresa**
-  Usuario: `nerea.instructor@empresa.local`
-  Contraseña: `instructor`
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| **Administrador** | admin@test.com | admin |
+| **Tutor Egibide** | unai.alumno@centro.local | alumno |
+| **Tutor Empresa** | maite.tutor@centro.local | tutor |
+| **Alumno** | nerea.instructor@empresa.local | instructor 
 
 > Estas credenciales se proporcionan únicamente con fines educativos y de evaluación del proyecto.
 
 ---
 
-## ✍️ Autoría
+## 🖥️ Tecnologías utilizadas
 
-Proyecto desarrollado por alumnado del CFGS **DAW** – Egibide.
+### Desarrollo
 
-Curso académico **2025–2026**.
+![Vue.js](https://img.shields.io/badge/Vue.js-81045F?logo=vue.js&logoColor=white&style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-81045F?logo=typescript&logoColor=white&style=for-the-badge)
+![Pinia](https://img.shields.io/badge/Pinia-81045F?logo=vue.js&logoColor=white&style=for-the-badge)
+![Bootstrap](https://img.shields.io/badge/Bootstrap_5-81045F?logo=bootstrap&logoColor=white&style=for-the-badge)
+![SCSS](https://img.shields.io/badge/SCSS-81045F?logo=sass&logoColor=white&style=for-the-badge)
+
+![Laravel](https://img.shields.io/badge/Laravel-81045F?logo=laravel&logoColor=white&style=for-the-badge)
+![PHP](https://img.shields.io/badge/PHP-81045F?logo=php&logoColor=white&style=for-the-badge)
+![MySQL](https://img.shields.io/badge/MySQL-81045F?logo=mysql&logoColor=white&style=for-the-badge)
 
 ---
 
-## 📎 Licencia
+### Organización y control de versiones
 
-Este proyecto se desarrolla con fines educativos dentro del marco del **Reto 2 de Egibide**.
+![GitHub](https://img.shields.io/badge/GitHub-81045F?logo=github&logoColor=white&style=for-the-badge)
+![Git](https://img.shields.io/badge/Git-81045F?logo=git&logoColor=white&style=for-the-badge)
+![Trello](https://img.shields.io/badge/Trello-81045F?logo=trello&logoColor=white&style=for-the-badge)
+
+---
+
+### Comunicación
+
+![WhatsApp](https://img.shields.io/badge/WhatsApp-81045F?logo=whatsapp&logoColor=white&style=for-the-badge)
+
+---
+
+## 👥 Equipo de desarrollo
+
+- **Danel**
+- **Eneko**
+- **Iker**
+
+---
+
+📍 **Proyecto académico / institucional**  
+**Egibide · Dual Kudeatzailea**
