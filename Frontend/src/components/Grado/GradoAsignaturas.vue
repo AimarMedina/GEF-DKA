@@ -2,8 +2,10 @@
 import { ref, watch } from 'vue';
 import FormularioCrear from '@/components/FormularioCrear.vue';
 import AsignaturaRas from './AsignaturaRas.vue';
-import ConfirmarEliminar from '../ConfirmarEliminar.vue'; // <--- IMPORTAMOS
-import api from '@/services/api.js'import { useNotificacion } from '@/composables/useNotificacion'
+import ConfirmarEliminar from '../ConfirmarEliminar.vue';
+import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion';
+
 const props = defineProps({ grado: Object });
 const asignaturas = ref([]);
 const loading = ref(false);
