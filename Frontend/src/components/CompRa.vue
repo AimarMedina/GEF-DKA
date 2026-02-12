@@ -5,7 +5,7 @@
       Competencias vs RAs
     </h2>
 
-    <div class="mb-4 col-12 col-md-4">
+    <div class="mb-4 col-12 col-md-8">
      <BuscadorSelect
         v-model="gradoSeleccionado"
         :options="grados"

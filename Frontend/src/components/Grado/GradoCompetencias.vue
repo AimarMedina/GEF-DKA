@@ -1,8 +1,11 @@
 <script setup>
 import { ref, watch } from "vue";
 import FormularioCrear from "@/components/FormularioCrear.vue";
-import ConfirmarEliminar from '../ConfirmarEliminar.vue'; // <--- IMPORTAMOS
-import api from '@/services/api.js'import { useNotificacion } from '@/composables/useNotificacion'
+import ConfirmarEliminar from '../ConfirmarEliminar.vue';
+import { useNotificacion } from '@/composables/useNotificacion';
+import api from '@/services/api.js';
+
+
 const props = defineProps({ grado: Object });
 const competencias = ref([]);
 const loading = ref(false);
