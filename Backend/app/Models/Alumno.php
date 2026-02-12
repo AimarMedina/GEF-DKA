@@ -4,62 +4,54 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Alumno extends Model
-{
+class Alumno extends Model {
     protected $table = 'alumno';
     protected $primaryKey = 'ID_Usuario';
     public $incrementing = false;
 
     protected $fillable = [
         'ID_Usuario',
+        'DNI',
+        'Matricula',
         'ID_Grado',
         'ID_Tutor',
         'ID_Instructor'
     ];
 
-    public function usuario()
-    {
+    public function usuario() {
         return $this->belongsTo(User::class, 'ID_Usuario', 'id');
     }
 
-    public function grado()
-    {
+    public function grado() {
         return $this->belongsTo(Grado::class, 'ID_Grado');
     }
 
-    public function tutor()
-    {
+    public function tutor() {
         return $this->belongsTo(Tutor::class, 'ID_Tutor', 'ID_Usuario');
     }
 
-    public function instructor()
-    {
+    public function instructor() {
         return $this->belongsTo(Instructor::class, 'ID_Instructor', 'ID_Usuario');
     }
 
-    public function notasCompetencias()
-    {
+    public function notasCompetencias() {
         return $this->hasMany(NotaCompetencia::class, 'ID_Alumno', 'ID_Usuario');
     }
 
-    public function notasTransversales()
-    {
+    public function notasTransversales() {
         return $this->hasMany(NotaTransversal::class, 'ID_Alumno', 'ID_Usuario');
     }
 
-    public function estancias()
-    {
+    public function estancias() {
         return $this->hasMany(EstanciaAlumno::class, 'ID_Alumno', 'ID_Usuario')
             ->orderBy('Fecha_inicio', 'desc');
     }
-    public function estanciaActual()
-    {
+    public function estanciaActual() {
         return $this->hasOne(EstanciaAlumno::class, 'ID_Alumno', 'ID_Usuario')
             ->latestOfMany();
     }
 
-    public function cuadernos()
-    {
+    public function cuadernos() {
         return $this->hasMany(
             AlumnoEntrega::class,
             'ID_Alumno',
@@ -67,13 +59,11 @@ class Alumno extends Model
         );
     }
 
-    public function notasEgibide()
-    {
+    public function notasEgibide() {
         return $this->hasMany(NotaEgibide::class, 'ID_Alumno', 'ID_Usuario');
     }
 
-    public function notaCuaderno()
-    {
+    public function notaCuaderno() {
         return $this->hasOne(NotaCuaderno::class, 'ID_Alumno', 'ID_Usuario');
     }
 }

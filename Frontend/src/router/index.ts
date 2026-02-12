@@ -1,20 +1,22 @@
-import { useUserStore } from '@/stores/userStore'
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
-import UsersView from '../views/UsersView.vue'
-import AlumnosInstructorView from '@/views/instructor/AlumnosInstructorView.vue'
-import AlumnosTutorView from '@/views/tutor/AlumnosTutorView.vue'
-import SeguimientoView from '@/views/tutor/SeguimientoView.vue'
-import EmpresaView from '../views/admin/EmpresaView.vue'
-import EstanciaAlumnoView from '../views/alumno/EstanciaAlumnoView.vue'
-import MiGradoView from '@/views/tutor/MiGradoView.vue'
+import { useUserStore } from '@/stores/userStore';
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import LoginView from '../views/LoginView.vue';
+import UsersView from '../views/UsersView.vue';
+import AlumnosInstructorView from '@/views/instructor/AlumnosInstructorView.vue';
+import AlumnosTutorView from '@/views/tutor/AlumnosTutorView.vue';
+import SeguimientoView from '@/views/tutor/SeguimientoView.vue';
+import EmpresaView from '../views/admin/EmpresaView.vue';
+import EstanciaAlumnoView from '../views/alumno/EstanciaAlumnoView.vue';
+import MiGradoView from '@/views/tutor/MiGradoView.vue';
 import AlumnoCuadernosView from '@/views/cuadernos/AlumnoCuadernosView.vue';
 import TutorCuadernosView from '@/views/cuadernos/TutorCuadernosView.vue';
-import AlumnoNotasView from '@/views/alumno/AlumnoNotasView.vue'
-import CompRaView from '@/views/CompRaView.vue'
-import GradosView from '@/views/GradosView.vue'
-import CambiarContrasenaView from '@/views/CambiarContrasenaView.vue'
+import AlumnoNotasView from '@/views/alumno/AlumnoNotasView.vue';
+import CompRaView from '@/views/CompRaView.vue';
+import GradosView from '@/views/GradosView.vue';
+import CambiarContrasenaView from '@/views/CambiarContrasenaView.vue';
+import ImportacionView from '@/views/admin/ImportacionView.vue';
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -26,7 +28,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'login',
-      component: LoginView
+      component: LoginView,
     },
     {
       path: '/users',
@@ -36,27 +38,26 @@ const router = createRouter({
     {
       path: '/tutores/:id/alumnos',
       name: 'alumnosTutor',
-      component: AlumnosTutorView ,
-      meta: { requiresAuth: true }
+      component: AlumnosTutorView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/instructores/:id/alumnos',
       name: 'alumnosInstructor',
-      component:AlumnosInstructorView,
-      meta: { requiresAuth: true }
-
+      component: AlumnosInstructorView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/tutor/alumno/:id/seguimiento',
       name: 'seguimientoAlumno',
-      component: SeguimientoView
+      component: SeguimientoView,
     },
 
     {
       path: '/tutor/seguimiento/:estanciaId',
       name: 'seguimiento',
       component: SeguimientoView,
-      props: true
+      props: true,
     },
 
     {
@@ -67,67 +68,68 @@ const router = createRouter({
     {
       path: '/alumno/:id/estancia',
       name: 'estanciaAlumno',
-      component:EstanciaAlumnoView,
+      component: EstanciaAlumnoView,
     },
     {
       path: '/cuadernos-alumno',
       name: 'alumno-cuadernos',
-      component: AlumnoCuadernosView
+      component: AlumnoCuadernosView,
     },
     {
       path: '/cuadernos-tutor',
       name: 'tutor-cuadernos',
-      component: TutorCuadernosView
+      component: TutorCuadernosView,
     },
     {
       path: '/alumno/mis-notas',
-      name: "alumno-notas",
-      component: AlumnoNotasView ,
-      meta: { requiresAuth: true }
+      name: 'alumno-notas',
+      component: AlumnoNotasView,
+      meta: { requiresAuth: true },
     },
     {
-      path: "/grados",
-      name: "grados",
-      component: GradosView
+      path: '/grados',
+      name: 'grados',
+      component: GradosView,
     },
     {
-      path: "/competenciasXra",
-      name: "compra",
-      component: CompRaView
+      path: '/competenciasXra',
+      name: 'compra',
+      component: CompRaView,
     },
     {
-    path: "/mi-grado",
-    name: "miGrado",
-    component: MiGradoView
+      path: '/mi-grado',
+      name: 'miGrado',
+      component: MiGradoView,
     },
     {
       path: '/cambiar-contrasena',
-    name: 'cambiar-contrasena',
-    component: CambiarContrasenaView,
-    meta: { requireAuth: true }
-    }
-
-
+      name: 'cambiar-contrasena',
+      component: CambiarContrasenaView,
+      meta: { requireAuth: true },
+    },
+    {
+      path: '/importarDatos',
+      name: 'importarDatos',
+      component: ImportacionView,
+    },
   ],
-})
+});
 
 router.beforeEach(async (to, from, next) => {
-  const userStore = useUserStore()
+  const userStore = useUserStore();
 
-  const userAuth = await userStore.getUser()
+  const userAuth = await userStore.getUser();
   const isAdmin = userStore.user?.tipo == 'admin';
   if (!userAuth && to.path !== '/') {
-    return next('/')
+    return next('/');
   }
 
-  if (userAuth && to.path === '/' || !isAdmin && to.path == '/users') {
-    return next('/home')
+  if ((userAuth && to.path === '/') || (!isAdmin && to.path == '/users')) {
+    return next('/home');
   }
 
-    console.log()
-  next()
-})
+  console.log();
+  next();
+});
 
-
-
-export default router
+export default router;
