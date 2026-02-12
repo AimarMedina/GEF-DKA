@@ -35,7 +35,7 @@ test('login fails with wrong password', function () {
         'password' => 'wrongpassword',
     ]);
 
-    $response->assertStatus(200)
+    $response->assertStatus(401)
         ->assertJson(['status' => 'error']);
 });
 
@@ -163,7 +163,9 @@ test('create fails with duplicate email', function () {
 
     $response = $this->withHeader('Authorization', "Bearer $token")
         ->post('/api/user/create', [
-            'nombre' => 'Nuevo',            'apellidos' => 'Lopez',            'email' => 'existing@example.com',
+            'nombre' => 'Nuevo',
+            'apellidos' => 'Lopez',
+            'email' => 'existing@example.com',
             'password' => 'password123',
             'tipo' => 'alumno',
         ]);
@@ -178,7 +180,9 @@ test('create fails with short password', function () {
 
     $response = $this->withHeader('Authorization', "Bearer $token")
         ->post('/api/user/create', [
-            'nombre' => 'Carlos',            'apellidos' => 'Perez',            'email' => 'test@example.com',
+            'nombre' => 'Carlos',
+            'apellidos' => 'Perez',
+            'email' => 'test@example.com',
             'password' => '12345',
             'tipo' => 'alumno',
         ]);
@@ -307,5 +311,3 @@ test('delete fails with non-existent user', function () {
     $response->assertStatus(404)
         ->assertJson(['error' => 'Usuario no encontrado']);
 });
-
-

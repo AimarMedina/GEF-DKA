@@ -30,7 +30,7 @@ test('search grados by name', function () {
         ->get('/api/grados?q=Web');
 
     $response->assertStatus(200)
-        ->assertJsonCount(1, 'data');
+        ->assertJsonCount(1);
 });
 
 test('get all grados without pagination', function () {
@@ -117,8 +117,7 @@ test('get grado asignaturas', function () {
         ->get("/api/grados/{$grado->id}/asignaturas");
 
     $response->assertStatus(200);
-})
-;
+});
 test('get grado competencias', function () {
     $grado = Grado::create(['Nombre' => 'CompDAM', 'Curso' => '2º']);
     $admin = User::factory()->create(['tipo' => 'admin']);
