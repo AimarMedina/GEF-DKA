@@ -6,6 +6,7 @@ use App\Models\Empresa;
 use Illuminate\Http\Request;
 
 class EmpresaController extends Controller{
+
     private function validateRequest(Request $req) {
 
         return $req->validate([
@@ -31,25 +32,19 @@ class EmpresaController extends Controller{
     public function getInstructores($cif){
         $empresa = Empresa::where('CIF', $cif)->firstOrFail();
 
-        $instructores = $empresa->instructores()
-            ->whereNotNull('ID_Usuario') // asegurarse de que tengan usuario
+        $instructores = $empresa->instructores()->whereNotNull('ID_Usuario')
+            // asegurarse de que tengan usuario
             // Cargar campos necesarios del usuario para la vista (nombre, apellidos, email, telefono)
             ->with('user:id,nombre,apellidos,email,n_tel') // carga el usuario con más campos
-            ->get()
-            ->filter(fn($i) => $i->user !== null); // opcional, por seguridad
+            ->get()->filter(fn($i) => $i->user !== null); // opcional, por seguridad
 
-        return response()->json([
-            'data' => $instructores
-        ]);
+        return response()->json([ 'data' => $instructores ]);
     }
-
-
-
 
 
     public function index(){
         // Traemos todas las empresas con solo los campos necesarios
-        $empresas = Empresa::all(['CIF', 'Nombre']);
+        $empresas = Empresa::all(['CIF', 'Nombre', 'Direccion', 'Email', 'N_Tel']);
 
         // Retornamos en formato JSON
         return response()->json([
@@ -57,13 +52,7 @@ class EmpresaController extends Controller{
         ]);
     }
 
-
-
-
-
-
-   public function getCompanys(Request $req)
-{
+   public function getCompanys(Request $req){
         $q = trim((string) $req->query('q', ''));
 
         $perPage = $req->query('per_page', 5);
@@ -84,6 +73,7 @@ class EmpresaController extends Controller{
 
         return response()->json($empresas);
     }
+
     public function create(Request $req){
         $data = $this->validateRequest($req);
 

@@ -5,6 +5,7 @@ import CrearGradoModal from "./CrearGradoModal.vue";
 import TransversalModal from "@/components/Grado/TranversalModal.vue";
 import ConfirmarEliminar from "../ConfirmarEliminar.vue";
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 // AÑADIMOS LOS NUEVOS EVENTOS AL EMIT
 const emit = defineEmits(['verAsignaturas', 'verCompetencias']);
@@ -18,6 +19,7 @@ const mostrarModal = ref(false);
 const mostrarTransversalModal = ref(false);
 const eliminarModal = ref(false);
 const gradoEliminar = ref(null);
+const { error } = useNotificacion();
 
 const searchQuery = ref("");
 let searchTimeout = null;
@@ -85,7 +87,7 @@ async function eliminarGrado(id) {
     fetchGrados(currentPage.value); // Recargar la página actual
   } catch (err) {
     console.error('Error al eliminar grado:', err);
-    alert(err.response?.data?.message || 'Error al eliminar el grado');
+    error('Error', err.response?.data?.message || 'Error al eliminar el grado');
   }
 }
 

@@ -2,11 +2,12 @@
 import { ref, watch } from 'vue';
 import FormularioCrear from '@/components/FormularioCrear.vue';
 import ConfirmarEliminar from '../ConfirmarEliminar.vue';
-import api from '@/services/api.js'
-
+import api from '@/services/api.js'import { useNotificacion } from '@/composables/useNotificacion'
 const props = defineProps({
     asignatura: Object // Recibimos la asignatura completa (id y nombre)
 });
+
+const { error } = useNotificacion()
 
 const ras = ref([]);
 const loading = ref(false);
@@ -44,7 +45,7 @@ const eliminarRa = async (id) => {
         await api.delete(`/api/ras/${id}`);
         fetchRas();
     } catch (e) {
-        alert('Error al eliminar');
+        error('Error', 'Error al eliminar');
     }
 };
 

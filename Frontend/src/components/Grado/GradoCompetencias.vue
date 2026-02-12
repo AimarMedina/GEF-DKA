@@ -2,12 +2,12 @@
 import { ref, watch } from "vue";
 import FormularioCrear from "@/components/FormularioCrear.vue";
 import ConfirmarEliminar from '../ConfirmarEliminar.vue'; // <--- IMPORTAMOS
-import api from '@/services/api.js'
-
+import api from '@/services/api.js'import { useNotificacion } from '@/composables/useNotificacion'
 const props = defineProps({ grado: Object });
 const competencias = ref([]);
 const loading = ref(false);
 const mostrarForm = ref(false);
+const { error } = useNotificacion();
 
 // Variables para el modal de eliminar
 const compEliminar = ref(null);
@@ -56,7 +56,7 @@ async function eliminarCompetencia(id) {
     );
     fetchCompetencias();
   } catch (e) {
-    alert("Error al eliminar");
+    error('Error', 'Error al eliminar');
   }
 }
 </script>
