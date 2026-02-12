@@ -147,9 +147,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // ========================================
     // RUTAS COMPARTIDAS (múltiples roles)
     // ========================================
-    
+
+    Route::get('/alumno/{id}', [AlumnoController::class, 'getGrado']);
+    Route::get('/allempresas', [EmpresaController::class, 'getCompanys']);
+    Route::get('/instructores/{id}/alumnos', [AlumnoController::class, 'alumnosDeInstructor']);
     Route::get('/empresa/{cif}/instructores', [InstructorController::class, 'getCompanyInstructor']);
-    Route::get('/empresas', [EmpresaController::class, 'getCompanys']);
     Route::get('/tutores/{id}/alumnos', [AlumnoController::class, 'alumnosDeTutor']);
     Route::get('/tutor/alumnos-sin-asignar', [AlumnoController::class, 'alumnosSinAsignarParaTutor']);
     Route::get('/alumno/{id}/mis-notas', [AlumnoController::class, 'misNotas']);
