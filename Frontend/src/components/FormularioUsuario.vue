@@ -130,7 +130,7 @@ watch(
 async function cargarGrados() {
   try {
     const response = await api.get('/api/grados');
-    grados.value = response.data.data;
+    grados.value = response.data;
   } catch (e) {
     console.error(e);
   }
