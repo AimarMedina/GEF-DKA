@@ -93,17 +93,15 @@ export const useUsersStore = defineStore('users', () => {
     try {
         if (data.id) {
             await api.put(`/api/users/${data.id}`, data);
-            alert('Usuario actualizado correctamente');
         } else {
             await api.post('/api/users', data);
-            alert('Usuario creado correctamente');
         }
         // Actualiza la cache
         removeUserFromCache(data.id);
         await fetchUsers(currentPage.value, filters);
     } catch (e) {
         console.error(e);
-        alert('Error al guardar usuario');
+        throw new Error(e.response?.data?.message || 'Error al guardar usuario');
     }
   }
 
@@ -114,10 +112,9 @@ export const useUsersStore = defineStore('users', () => {
         await api.delete(`/api/users/${currentUser.value.id}`);
         removeUserFromCache(currentUser.value.id);
         await fetchUsers(currentPage.value, filters);
-        alert('Usuario eliminado correctamente');
     } catch (e) {
         console.error(e);
-        alert('Error al eliminar usuario');
+        throw new Error(e.response?.data?.message || 'Error al eliminar usuario');
     } finally {
         currentUser.value = null;
     }

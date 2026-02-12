@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import FormularioUsuario from '../FormularioUsuario.vue'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({ empresa: Object })
 
@@ -10,6 +11,7 @@ const cache = ref({})
 const loading = ref(false)
 const showModal = ref(false)
 const errorMessage = ref(null)
+const { info, success, error } = useNotificacion()
 
 async function cargarInstructores(cif) {
     // COMENTA ESTA LÍNEA temporalmente para forzar la carga real
@@ -39,6 +41,8 @@ watch(
 )
 
 async function crearUsuario(instructorData) {
+    info('Procesando', 'Un momento, por favor...')
+    
     try {
         const response = await api.post('/api/empresa/instructor/create', {
             ...instructorData,
@@ -46,10 +50,16 @@ async function crearUsuario(instructorData) {
         })
         instructores.value.push(response.data.instructor)
         cache.value[props.empresa.CIF] = instructores.value
+        success('Éxito', `Instructor ${response.data.instructor.user.nombre} creado correctamente`)
         showModal.value = false
         errorMessage.value = {}
-    } catch (error) {
-        errorMessage.value = error.response.data.errors
+    } catch (err) {
+        if (err.response?.status === 422) {
+            errorMessage.value = err.response.data.errors
+            error('Error de validación', 'Revisa los campos marcados en rojo')
+        } else {
+            error('Error', err.response?.data?.message || 'No se pudo crear el instructor')
+        }
     }
 }
 </script>

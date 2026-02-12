@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import BuscadorSelect from './BuscadorSelect.vue'
 import { useUsersStore } from '@/stores/users.store'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   show: Boolean,
@@ -11,6 +12,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'crear'])
 const usersStore = useUsersStore()
+const { warning } = useNotificacion()
 
 const grados = ref([])
 const gradoSeleccionado = ref('')
@@ -64,7 +66,7 @@ async function cargarGrados() {
 function guardar() {
   const id_grado_final = props.tipo === 'alumno' ? gradoSeleccionado.value || null : null
   if (props.tipo === 'alumno' && !id_grado_final) {
-    alert('Debes seleccionar un grado')
+    warning('Advertencia', 'Debes seleccionar un grado')
     return
   }
 

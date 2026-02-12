@@ -4,6 +4,7 @@ import { useUsersStore } from '@/stores/users.store'
 import { storeToRefs } from 'pinia'
 import ConfirmarEliminar from './ConfirmarEliminar.vue'
 import FormularioUsuario from './FormularioUsuario.vue'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   filters: Object
@@ -11,6 +12,7 @@ const props = defineProps({
 
 const usersStore = useUsersStore()
 const { users, currentPage, totalPages, currentUser } = storeToRefs(usersStore)
+const { info, success, error } = useNotificacion()
 
 const mostrarConfirmarModal = ref(false)
 const mostrarModalUsuario = ref(false)
@@ -71,8 +73,28 @@ const nextEllipsisTarget = computed(() => Math.min(totalPages.value, chunkStart.
 
 async function handleConfirmDelete(confirm) {
   if (!confirm || !currentUser.value) return
-  await usersStore.handleConfirmDelete(confirm, props.filters)
+  
+  info('Procesando', 'Un momento, por favor...')
+  try {
+    await usersStore.handleConfirmDelete(confirm, props.filters)
+    success('Éxito', 'Usuario eliminado correctamente')
+  } catch (err) {
+    error('Error', err.message || 'No se pudo eliminar el usuario')
+  }
   mostrarConfirmarModal.value = false
+}
+
+async function handleGuardarUsuario(userData) {
+  const esEdicion = userData.id
+  info('Procesando', 'Un momento, por favor...')
+  
+  try {
+    await usersStore.guardarUsuario(userData, props.filters)
+    success('Éxito', esEdicion ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente')
+    cerrarModalUsuario()
+  } catch (err) {
+    error('Error', err.message || 'No se pudo guardar el usuario')
+  }
 }
 </script>
 
@@ -159,7 +181,7 @@ async function handleConfirmDelete(confirm) {
       :show="mostrarModalUsuario"
       :tipo="tipoModal"
       @close="cerrarModalUsuario"
-      @crear="usersStore.guardarUsuario($event, props.filters)"
+      @crear="handleGuardarUsuario($event)"
     />
   </div>
 </template>
