@@ -2,7 +2,8 @@
 import { ref, watch } from 'vue';
 import FormularioCrear from '@/components/FormularioCrear.vue';
 import ConfirmarEliminar from '../ConfirmarEliminar.vue';
-import api from '@/services/api.js'import { useNotificacion } from '@/composables/useNotificacion'
+import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 const props = defineProps({
     asignatura: Object // Recibimos la asignatura completa (id y nombre)
 });
