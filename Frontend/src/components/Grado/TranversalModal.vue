@@ -2,12 +2,15 @@
 import { ref, watch } from 'vue'
 import api from '@/services/api.js'
 import ConfirmarEliminar from '../ConfirmarEliminar.vue'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   show: Boolean
 })
 
 const emit = defineEmits(['close'])
+
+const { error, warning } = useNotificacion()
 
 const transversales = ref([])
 const cargando = ref(false)
@@ -32,7 +35,7 @@ async function cargarTransversales() {
     transversales.value = res.data
   } catch (e) {
     console.error('Error cargando transversales:', e)
-    alert('Error al cargar las transversales')
+    error('Error', 'Error al cargar las transversales')
   } finally {
     cargando.value = false
   }
@@ -40,7 +43,7 @@ async function cargarTransversales() {
 
 async function crearTransversal() {
   if (!nuevaTransversal.value.trim()) {
-    alert('La descripción es obligatoria')
+    warning('Advertencia', 'La descripción es obligatoria')
     return
   }
 
@@ -53,7 +56,7 @@ async function crearTransversal() {
     await cargarTransversales()
   } catch (e) {
     console.error('Error creando transversal:', e)
-    alert('Error al crear la transversal')
+    error('Error', 'Error al crear la transversal')
   }
 }
 
@@ -69,7 +72,7 @@ function cancelarEdicion() {
 
 async function guardarEdicion(id) {
   if (!transversalEditada.value.trim()) {
-    alert('La descripción es obligatoria')
+    warning('Advertencia', 'La descripción es obligatoria')
     return
   }
 
@@ -83,7 +86,7 @@ async function guardarEdicion(id) {
     await cargarTransversales()
   } catch (e) {
     console.error('Error actualizando transversal:', e)
-    alert('Error al actualizar la transversal')
+    error('Error', 'Error al actualizar la transversal')
   }
 }
 
@@ -107,7 +110,7 @@ async function eliminarTransversal(id) {
     await cargarTransversales()
   } catch (e) {
     console.error('Error eliminando transversal:', e)
-    alert(e.response?.data?.message || 'Error al eliminar la transversal')
+    error('Error', e.response?.data?.message || 'Error al eliminar la transversal')
   }
 }
 </script>

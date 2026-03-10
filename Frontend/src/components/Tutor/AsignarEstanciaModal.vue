@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, defineProps, defineEmits } from 'vue'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   show: Boolean,
@@ -8,6 +9,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close','crear'])
+const { error, warning } = useNotificacion()
 
 const diasSemana = ['Lunes','Martes','Miércoles','Jueves','Viernes']
 
@@ -64,23 +66,33 @@ watch(() => props.show, val => {
   }
 })
 
+// Cambia esto en tu watch de CIF_Empresa
 watch(() => nuevaEstancia.value.CIF_Empresa, async cif => {
-  if(!cif) return
+  if(!cif) {
+    instructores.value = []
+    return
+  }
 
-  const res = await api.get(`/api/empresa/${cif}/instructores`)
-  instructores.value = res.data || []
-  console.log(instructores.value);
+  try {
+    const res = await api.get(`/api/empresa/${cif}/instructores`)
+    // Laravel devuelve { data: [...] }, Axios lo mete en res.data
+    // Por tanto, los instructores están en res.data.data
+    instructores.value = res.data.data || []
+  } catch (error) {
+    console.error("Error cargando instructores:", error)
+    instructores.value = []
+  }
 })
 
 async function crearEstancia(){
   const horariosActivos = nuevaEstancia.value.horarios.filter(h => h.activo)
 
   if(!horariosActivos.length){
-    alert('Selecciona al menos un día con horario')
+    warning('Advertencia', 'Selecciona al menos un día con horario')
     return
   }
   if(!nuevaEstancia.value.Fecha_inicio || !nuevaEstancia.value.Fecha_fin){
-    alert('Debes seleccionar fecha inicio y fin')
+    warning('Advertencia', 'Debes seleccionar fecha inicio y fin')
     return
   }
   const payload = {
@@ -106,7 +118,7 @@ async function crearEstancia(){
     cerrarModal()
   } catch(err) {
     console.error(err)
-    alert('Error al crear la estancia. Revisa la consola.')
+    error('Error', 'Error al crear la estancia. Revisa la consola.')
   }
   }
 

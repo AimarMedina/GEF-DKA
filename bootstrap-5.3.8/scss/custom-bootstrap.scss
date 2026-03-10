@@ -1,0 +1,8 @@
+// custom-bootstrap.scss
+// Sobrescribe variables de Bootstrap antes de importar el resto.
+// Define color primary personalizado y luego importa Bootstrap.
+
+$primary: #7B1F6A !default;
+
+// Importar bootstrap principal desde este directorio
+@import "bootstrap";

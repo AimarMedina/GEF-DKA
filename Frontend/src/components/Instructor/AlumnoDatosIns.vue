@@ -1,10 +1,13 @@
 <script setup>
 import { watch, ref } from 'vue'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   alumno: Object
 })
+
+const { error } = useNotificacion()
 
 const competencias = ref([])
 const competenciasDisponibles = ref([])
@@ -137,7 +140,7 @@ const actualizarNotaTransversal = async (transversal) => {
     console.log('Nota transversal guardada:', transversal.nota)
   } catch (e) {
     console.error('Error guardando nota transversal', e)
-    alert('Error al guardar la nota transversal')
+    error('Error', 'Error al guardar la nota transversal')
   }
 }
 

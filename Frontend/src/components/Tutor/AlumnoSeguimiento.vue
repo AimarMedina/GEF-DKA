@@ -4,6 +4,7 @@ import CrearSeguimientoModal from './CrearSeguimientoModal.vue'
 import EditarSeguimientoModal from './EditarSeguimientoModal.vue'
 import ConfirmarEliminar from '../ConfirmarEliminar.vue'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   estanciaId: {
@@ -11,6 +12,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const { error } = useNotificacion()
 
 // Datos y modales
 const seguimientos = ref([])
@@ -72,14 +75,14 @@ async function guardarNuevoSeguimiento(data) {
     crearModalVisible.value = false
   } catch (err) {
     console.error(err)
-    alert(err.response?.data?.message || err.message)
+    error('Error al guardar seguimiento', err.response?.data?.message || err.message)
   }
 }
 
 // Guardar seguimiento (editar)
 async function guardarEdicionSeguimiento(data) {
   if (!data.id) {
-    alert('No se puede editar: falta ID')
+    error('Error', 'No se puede editar: falta ID')
     return
   }
 
@@ -94,14 +97,14 @@ async function guardarEdicionSeguimiento(data) {
     editing.value = null
   } catch (err) {
     console.error(err)
-    alert(err.response?.data?.message || err.message)
+    error('Error al actualizar', err.response?.data?.message || err.message)
   }
 }
 
 // Eliminar seguimiento
 async function eliminarSeguimiento(id) {
   if (!id) {
-    alert('No se puede eliminar: falta ID')
+    error('Error', 'No se puede eliminar: falta ID')
     return
   }
 
@@ -114,7 +117,7 @@ async function eliminarSeguimiento(id) {
 
   } catch (err) {
     console.error(err)
-    alert('Error al eliminar seguimiento')
+    error('Error', 'Error al eliminar seguimiento')
   }
 }
 

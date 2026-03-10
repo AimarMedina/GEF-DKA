@@ -1,9 +1,19 @@
 <script setup lang="ts">
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref, provide } from 'vue'
 import { RouterView } from 'vue-router'
 import { useUserStore } from './stores/userStore'
+import PopupNotificacion from './components/PopupNotificacion.vue'
 
 const userStore = useUserStore()
+const popupRef = ref()
+
+const mostrarNotificacion = (tipo: string, titulo: string, mensaje: string) => {
+  if (popupRef.value) {
+    popupRef.value.mostrar(tipo, titulo, mensaje)
+  }
+}
+
+provide('mostrarNotificacion', mostrarNotificacion)
 
 onBeforeMount(async () => {
   await userStore.getUser()
@@ -11,6 +21,8 @@ onBeforeMount(async () => {
 </script>
 
 <template>
+  <PopupNotificacion ref="popupRef" />
+  
   <div
     v-if="!userStore.initialized"
     class="d-flex justify-content-center align-items-center mt-5 gap-2"

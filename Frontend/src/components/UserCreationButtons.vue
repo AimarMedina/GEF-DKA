@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import FormularioUsuario from './FormularioUsuario.vue'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
     tipo: {
@@ -17,6 +18,7 @@ const props = defineProps({
 const showModal = ref(false)
 const errorMessage = ref(null)
 const tipoUsuario = ref(null)
+const { info, success, error } = useNotificacion()
 
 // si grado es NONE → false
 const idGradoProp = computed(() => {
@@ -34,22 +36,27 @@ function abrirModal(tipoSeleccionado) {
 async function crearUsuario(userData) {
   console.log(userData);
 
-    try {
-        const response = await api.post('/api/user/create', {
-            ...userData,
-            tipo: tipoUsuario.value
-        })
-        console.log(response.data);
-        showModal.value = false
-        errorMessage.value = {}
-    } catch (error) {
-    if (error.response && error.response.status === 422) {
-        errorMessage.value = error.response.data.errors || {};
-    } else {
-        console.error(error)
-    }
-}
+  info('Procesando', 'Un momento, por favor...')
 
+  try {
+    const response = await api.post('/api/user/create', {
+      ...userData,
+      tipo: tipoUsuario.value
+    })
+    console.log(response.data);
+    
+    success('Éxito', `Usuario ${response.data.nombre} creado correctamente`)
+    showModal.value = false
+    errorMessage.value = {}
+  } catch (err) {
+    if (err.response && err.response.status === 422) {
+      errorMessage.value = err.response.data.errors || {}
+      error('Error de validación', 'Revisa los campos marcados en rojo')
+    } else {
+      console.error(err)
+      error('Error', err.response?.data?.message || 'No se pudo crear el usuario')
+    }
+  }
 }
 </script>
 
