@@ -13,7 +13,7 @@ defineProps({
             <p><strong>CIF:</strong> {{ empresa.CIF }}</p>
             <p><strong>Dirección:</strong> {{ empresa.Direccion }}</p>
             <p><strong>Email:</strong> {{ empresa.Email }}</p>
-            <p><Strong>Telefono:</Strong> {{ empresa.N_Tel }}</p>
+            <p><strong>Telefono:</strong> {{ empresa.N_Tel }}</p>
         </div>
     </div>
 </template>

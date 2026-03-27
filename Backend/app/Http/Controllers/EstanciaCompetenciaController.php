@@ -43,7 +43,7 @@ class EstanciaCompetenciaController extends Controller
         ], 201);
     }
 
-    public function delete(Request $req, $estanciaId, $competenciaId)
+    public function delete($estanciaId, $competenciaId)
     {
         $estancia = EstanciaAlumno::findOrFail($estanciaId);
 

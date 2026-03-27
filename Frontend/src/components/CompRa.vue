@@ -5,7 +5,7 @@
       Competencias vs RAs
     </h2>
 
-    <div class="mb-4 col-12 col-md-4">
+    <div class="mb-4 col-12 col-md-8">
      <BuscadorSelect
         v-model="gradoSeleccionado"
         :options="grados"
@@ -152,8 +152,10 @@ async function toggleCompRa(asig, ra, comp) {
 }
 
 onMounted(async () => {
-  const { data } = await api.get('/api/grados')
-  grados.value = data.data
+  const { data } = await api.get('/api/grados2')
+  
+  grados.value = data
+ 
 })
 
 

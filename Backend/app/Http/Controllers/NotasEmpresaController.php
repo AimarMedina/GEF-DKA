@@ -6,6 +6,7 @@ use App\Models\Alumno;
 use App\Models\Transversal;
 use App\Models\NotaTransversal;
 use App\Models\NotaCompetencia;
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 
 class NotasEmpresaController extends Controller
@@ -34,6 +35,22 @@ class NotasEmpresaController extends Controller
         return $alumno;
     }
 
+    public function storeUpdate(Request $request, $idAlumno, $idCompetencia) {
+        $request->validate([
+            'nota' => 'required|numeric|min:0|max:10'
+        ]);
+
+        // IMPORTANTE: Las claves deben ser idénticas al $fillable del modelo
+        return NotaCompetencia::updateOrCreate(
+            [
+                'ID_Alumno'      => $idAlumno,      
+                'ID_Competencia' => $idCompetencia   
+            ],
+            [
+                'Nota'           => $request->nota  
+            ]
+        );
+    }
     /**
      * GET /api/alumnos/{id}/notas
      * Muestra las competencias y las notas actuales.
@@ -54,7 +71,7 @@ class NotasEmpresaController extends Controller
             $nota = NotaTransversal::where('ID_Transversal', $t->id)
                         ->where('ID_Alumno', $idAlumno)
                         ->first();
-            
+
             return [
                 'id' => $t->id,
                 'descripcion' => $t->Descripcion,
@@ -107,6 +124,15 @@ class NotasEmpresaController extends Controller
                 'tecnicas' => $tecnicas,
             ]
         ]);
+    }
+    public function update(Request $request, $id) {
+        $request->validate(['nota' => 'required|numeric|min:0|max:10']);
+        
+        // Actualiza TODOS los registros de ese alumno
+        // Si tu base de datos usa minúsculas, cambia el controlador a:
+        NotaCompetencia::where('id_alumno', $id)->update(['nota' => $request->nota]);
+
+        return response()->json(['message' => 'Notas transversales actualizadas']);
     }
 
     /**

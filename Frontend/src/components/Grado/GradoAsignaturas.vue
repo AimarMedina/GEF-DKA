@@ -2,13 +2,15 @@
 import { ref, watch } from 'vue';
 import FormularioCrear from '@/components/FormularioCrear.vue';
 import AsignaturaRas from './AsignaturaRas.vue';
-import ConfirmarEliminar from '../ConfirmarEliminar.vue'; // <--- IMPORTAMOS
+import ConfirmarEliminar from '../ConfirmarEliminar.vue';
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion';
 
 const props = defineProps({ grado: Object });
 const asignaturas = ref([]);
 const loading = ref(false);
 const mostrarForm = ref(false);
+const { error } = useNotificacion();
 
 // Variables para el modal de eliminar
 const asigEliminar = ref(null);
@@ -62,7 +64,7 @@ async function eliminarAsignatura(id){
         await api.delete(`/api/asignaturas/${id}`);
         fetchAsignaturas();
     } catch (e){
-        alert('Error al eliminar');
+        error('Error', 'Error al eliminar');
     }
 }
 </script>

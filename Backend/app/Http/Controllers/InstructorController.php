@@ -12,10 +12,8 @@ class InstructorController extends Controller
         $instructores = Instructor::with('user')->where('CIF_Empresa',$cif)->get();
         return response()->json($instructores);
     }
-     public function crearInstructor(Request $request)
-    {
-        // Validamos los datos básicos
-        $data = $request->validate([
+    private function validarReq(Request $request){
+        return $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
             'email' => ['required','email','max:255','unique:users,email'],
@@ -36,29 +34,38 @@ class InstructorController extends Controller
             'CIF_Empresa.required' => 'Debes seleccionar una empresa.',
             'CIF_Empresa.exists' => 'La empresa seleccionada no existe.',
         ]);
+    }
 
+     public function crearInstructor(Request $request)
+    {
+        // Validamos los datos básicos
+        $data = $this->validarReq($request);
 
-
-        // Creamos el usuario
+        // Creamos el usuario (asegurando hash de la contraseña)
         $user = User::create([
             'nombre' => $data['nombre'],
             'apellidos' => $data['apellidos'] ?? null,
             'email' => $data['email'],
             'n_tel' => $data['n_tel'] ?? null,
-            'password' => $data['password'],
+            'password' => bcrypt($data['password']),
             'tipo' => 'instructor',
         ]);
 
+        // Si el hook de User ya creó una fila en instructor (por el created hook),
+        // actualizamos esa fila en lugar de intentar crearla de nuevo.
         $user->load('instructor');
 
-        // Asignamos la empresa al instructor recién creado
         $instructor = $user->instructor;
-
         if ($instructor) {
             $instructor->CIF_Empresa = $data['CIF_Empresa'];
             $instructor->save();
+        } else {
+            $user->instructor()->create([
+                'CIF_Empresa' => $data['CIF_Empresa'],
+            ]);
+            $user->load('instructor');
+            $instructor = $user->instructor;
         }
-
 
         return response()->json([
             'message' => 'Instructor creado correctamente',

@@ -54,6 +54,7 @@ import { ref, onMounted, watch } from 'vue'
 import EmpresaForm from './EmpresaForm.vue'
 import Buscador from "../Buscador.vue";
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const empresas = ref([])
 const mostrarModal = ref(false)
@@ -69,6 +70,7 @@ const q = ref("");
 let searchTimeout = null;
 
 const emit = defineEmits(['seleccionarEmpresa'])
+const { info, success, error } = useNotificacion()
 
 // Cargar al inicio
 onMounted(() => {
@@ -103,16 +105,22 @@ async function cargarEmpresas(page = 1) {
 }
 
 const crearEmpresa = async (empresa) => {
+    info('Procesando', 'Un momento, por favor...')
+    
     try {
         const response = await api.post('/api/empresa/create', { ...empresa })
         mostrarModal.value = false
         errores.value = null
         q.value = response.data.Nombre
+        success('Éxito', `Empresa ${response.data.Nombre} creada correctamente`)
         // Recargar para ver la nueva
         cargarEmpresas(1)
     } catch (e) {
         if (e.response?.status === 422) {
             errores.value = e.response.data.errors
+            error('Error de validación', 'Revisa los campos marcados en rojo')
+        } else {
+            error('Error', e.response?.data?.message || 'No se pudo crear la empresa')
         }
     }
 }

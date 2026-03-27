@@ -46,11 +46,11 @@ class UserController extends Controller
             'status' => 'success',
             'message' => 'Autenticado',
             'user' => $userAuth
-        ]);
+        ], 200);
     }
-    public function getUser($id)
-    {
-        return User::find($id);
+
+    public function getUser($id){
+        return User::findOrFail($id);
     }
 
     public function login(Request $req)
@@ -64,7 +64,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Credenciales inválidas',
-            ], 200);
+            ], 403);
         }
 
         $user = Auth::user();
@@ -91,8 +91,7 @@ class UserController extends Controller
         ], 200);
     }
 
-  public function getUsers(Request $req)
-    {
+    public function getUsers(Request $req){
         $perPage = $req->get('per_page', 5);
 
         $query = User::query()->orderBy('id');
@@ -119,11 +118,12 @@ class UserController extends Controller
             });
         }
 
-       
+
         if ($req->tipo === 'alumno') {
             $query->with(['alumno.grado']);
         } elseif ($req->tipo === 'instructor') {
-            $query->with(['instructor.empresa']); //Si es instructor buscamos la empresa para facilitar la busqyeda al admin
+            $query->with(['instructor.empresa']);
+            //Si es instructor buscamos la empresa para facilitar la busqyeda al admin
         }
 
         $usuarios = $query->paginate($perPage);
@@ -134,10 +134,9 @@ class UserController extends Controller
         ]);
     }
 
-
     // Crear usuario
-    public function create(Request $req)
-    {
+    public function create(Request $req){
+
         $data = $req->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
@@ -165,19 +164,18 @@ class UserController extends Controller
     }
 
     // Actualizar usuario
-    public function update(Request $req, $id)
-    {
+    public function update(Request $req, $id){
         $user = User::findOrFail($id);
 
-        $data = $req->validate([
-            'nombre' => 'sometimes|required|string|max:255',
-            'apellidos' => 'nullable|string|max:255',
-            'email' => ['sometimes', 'required', 'email', 'max:255', 'unique:users,email,' . $id],
-            'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/', 'unique:users,n_tel,' . $id],
-            'password' => 'nullable|string|min:6',
-            'tipo' => 'sometimes|required|string|in:alumno,tutor,instructor,admin',
-            'id_grado' => 'nullable|exists:grado,id',
-        ]);
+            $data = $req->validate([
+                'nombre' => 'sometimes|required|string|max:255',
+                'apellidos' => 'nullable|string|max:255',
+                'email' => ['sometimes', 'required', 'email', 'max:255', 'unique:users,email,' . $id],
+                'n_tel' => ['nullable', 'string', 'regex:/^[0-9]{9}$/', 'unique:users,n_tel,' . $id],
+                'password' => 'nullable|string|min:6',
+                'tipo' => 'sometimes|required|string|in:alumno,tutor,instructor,admin',
+                'id_grado' => 'nullable|exists:grado,id',
+            ]);
 
         $user->update([
             'nombre' => $data['nombre'] ?? $user->nombre,
@@ -245,7 +243,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuario eliminado correctamente']);
     }
-
 }
 
 

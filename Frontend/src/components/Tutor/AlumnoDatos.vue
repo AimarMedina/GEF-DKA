@@ -6,6 +6,7 @@ import NotasAlumno from '@/components/Tutor/NotasAlumno.vue'
 import AsignarInstructorModal from '@/components/Tutor/AsignarInstructorModal.vue'
 import ConfirmarEliminar from '@/components/ConfirmarEliminar.vue'
 import api from '@/services/api.js'
+import { useNotificacion } from '@/composables/useNotificacion'
 
 const props = defineProps({
   alumno: Object
@@ -15,6 +16,7 @@ const emit = defineEmits(['estanciaCreada', 'estanciaEliminada', 'instructorAsig
 const router = useRouter()
 const route = useRoute()
 const isTutorView = computed(() => route.name === 'alumnosTutor')
+const { error } = useNotificacion()
 
 const showEstanciaModal = ref(false)
 const showInstructorModal = ref(false)
@@ -88,7 +90,7 @@ async function eliminarEstancia(estanciaId) {
     emit('estanciaEliminada')
   } catch (err) {
     console.error('Error al eliminar estancia:', err)
-    alert('Error al eliminar la estancia')
+    error('Error', 'Error al eliminar la estancia')
     throw err // Re-lanzar el error para que confirmarEliminarEstancia lo capture
   }
 }

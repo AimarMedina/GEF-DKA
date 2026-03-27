@@ -32,10 +32,8 @@ class AlumnoController extends Controller
                 ], 403);
             }
         }
-        // ----------------
 
         // Lógica de búsqueda y paginación (la mantenemos igual)
-        $perPage = (int) $request->query('per_page', 5);
         $q = trim((string) $request->query('q', ''));
 
         $query = Alumno::query()->where('id_tutor', $id);
@@ -88,8 +86,8 @@ class AlumnoController extends Controller
         return Alumno::with('grado')->findOrFail($id);
     }
 
-    public function misNotasAlumno(Request $request, $id)
-{
+    public function misNotasAlumno($id){
+
     $alumno = Alumno::with('grado')->findOrFail($id); // Alumno con su grado
     $grado = $alumno->grado;
     $asignaturas = Asignatura::where('ID_Grado', $grado->id)->get();
@@ -153,8 +151,8 @@ class AlumnoController extends Controller
         return response()->json($alumno);
     }
 
-    public function guardarNotaEgibide(Request $request, $idAlumno)
-    {
+    public function guardarNotaEgibide(Request $request, $idAlumno){
+
         $request->validate([
             'id_asignatura' => 'required|integer|exists:asignatura,id',
             'nota' => 'required|numeric|min:0|max:10',
@@ -164,16 +162,20 @@ class AlumnoController extends Controller
         $alumno = Alumno::findOrFail($idAlumno);
         $user = $request->user();
 
-        if (
-            $user->tipo !== 'admin' &&
-            $user->id != $alumno->ID_Tutor
-        ) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ( $user->tipo !== 'admin' && $user->id != $alumno->ID_Tutor ) {
+            return response()->json(
+                [
+                    'message' => 'No autorizado',
+                    'tipo-Usuario' => $user->tipo,
+                    'ID-Usuario' => $user->id,
+                    'ID-Alumno' => $idAlumno,
+                    'user' => $user
+                ]
+                , 403);
         }
 
         // updateOrCreate
-        $nota = NotaEgibide::updateOrCreate(
-            [
+        $nota = NotaEgibide::updateOrCreate([
                 'ID_Alumno' => $idAlumno,
                 'ID_Asignatura' => $request->id_asignatura,
             ],
@@ -212,5 +214,32 @@ class AlumnoController extends Controller
             'message' => 'Instructor asignado correctamente',
             'alumno' => $alumno->load(['instructor.user'])
         ]);
+    }
+    public function alumnosDeTutorClases($idTutor)
+    {
+        // 1. Obtenemos los IDs de los grados donde imparte clase el tutor
+        // Nota: Asegúrate de que los nombres de las columnas 'ID_Tutor' e 'ID_Grado'
+        // sean exactos a tu base de datos (a veces son id_tutor/id_grado)
+        $gradosIds = \DB::table('tutor_grado')
+            ->where('ID_Tutor', $idTutor)
+            ->pluck('ID_Grado');
+
+        // 2. Buscamos los alumnos con las MISMAS relaciones que la función 1
+        $alumnos = Alumno::whereIn('ID_Grado', $gradosIds)
+            ->with([
+                'usuario:id,nombre,apellidos,email,tipo',
+                'grado:id,nombre',
+                'estanciaActual.empresa', // <--- El nombre correcto es este
+                'instructor.user'
+            ])
+            ->get();
+
+        // 3. Mapeo para compatibilidad con tu Frontend
+        // Como en tu Vue buscas "estancia_actual" pero Laravel devuelve "estanciaActual"
+        $alumnos->each(function($alumno) {
+            $alumno->estancia_actual = $alumno->estanciaActual;
+        });
+
+        return response()->json($alumnos);
     }
 }
